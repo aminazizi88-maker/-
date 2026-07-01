@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(*)",
+      "Glob(*)",
+      "Grep(*)",
+      "Bash(git status)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Bash(wc -l*)",
+      "Bash(ls*)"
+    ]
+  },
+  "env": {},
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Read",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '[Claude] فقط بخش مرتبط را بخوان — offset+limit استفاده کن'"
+          }
+        ]
+      }
+    ]
+  }
+}
