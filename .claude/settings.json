@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git status)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Bash(git add*)",
+      "Bash(git commit*)",
+      "Bash(git push*)",
+      "Bash(git fetch*)",
+      "Bash(git branch*)",
+      "Bash(git checkout*)",
+      "Bash(ls*)",
+      "Bash(wc*)",
+      "Bash(grep*)",
+      "Bash(find*)",
+      "Read(*)",
+      "Glob(*)"
+    ],
+    "deny": []
+  },
+  "env": {},
+  "includeCoAuthoredBy": true,
+  "cleanupPeriodDays": 30
+}
