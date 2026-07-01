@@ -1,0 +1,2209 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>سیستم جامع محاسبه پاداش قهرمانان ورزشی</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+  --teal: #0d6e8a; --teal-dark: #084f64; --teal-light: #1a8fab; --teal-ultra-light: #e8f4f8;
+  --gold: #c9a227; --gold-light: #e8be45; --gold-ultra-light: #fdf8ec;
+  --silver: #8c9ab0; --bronze: #a0674a;
+  --white: #ffffff; --bg: #f0f5f8; --card: #ffffff;
+  --text: #1a2634; --text-muted: #5a7080; --border: #d0e0e8;
+  --success: #2a8a5a; --danger: #c0392b; --warning: #e67e22;
+  --radius: 12px; --shadow: 0 4px 20px rgba(13,110,138,.08); --shadow-lg: 0 8px 40px rgba(13,110,138,.15);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Vazirmatn', sans-serif; background: var(--bg); color: var(--text); direction: rtl; font-size: 14px; line-height: 1.7; }
+
+/* LOGIN */
+#login-screen { position:fixed; inset:0; background:linear-gradient(135deg,var(--teal-dark),var(--teal),#1a8fab); display:flex; align-items:center; justify-content:center; z-index:9999; }
+.login-box { background:white; border-radius:20px; padding:48px 40px; width:100%; max-width:420px; box-shadow:0 30px 80px rgba(0,0,0,.3); text-align:center; animation:loginIn .5s ease; }
+@keyframes loginIn { from { transform:scale(.85) translateY(40px); opacity:0; } to { transform:scale(1) translateY(0); opacity:1; } }
+.login-logo { font-size:56px; margin-bottom:8px; }
+.login-title { font-size:22px; font-weight:800; color:var(--teal-dark); margin-bottom:4px; }
+.login-subtitle { font-size:13px; color:var(--text-muted); margin-bottom:32px; }
+.login-field { margin-bottom:16px; text-align:right; }
+.login-field label { display:block; font-size:13px; font-weight:600; color:var(--text-muted); margin-bottom:6px; }
+.login-field input { width:100%; border:2px solid var(--border); border-radius:10px; padding:12px 16px; font-family:inherit; font-size:14px; transition:border-color .2s; direction:ltr; text-align:left; }
+.login-field input:focus { outline:none; border-color:var(--teal); box-shadow:0 0 0 3px rgba(13,110,138,.1); }
+.login-field input.error { border-color:var(--danger); }
+.login-btn { width:100%; background:linear-gradient(135deg,var(--teal-dark),var(--teal)); color:white; border:none; border-radius:10px; padding:13px; font-family:inherit; font-size:15px; font-weight:700; cursor:pointer; margin-top:8px; transition:all .2s; }
+.login-btn:hover { opacity:.9; transform:translateY(-1px); }
+.login-error { margin-top:12px; color:var(--danger); font-size:13px; font-weight:500; display:none; }
+
+/* TOPBAR */
+.topbar { background:linear-gradient(135deg,var(--teal-dark) 0%,var(--teal) 60%,var(--teal-light) 100%); color:white; padding:0 24px; display:flex; align-items:center; justify-content:space-between; height:64px; box-shadow:var(--shadow-lg); position:sticky; top:0; z-index:100; }
+.topbar-brand { display:flex; align-items:center; gap:12px; font-weight:700; font-size:18px; }
+.topbar-brand .medal-icon { font-size:28px; }
+.topbar-brand .brand-sub { font-size:11px; font-weight:400; opacity:.8; display:block; }
+.topbar-actions { display:flex; align-items:center; gap:8px; }
+.topbar-btn { background:rgba(255,255,255,.15); border:1px solid rgba(255,255,255,.25); color:white; padding:8px 14px; border-radius:8px; cursor:pointer; font-family:inherit; font-size:13px; display:flex; align-items:center; gap:6px; transition:all .2s; }
+.topbar-btn:hover { background:rgba(255,255,255,.25); }
+.topbar-btn.gold-btn { background:var(--gold); border-color:var(--gold-light); }
+.topbar-btn.gold-btn:hover { background:var(--gold-light); }
+.topbar-btn.danger-btn { background:rgba(192,57,43,.7); border-color:rgba(192,57,43,.9); }
+.topbar-btn.danger-btn:hover { background:var(--danger); }
+.user-info { display:flex; align-items:center; gap:8px; background:rgba(255,255,255,.12); padding:6px 12px; border-radius:20px; font-size:13px; border:1px solid rgba(255,255,255,.2); }
+
+/* NAV */
+.nav-tabs { background:white; border-bottom:2px solid var(--border); display:flex; padding:0 24px; gap:4px; overflow-x:auto; box-shadow:0 2px 8px rgba(0,0,0,.04); }
+.nav-tab { padding:14px 20px; cursor:pointer; border-bottom:3px solid transparent; font-weight:500; color:var(--text-muted); transition:all .2s; white-space:nowrap; display:flex; align-items:center; gap:8px; font-size:13px; }
+.nav-tab:hover { color:var(--teal); }
+.nav-tab.active { color:var(--teal); border-bottom-color:var(--teal); font-weight:700; }
+
+/* LAYOUT */
+.main { max-width:1500px; margin:0 auto; padding:24px 20px; }
+.page { display:none; }
+.page.active { display:block; }
+
+/* CARDS */
+.card { background:var(--card); border-radius:var(--radius); box-shadow:var(--shadow); padding:24px; margin-bottom:20px; border:1px solid var(--border); }
+.card-title { font-size:16px; font-weight:700; color:var(--teal-dark); margin-bottom:20px; display:flex; align-items:center; gap:10px; padding-bottom:12px; border-bottom:2px solid var(--teal-ultra-light); flex-wrap:wrap; }
+.card-title i { color:var(--gold); }
+
+/* FORM */
+.form-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:16px; }
+.form-group { display:flex; flex-direction:column; gap:6px; }
+.form-group label { font-weight:600; font-size:13px; color:var(--text-muted); }
+.form-group label span.req { color:var(--danger); margin-right:2px; }
+.form-control { border:2px solid var(--border); border-radius:8px; padding:10px 14px; font-family:inherit; font-size:14px; color:var(--text); background:white; transition:all .2s; direction:rtl; width:100%; }
+.form-control:focus { outline:none; border-color:var(--teal); box-shadow:0 0 0 3px rgba(13,110,138,.1); }
+.form-control.error { border-color:var(--danger); }
+.form-actions { display:flex; gap:10px; margin-top:20px; flex-wrap:wrap; }
+
+/* WEIGHTLIFTING SECTION */
+.wl-section { background:var(--gold-ultra-light); border:2px solid var(--gold); border-radius:10px; padding:16px; margin-top:14px; }
+.wl-section-title { font-weight:700; color:var(--gold); font-size:13px; margin-bottom:12px; display:flex; align-items:center; gap:8px; }
+.wl-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; }
+
+/* BUTTONS */
+.btn { padding:10px 22px; border-radius:8px; border:none; cursor:pointer; font-family:inherit; font-size:14px; font-weight:600; display:inline-flex; align-items:center; gap:8px; transition:all .2s; }
+.btn:hover { transform:translateY(-2px); box-shadow:var(--shadow); }
+.btn:active { transform:translateY(0); }
+.btn-primary { background:var(--teal); color:white; }
+.btn-primary:hover { background:var(--teal-dark); }
+.btn-secondary { background:var(--silver); color:white; }
+.btn-success { background:var(--success); color:white; }
+.btn-danger { background:var(--danger); color:white; }
+.btn-gold { background:var(--gold); color:white; }
+.btn-gold:hover { background:var(--gold-light); }
+.btn-green { background:#27ae60; color:white; }
+.btn-green:hover { background:#219150; }
+.btn-sm { padding:6px 12px; font-size:12px; }
+.btn-icon { padding:6px 10px; }
+.btn-cancel { background:#e0e8ef; color:var(--text); }
+.btn-cancel:hover { background:#c8d8e4; }
+
+/* FILTERS */
+.filters-bar { display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:16px; padding:16px; background:var(--teal-ultra-light); border-radius:var(--radius); border:1px solid var(--border); }
+.filters-bar .form-control { max-width:160px; }
+.search-input { flex:1; min-width:180px; max-width:280px !important; }
+
+/* TABLE */
+.table-wrap { overflow-x:auto; border-radius:var(--radius); }
+table { width:100%; border-collapse:collapse; font-size:13px; }
+thead th { background:linear-gradient(135deg,var(--teal-dark),var(--teal)); color:white; padding:12px 14px; text-align:right; font-weight:600; white-space:nowrap; }
+thead th:first-child { border-radius:0 var(--radius) 0 0; }
+thead th:last-child { border-radius:var(--radius) 0 0 0; }
+tbody tr { transition:background .15s; }
+tbody tr:hover { background:var(--teal-ultra-light); }
+tbody tr:nth-child(even) { background:#f8fbfc; }
+tbody td { padding:11px 14px; border-bottom:1px solid var(--border); vertical-align:middle; white-space:nowrap; }
+
+.badge { display:inline-flex; align-items:center; gap:4px; padding:3px 10px; border-radius:20px; font-size:12px; font-weight:600; }
+.badge-gold { background:#fdf3d0; color:#a07800; border:1px solid #e8d080; }
+.badge-silver { background:#f0f2f5; color:#5a6a80; border:1px solid #c0ccd8; }
+.badge-bronze { background:#fdf0ea; color:#8a4520; border:1px solid #e0b09a; }
+.badge-teal { background:var(--teal-ultra-light); color:var(--teal-dark); border:1px solid #b0d8e8; }
+.badge-male { background:#e8f0ff; color:#2040a0; border:1px solid #b0c8f0; }
+.badge-female { background:#ffe8f5; color:#a02060; border:1px solid #f0b0d8; }
+.badge-green { background:#e8f5ef; color:#1a6a40; border:1px solid #90d8b0; }
+.badge-orange { background:#fef3e2; color:#a05000; border:1px solid #e8c88a; }
+.badge-purple { background:#f5e8ff; color:#6020a0; border:1px solid #d0a8f0; }
+
+.amount-cell { font-weight:700; color:var(--teal-dark); font-size:13px; direction:ltr; text-align:left; }
+.empty-state { text-align:center; padding:60px 20px; color:var(--text-muted); }
+.empty-state i { font-size:48px; margin-bottom:16px; opacity:.3; }
+.coach-tag { font-size:11px; background:#e8f5ef; color:#1a6a40; border:1px solid #90d8b0; border-radius:10px; padding:2px 8px; }
+
+/* STAT CARDS */
+.stats-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:16px; margin-bottom:20px; }
+.stat-card { background:white; border-radius:var(--radius); padding:20px; border:1px solid var(--border); box-shadow:var(--shadow); display:flex; align-items:center; gap:16px; }
+.stat-icon { width:52px; height:52px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:22px; flex-shrink:0; }
+.stat-icon.teal { background:var(--teal-ultra-light); color:var(--teal); }
+.stat-icon.gold { background:var(--gold-ultra-light); color:var(--gold); }
+.stat-icon.silver { background:#f0f2f5; color:var(--silver); }
+.stat-icon.green { background:#e8f5ef; color:var(--success); }
+.stat-icon.orange { background:#fef3e2; color:var(--warning); }
+.stat-value { font-size:22px; font-weight:800; color:var(--teal-dark); line-height:1; }
+.stat-label { font-size:12px; color:var(--text-muted); margin-top:4px; }
+
+/* CHARTS */
+.charts-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+@media(max-width:768px) { .charts-grid { grid-template-columns:1fr; } }
+.chart-card { min-height:280px; }
+.chart-card canvas { max-height:220px; }
+.bar-stat { margin-bottom:10px; }
+.bar-stat-header { display:flex; justify-content:space-between; font-size:13px; margin-bottom:4px; }
+.bar-stat-bar { height:10px; background:var(--border); border-radius:5px; overflow:hidden; }
+.bar-stat-fill { height:100%; border-radius:5px; background:linear-gradient(90deg,var(--teal),var(--teal-light)); transition:width .5s ease; }
+
+/* SETTINGS */
+.settings-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+@media(max-width:768px) { .settings-grid { grid-template-columns:1fr; } }
+.settings-row { display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--border); gap:12px; }
+.settings-row:last-child { border-bottom:none; }
+.settings-label { font-weight:500; font-size:14px; }
+.settings-input { width:110px; border:2px solid var(--border); border-radius:8px; padding:7px 12px; font-family:inherit; font-size:14px; text-align:center; transition:border-color .2s; }
+.settings-input:focus { outline:none; border-color:var(--teal); }
+.settings-table { border-collapse:collapse; width:100%; font-size:13px; }
+.settings-table th, .settings-table td { border:1px solid var(--border); padding:6px 8px; text-align:center; white-space:nowrap; }
+.settings-table th { background:var(--teal-ultra-light); font-weight:700; }
+.settings-table .settings-input { width:68px; padding:4px 5px; font-size:12px; }
+
+/* MODAL */
+.modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:1000; align-items:center; justify-content:center; padding:20px; backdrop-filter:blur(4px); }
+.modal-overlay.open { display:flex; }
+.modal { background:white; border-radius:16px; max-width:760px; width:100%; max-height:90vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,.3); animation:modalIn .3s ease; }
+@keyframes modalIn { from { transform:scale(.9) translateY(20px); opacity:0; } to { transform:scale(1) translateY(0); opacity:1; } }
+.modal-header { padding:20px 24px; border-bottom:2px solid var(--border); display:flex; align-items:center; justify-content:space-between; background:linear-gradient(135deg,var(--teal-dark),var(--teal)); border-radius:16px 16px 0 0; color:white; }
+.modal-header h3 { font-size:17px; font-weight:700; }
+.modal-close { background:rgba(255,255,255,.2); border:none; color:white; width:32px; height:32px; border-radius:8px; cursor:pointer; font-size:16px; display:flex; align-items:center; justify-content:center; transition:background .2s; }
+.modal-close:hover { background:rgba(255,255,255,.35); }
+.modal-body { padding:24px; }
+
+/* IMPORT */
+.import-zone { border:2px dashed var(--teal); border-radius:var(--radius); padding:32px; text-align:center; cursor:pointer; transition:all .2s; background:var(--teal-ultra-light); margin-bottom:16px; }
+.import-zone:hover { background:#d0ecf5; border-color:var(--teal-dark); }
+.import-zone i { font-size:36px; color:var(--teal); margin-bottom:12px; display:block; }
+.import-zone p { color:var(--text-muted); font-size:14px; }
+.template-info { background:var(--gold-ultra-light); border:1px solid var(--gold); border-radius:8px; padding:14px 16px; font-size:13px; color:var(--text); margin-bottom:16px; }
+.template-info code { background:white; border:1px solid var(--border); border-radius:4px; padding:2px 6px; font-size:12px; direction:ltr; display:inline-block; }
+
+/* HELP */
+.help-section { margin-bottom:20px; }
+.help-section h4 { color:var(--teal-dark); font-size:15px; font-weight:700; margin-bottom:10px; display:flex; align-items:center; gap:8px; }
+.help-section h4 i { color:var(--gold); }
+.formula-box { background:var(--teal-ultra-light); border:2px solid var(--teal); border-radius:10px; padding:14px 18px; font-size:14px; font-weight:600; text-align:center; color:var(--teal-dark); line-height:2; }
+.help-list { list-style:none; padding:0; }
+.help-list li { padding:6px 0; border-bottom:1px solid var(--border); font-size:13px; display:flex; gap:8px; }
+.help-list li:last-child { border-bottom:none; }
+.help-list li::before { content:"◈"; color:var(--gold); flex-shrink:0; }
+
+/* BONUS PREVIEW */
+.bonus-preview { background:linear-gradient(135deg,#e8f8ee,#d0f0e0); border:2px solid var(--success); border-radius:12px; padding:18px 22px; margin-top:18px; display:none; }
+.bonus-preview-amount { font-size:26px; font-weight:800; color:var(--success); }
+.bonus-preview-label { font-size:13px; color:var(--text-muted); margin-bottom:4px; }
+.bonus-preview-formula { font-size:11px; color:var(--text-muted); margin-top:4px; direction:ltr; text-align:left; }
+.bonus-preview-staff { margin-top:12px; padding-top:12px; border-top:1px dashed #90d8b0; font-size:13px; }
+.bonus-preview-staff-row { display:flex; justify-content:space-between; padding:3px 0; }
+.bonus-preview-staff-row .role-name { color:var(--text-muted); }
+.bonus-preview-staff-row .role-amount { font-weight:700; color:var(--teal-dark); direction:ltr; }
+
+/* INFO BOX */
+.info-box { background:#e8f5ef; border:1px solid #90d8b0; border-radius:8px; padding:12px 16px; font-size:13px; color:#1a5030; margin-bottom:16px; display:flex; align-items:flex-start; gap:10px; }
+.warning-box { background:#fef3e2; border:1px solid var(--gold); border-radius:8px; padding:12px 16px; font-size:13px; color:#7a4500; margin-bottom:16px; display:flex; align-items:flex-start; gap:10px; }
+
+/* RULE TAG */
+.rule-tag { display:inline-flex; align-items:center; gap:4px; background:var(--gold-ultra-light); border:1px solid var(--gold); color:#7a4500; font-size:11px; border-radius:6px; padding:1px 8px; margin-right:4px; }
+
+/* SORTABLE HEADERS */
+thead th.sortable { cursor:pointer; user-select:none; }
+thead th.sortable:hover { background:linear-gradient(135deg,#063c4d,var(--teal-dark)); }
+.sort-ind { font-size:10px; opacity:.85; margin-right:2px; }
+
+/* DOLLAR CELL */
+.dollar-cell { font-weight:700; color:var(--success); font-size:13px; direction:ltr; text-align:left; }
+
+/* SETTINGS PAGE — BLACK TITLES */
+#page-settings .card-title { color:#000; }
+#page-settings .card-title i { color:#000; }
+#page-settings .section-div { color:#000; }
+
+/* CUSTOM FEDERATION INPUT */
+#f-federation-custom, #f-sport-custom { margin-top:6px; }
+
+/* PRINT */
+@media print {
+  @page { size:A4; margin:8mm; }
+  body { background:white; font-size:12px; }
+  #login-screen { display:none !important; }
+  .topbar, .nav-tabs, .form-actions, .filters-bar, .btn, .topbar-btn, .page:not(.active), .charts-grid, .no-print, .bonus-preview { display:none !important; }
+  .main { padding:0; max-width:100%; }
+  .card { box-shadow:none; border:1px solid #ccc; page-break-inside:avoid; }
+  .page.active { display:block !important; }
+  thead th { background:#084f64 !important; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  .badge { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  .print-header { display:block !important; }
+  #page-table { display:block !important; }
+  .stats-grid { display:grid !important; grid-template-columns:1fr 1fr 1fr 1fr !important; }
+}
+/* PRINT — SETTINGS A4 */
+@media print {
+  body.print-settings .page:not(#page-settings) { display:none !important; }
+  body.print-settings #page-settings { display:block !important; }
+  body.print-settings #page-settings .card-title { color:#000 !important; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  body.print-settings #page-settings .btn,
+  body.print-settings #page-settings .password-section { display:none !important; }
+  body.print-settings .settings-table { font-size:8.5px; width:100%; }
+  body.print-settings .settings-table th, body.print-settings .settings-table td { padding:2px 3px; }
+  body.print-settings .settings-input { border:none !important; background:transparent !important; width:auto !important; min-width:28px; font-size:8.5px; padding:0; text-align:center; }
+  body.print-settings .card { box-shadow:none; border:1px solid #999; padding:8px; margin-bottom:8px; page-break-inside:avoid; }
+  body.print-settings .settings-grid { grid-template-columns:1fr 1fr !important; gap:8px; }
+  body.print-settings .table-wrap { overflow:visible !important; }
+}
+.print-header { display:none; text-align:center; margin-bottom:20px; }
+.print-header h2 { color:var(--teal-dark); font-size:20px; }
+.print-header p { color:var(--text-muted); font-size:13px; }
+
+/* RESPONSIVE */
+@media(max-width:768px) {
+  .topbar { padding:0 12px; }
+  .topbar-brand span:not(.medal-icon) { display:none; }
+  .main { padding:16px 12px; }
+  .form-grid { grid-template-columns:1fr 1fr; }
+  .nav-tab span { display:none; }
+  .user-info span { display:none; }
+  .wl-grid { grid-template-columns:1fr; }
+}
+@media(max-width:480px) {
+  .form-grid { grid-template-columns:1fr; }
+  .stats-grid { grid-template-columns:1fr 1fr; }
+  .settings-grid { grid-template-columns:1fr; }
+}
+
+/* TOAST */
+#toast-container { position:fixed; bottom:24px; left:24px; z-index:9999; display:flex; flex-direction:column; gap:10px; }
+.toast { padding:12px 20px; border-radius:10px; color:white; font-size:14px; font-weight:500; box-shadow:var(--shadow-lg); display:flex; align-items:center; gap:10px; animation:slideIn .3s ease; max-width:340px; }
+@keyframes slideIn { from { transform:translateX(-100%); opacity:0; } to { transform:translateX(0); opacity:1; } }
+.toast.success { background:var(--success); }
+.toast.error { background:var(--danger); }
+.toast.info { background:var(--teal); }
+.toast.warning { background:var(--warning); }
+
+/* PASSWORD SECTION */
+.password-section { border:2px solid var(--teal-ultra-light); border-radius:var(--radius); padding:20px; margin-top:16px; background:var(--teal-ultra-light); }
+.password-section h4 { color:var(--teal-dark); font-size:15px; margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+
+/* SECTION DIVIDER */
+.section-div { font-size:13px; font-weight:700; color:var(--teal-dark); background:var(--teal-ultra-light); padding:6px 14px; border-radius:8px; margin:16px 0 10px; border-right:4px solid var(--teal); }
+
+/* STAFF TABLE in form */
+.staff-mini-table { width:100%; border-collapse:collapse; font-size:12px; margin-top:10px; }
+.staff-mini-table th, .staff-mini-table td { border:1px solid var(--border); padding:5px 8px; }
+.staff-mini-table th { background:var(--teal-ultra-light); font-weight:600; font-size:11px; }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">🏅</div>
+    <div class="login-title">سیستم محاسبه پاداش</div>
+    <div class="login-subtitle">قهرمانان ورزشی ایران — بر اساس دستورالعمل وزارت ورزش و جوانان</div>
+    <div class="login-field">
+      <label>نام کاربری</label>
+      <input type="text" id="login-user" placeholder="نام کاربری" autocomplete="username">
+    </div>
+    <div class="login-field">
+      <label>رمز عبور</label>
+      <input type="password" id="login-pass" placeholder="رمز عبور" autocomplete="current-password" onkeydown="if(event.key==='Enter') doLogin()">
+    </div>
+    <div class="login-error" id="login-error"><i class="fas fa-exclamation-circle"></i> نام کاربری یا رمز عبور اشتباه است.</div>
+    <button class="login-btn" onclick="doLogin()"><i class="fas fa-sign-in-alt"></i> ورود به سیستم</button>
+  </div>
+</div>
+
+<!-- TOPBAR -->
+<header class="topbar" id="main-header" style="display:none;">
+  <div class="topbar-brand">
+    <span class="medal-icon">🏅</span>
+    <div>
+      <span>سیستم جامع پاداش قهرمانان</span>
+      <span class="brand-sub">وزارت ورزش و جوانان — مواد ۱۲ تا ۱۷</span>
+    </div>
+  </div>
+  <div class="topbar-actions">
+    <div class="user-info"><i class="fas fa-user-circle"></i><span id="header-username">کاربر</span></div>
+    <button class="topbar-btn" onclick="openHelp()"><i class="fas fa-question-circle"></i><span>راهنما</span></button>
+    <button class="topbar-btn gold-btn" onclick="printReport()"><i class="fas fa-print"></i><span>چاپ</span></button>
+    <button class="topbar-btn danger-btn" onclick="doLogout()"><i class="fas fa-sign-out-alt"></i><span>خروج</span></button>
+  </div>
+</header>
+
+<!-- NAV TABS -->
+<nav class="nav-tabs" id="main-nav" style="display:none;">
+  <div class="nav-tab active" onclick="showTab('page-form')" id="tab-page-form"><i class="fas fa-plus-circle"></i><span>ورود اطلاعات</span></div>
+  <div class="nav-tab" onclick="showTab('page-table')" id="tab-page-table"><i class="fas fa-table"></i><span>جدول پاداش‌ها</span></div>
+  <div class="nav-tab" onclick="showTab('page-import')" id="tab-page-import"><i class="fas fa-file-excel"></i><span>ورود اکسل</span></div>
+  <div class="nav-tab" onclick="showTab('page-dashboard')" id="tab-page-dashboard"><i class="fas fa-chart-bar"></i><span>داشبورد</span></div>
+  <div class="nav-tab" onclick="showTab('page-settings')" id="tab-page-settings"><i class="fas fa-sliders-h"></i><span>تنظیمات</span></div>
+</nav>
+
+<div class="main" id="main-content" style="display:none;">
+
+  <div class="print-header" id="print-header">
+    <h2>🏅 سیستم محاسبه پاداش قهرمانان ورزشی</h2>
+    <p>گزارش پاداش‌ها — <span id="print-date"></span></p>
+    <hr style="margin:12px 0; border-color:#ccc;">
+  </div>
+
+  <!-- ==================== PAGE: FORM ==================== -->
+  <div class="page active" id="page-form">
+    <div class="card">
+      <div class="card-title">
+        <i class="fas fa-user-plus"></i> افزودن / ویرایش اطلاعات فرد
+        <span id="edit-indicator" style="display:none; margin-right:auto; background:var(--warning); color:white; padding:3px 12px; border-radius:20px; font-size:12px;"><i class="fas fa-edit"></i> حالت ویرایش</span>
+      </div>
+
+      <!-- ROW 1: Personal info -->
+      <div class="section-div"><i class="fas fa-user"></i> مشخصات فردی</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>نام و نام خانوادگی <span class="req">*</span></label>
+          <input type="text" id="f-name" class="form-control" placeholder="نام کامل ورزشکار">
+        </div>
+        <div class="form-group">
+          <label>جنسیت <span class="req">*</span></label>
+          <select id="f-gender" class="form-control">
+            <option value="">انتخاب...</option>
+            <option value="آقا">آقا</option>
+            <option value="خانم">خانم</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>رده سنی <span class="req">*</span></label>
+          <select id="f-agegroup" class="form-control" onchange="updatePreview()">
+            <option value="">انتخاب...</option>
+            <option value="بزرگسالان">بزرگسالان (ضریب ۱۰۰٪)</option>
+            <option value="جوانان">جوانان (ضریب ۵۰٪)</option>
+            <option value="امیدها">امیدها (ضریب ۵۰٪)</option>
+            <option value="نوجوانان">نوجوانان (ضریب ۳۰٪)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>فدراسیون / انجمن ورزشی <span class="req">*</span></label>
+          <select id="f-federation" class="form-control" onchange="onFederationChange()"></select>
+          <input type="text" id="f-federation-custom" class="form-control" placeholder="نام فدراسیون را دستی وارد کنید" style="display:none;" oninput="updatePreview()">
+        </div>
+        <div class="form-group">
+          <label>رشته / ماده</label>
+          <select id="f-sport" class="form-control"></select>
+          <input type="text" id="f-sport-custom" class="form-control" placeholder="نام رشته را دستی وارد کنید" style="display:none;">
+        </div>
+      </div>
+
+      <!-- ROW 2: Event info -->
+      <div class="section-div" style="margin-top:20px;"><i class="fas fa-trophy"></i> مشخصات رویداد</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>نوع رویداد <span class="req">*</span></label>
+          <select id="f-comp" class="form-control" onchange="onCompChange()"></select>
+        </div>
+        <div class="form-group">
+          <label>نوع شرکت <span class="req">*</span></label>
+          <select id="f-type" class="form-control" onchange="updatePreview()">
+            <option value="فردی">فردی</option>
+            <option value="تیمی">تیمی</option>
+          </select>
+        </div>
+        <div class="form-group" id="standard-medal-group">
+          <label>مدال / نتیجه <span class="req">*</span></label>
+          <select id="f-medal" class="form-control" onchange="updatePreview()">
+            <option value="طلا">🥇 طلا</option>
+            <option value="نقره">🥈 نقره</option>
+            <option value="برنز">🥉 برنز</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>ترتیب مدال در رویداد <span class="req">*</span></label>
+          <select id="f-medalorder" class="form-control" onchange="updatePreview()">
+            <option value="اول">مدال اول این ورزشکار (۱۰۰٪)</option>
+            <option value="بعدی">مدال‌های بعدی (۳۰٪)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>سال برگزاری <span class="req">*</span></label>
+          <input type="number" id="f-year" class="form-control" placeholder="مثلاً ۱۴۰۳" min="1380" max="1500">
+        </div>
+        <div class="form-group">
+          <label>محل برگزاری <span class="req">*</span></label>
+          <input type="text" id="f-location" class="form-control" placeholder="شهر / کشور">
+        </div>
+      </div>
+
+      <!-- WEIGHTLIFTING SECTION (conditionally shown, replaces standard medal field) -->
+      <div class="wl-section" id="wl-section" style="display:none;">
+        <div class="wl-section-title"><i class="fas fa-dumbbell"></i> وزنه‌برداری — نتایج کسب‌شده (جدول ۴ دستورالعمل)</div>
+        <div class="info-box" style="margin-bottom:14px;">
+          <i class="fas fa-info-circle"></i>
+          <span>اگر ورزشکار همزمان در یک‌ضرب، دوضرب و مجموع مدال بگیرد، فقط مدال «مجموع» ملاک پاداش است. در غیر این صورت، بهترین مدال میان یک‌ضرب و دوضرب (هر کدام ملاک ندارد) ملاک محاسبه قرار می‌گیرد. فیلدهایی را که ورزشکار مدالی در آن‌ها نگرفته «بدون مدال» بگذارید.</span>
+        </div>
+        <div class="wl-grid">
+          <div class="form-group">
+            <label>مدال یک‌ضرب</label>
+            <select id="f-wl-snatch" class="form-control" onchange="updatePreview()">
+              <option value="—">بدون مدال</option>
+              <option value="طلا">🥇 طلا</option>
+              <option value="نقره">🥈 نقره</option>
+              <option value="برنز">🥉 برنز</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>مدال دو‌ضرب</label>
+            <select id="f-wl-cj" class="form-control" onchange="updatePreview()">
+              <option value="—">بدون مدال</option>
+              <option value="طلا">🥇 طلا</option>
+              <option value="نقره">🥈 نقره</option>
+              <option value="برنز">🥉 برنز</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>مدال مجموع</label>
+            <select id="f-wl-total" class="form-control" onchange="updatePreview()">
+              <option value="—">بدون مدال</option>
+              <option value="طلا">🥇 طلا</option>
+              <option value="نقره">🥈 نقره</option>
+              <option value="برنز">🥉 برنز</option>
+            </select>
+          </div>
+        </div>
+        <div id="wl-rule-result" style="margin-top:12px; font-size:12px; color:var(--teal-dark); font-weight:600;"></div>
+      </div>
+
+      <!-- ROW 3: Staff/Coach -->
+      <div class="section-div" style="margin-top:20px;"><i class="fas fa-users"></i> کادر فنی و پزشکی (اختیاری)</div>
+      <div class="form-grid">
+        <div class="form-group" style="grid-column:1/-1;">
+          <label>نقش فرد ثبت‌شده <span class="req">*</span></label>
+          <select id="f-role" class="form-control" onchange="updatePreview()" style="max-width:280px;">
+            <option value="ورزشکار">ورزشکار</option>
+            <option value="سرمربی">سرمربی</option>
+            <option value="مربی">مربی</option>
+            <option value="کادر پزشکی">کادر پزشکی</option>
+            <option value="سرپرست">سرپرست</option>
+            <option value="تکنیسین">تکنیسین / مکانیسین / تدارکات</option>
+            <option value="آنالیزور">آنالیزور / مربی بدنساز / ماساژور</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- BONUS PREVIEW -->
+      <div class="bonus-preview" id="bonus-preview">
+        <div class="bonus-preview-label">پاداش محاسبه‌شده بر اساس اطلاعات وارد شده:</div>
+        <div class="bonus-preview-amount" id="preview-amount">۰ ریال</div>
+        <div class="bonus-preview-formula" id="preview-formula"></div>
+        <div class="bonus-preview-staff" id="preview-staff" style="display:none;"></div>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn btn-green" id="submit-btn" onclick="submitForm()"><i class="fas fa-plus-circle"></i> افزودن</button>
+        <button class="btn btn-cancel" onclick="clearForm()"><i class="fas fa-times"></i> پاک‌کردن</button>
+        <button class="btn btn-cancel" id="cancel-edit-btn" style="display:none;" onclick="cancelEdit()"><i class="fas fa-ban"></i> لغو ویرایش</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== PAGE: TABLE ==================== -->
+  <div class="page" id="page-table">
+    <div class="stats-grid" id="table-stats"></div>
+    <div class="card">
+      <div class="card-title">
+        <i class="fas fa-table"></i> جدول پاداش‌ها
+        <div style="margin-right:auto; display:flex; gap:8px; flex-wrap:wrap;" class="no-print">
+          <button class="btn btn-green btn-sm" onclick="exportToExcel()"><i class="fas fa-file-excel"></i> خروجی اکسل</button>
+          <button class="btn btn-gold btn-sm" onclick="printReport()"><i class="fas fa-print"></i> چاپ</button>
+        </div>
+      </div>
+      <div class="filters-bar no-print">
+        <input type="text" id="search-input" class="form-control search-input" placeholder="🔍 جستجوی نام..." oninput="renderTable()">
+        <select id="filter-comp" class="form-control" onchange="renderTable()"><option value="">همه رویدادها</option></select>
+        <select id="filter-fed" class="form-control" onchange="renderTable()"><option value="">همه فدراسیون‌ها</option></select>
+        <select id="filter-medal" class="form-control" onchange="renderTable()">
+          <option value="">همه مدال‌ها</option>
+          <option value="طلا">🥇 طلا</option>
+          <option value="نقره">🥈 نقره</option>
+          <option value="برنز">🥉 برنز</option>
+        </select>
+        <select id="filter-role" class="form-control" onchange="renderTable()">
+          <option value="">همه نقش‌ها</option>
+          <option value="ورزشکار">ورزشکار</option>
+          <option value="سرمربی">سرمربی</option>
+          <option value="مربی">مربی</option>
+          <option value="کادر پزشکی">کادر پزشکی</option>
+          <option value="سرپرست">سرپرست</option>
+          <option value="تکنیسین">تکنیسین</option>
+          <option value="آنالیزور">آنالیزور</option>
+        </select>
+        <select id="filter-year" class="form-control" onchange="renderTable()"><option value="">همه سال‌ها</option></select>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ردیف</th>
+              <th class="sortable" onclick="sortTable('name')">نام <span class="sort-ind" data-k="name"></span></th>
+              <th class="sortable" onclick="sortTable('gender')">جنسیت <span class="sort-ind" data-k="gender"></span></th>
+              <th class="sortable" onclick="sortTable('agegroup')">رده سنی <span class="sort-ind" data-k="agegroup"></span></th>
+              <th class="sortable" onclick="sortTable('federation')">فدراسیون/انجمن <span class="sort-ind" data-k="federation"></span></th>
+              <th class="sortable" onclick="sortTable('sport')">رشته <span class="sort-ind" data-k="sport"></span></th>
+              <th class="sortable" onclick="sortTable('role')">نقش <span class="sort-ind" data-k="role"></span></th>
+              <th class="sortable" onclick="sortTable('comp')">رویداد <span class="sort-ind" data-k="comp"></span></th>
+              <th class="sortable" onclick="sortTable('type')">نوع <span class="sort-ind" data-k="type"></span></th>
+              <th class="sortable" onclick="sortTable('year')">سال <span class="sort-ind" data-k="year"></span></th>
+              <th>محل</th>
+              <th class="sortable" onclick="sortTable('medal')">مدال <span class="sort-ind" data-k="medal"></span></th>
+              <th>ترتیب مدال</th>
+              <th class="sortable" onclick="sortTable('bonus')">پاداش (ریال) <span class="sort-ind" data-k="bonus"></span></th>
+              <th class="sortable" onclick="sortTable('dollar')">پاداش (دلار) <span class="sort-ind" data-k="dollar"></span></th>
+              <th>ضریب نقش اعمال‌شده</th><th class="no-print">عملیات</th>
+            </tr>
+          </thead>
+          <tbody id="main-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== PAGE: IMPORT ==================== -->
+  <div class="page" id="page-import">
+    <div class="card">
+      <div class="card-title"><i class="fas fa-file-excel"></i> ورود گروهی از اکسل</div>
+      <div class="template-info">
+        <strong><i class="fas fa-info-circle"></i> فهرست کامل ستون‌های فایل اکسل ورودی:</strong>
+        <table class="staff-mini-table" style="margin-top:10px; font-size:12px;">
+          <thead><tr><th>#</th><th>عنوان ستون</th><th>وضعیت</th><th>مقادیر مجاز / توضیح</th></tr></thead>
+          <tbody>
+            <tr><td>۱</td><td><code>نام</code></td><td>اجباری</td><td>نام و نام خانوادگی فرد</td></tr>
+            <tr><td>۲</td><td><code>جنسیت</code></td><td>اختیاری</td><td>آقا / خانم (پیش‌فرض: آقا)</td></tr>
+            <tr><td>۳</td><td><code>رده سنی</code></td><td>اختیاری</td><td>بزرگسالان / جوانان / امیدها / نوجوانان</td></tr>
+            <tr><td>۴</td><td><code>فدراسیون</code></td><td>اختیاری</td><td>یکی از ۵۴ فدراسیون / انجمن ورزشی کشور</td></tr>
+            <tr><td>۵</td><td><code>رشته</code></td><td>اختیاری</td><td>رشته یا ماده ورزشی زیرمجموعه فدراسیون</td></tr>
+            <tr><td>۶</td><td><code>نقش</code></td><td>اختیاری</td><td>ورزشکار / سرمربی / مربی / کادر پزشکی / سرپرست / تکنیسین / آنالیزور</td></tr>
+            <tr><td>۷</td><td><code>رویداد</code></td><td>اجباری</td><td>یکی از عناوین رویدادهای جدول‌های ۱ تا ۴ دستورالعمل</td></tr>
+            <tr><td>۸</td><td><code>نوع شرکت</code></td><td>اختیاری</td><td>فردی / تیمی (پیش‌فرض: فردی)</td></tr>
+            <tr><td>۹</td><td><code>مدال</code></td><td>اختیاری</td><td>طلا / نقره / برنز (پیش‌فرض: طلا)</td></tr>
+            <tr><td>۱۰</td><td><code>ترتیب مدال</code></td><td>اختیاری</td><td>اول / بعدی (پیش‌فرض: اول)</td></tr>
+            <tr><td>۱۱</td><td><code>سال</code></td><td>اختیاری</td><td>سال برگزاری رویداد (شمسی)</td></tr>
+            <tr><td>۱۲</td><td><code>محل</code></td><td>اختیاری</td><td>محل برگزاری رویداد (شهر / کشور)</td></tr>
+          </tbody>
+        </table>
+        <p style="margin-top:10px; font-size:12px; color:var(--text-muted);">
+          ترتیب ستون‌ها اهمیتی ندارد، فقط عنوان ستون‌ها باید مطابق جدول بالا باشد. می‌توانید با دکمه «دانلود فایل نمونه» یک الگوی آماده دریافت کنید.
+        </p>
+      </div>
+      <div class="import-zone" onclick="document.getElementById('import-file').click()">
+        <i class="fas fa-cloud-upload-alt"></i>
+        <p><strong>کلیک کنید</strong> یا فایل را اینجا رها کنید</p>
+        <p>فایل‌های .xlsx و .xls پشتیبانی می‌شوند</p>
+      </div>
+      <input type="file" id="import-file" accept=".xlsx,.xls" style="display:none;" onchange="handleImportFile(event)">
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <button class="btn btn-secondary" onclick="downloadTemplate()"><i class="fas fa-download"></i> دانلود فایل نمونه</button>
+      </div>
+    </div>
+    <div class="card" id="import-preview-card" style="display:none;">
+      <div class="card-title"><i class="fas fa-eye"></i> پیش‌نمایش داده‌های وارد‌شده</div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ردیف</th><th>نام</th><th>جنسیت</th><th>رده سنی</th><th>نقش</th>
+              <th>رویداد</th><th>نوع</th><th>مدال</th><th>ترتیب</th><th>سال</th><th>محل</th>
+              <th>پاداش (ریال)</th><th>وضعیت</th>
+            </tr>
+          </thead>
+          <tbody id="import-tbody"></tbody>
+        </table>
+      </div>
+      <div style="margin-top:16px; display:flex; gap:10px;" class="no-print">
+        <button class="btn btn-success" onclick="confirmImport()"><i class="fas fa-check"></i> تأیید و ذخیره</button>
+        <button class="btn btn-cancel" onclick="cancelImport()"><i class="fas fa-times"></i> لغو</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== PAGE: DASHBOARD ==================== -->
+  <div class="page" id="page-dashboard">
+    <div class="stats-grid" id="dash-stats"></div>
+    <div class="charts-grid">
+      <div class="card chart-card"><div class="card-title"><i class="fas fa-chart-bar"></i> پاداش به تفکیک رویداد</div><canvas id="chart-comp"></canvas></div>
+      <div class="card chart-card"><div class="card-title"><i class="fas fa-chart-pie"></i> توزیع مدال‌ها</div><canvas id="chart-medal"></canvas></div>
+    </div>
+    <div class="charts-grid">
+      <div class="card chart-card"><div class="card-title"><i class="fas fa-venus-mars"></i> توزیع جنسیتی</div><canvas id="chart-gender"></canvas></div>
+      <div class="card chart-card"><div class="card-title"><i class="fas fa-chart-line"></i> روند پاداش به تفکیک سال</div><canvas id="chart-year"></canvas></div>
+    </div>
+    <div class="charts-grid">
+      <div class="card chart-card"><div class="card-title"><i class="fas fa-landmark"></i> پاداش به تفکیک فدراسیون (۱۰ برتر)</div><canvas id="chart-fed"></canvas></div>
+      <div class="card chart-card"><div class="card-title"><i class="fas fa-ranking-star"></i> ۱۰ فرد با بیشترین پاداش</div><canvas id="chart-top"></canvas></div>
+    </div>
+    <div class="charts-grid">
+      <div class="card chart-card"><div class="card-title"><i class="fas fa-money-bill-wave"></i> پاداش دلاری به تفکیک رده سنی</div><canvas id="chart-agebonus"></canvas></div>
+      <div class="card chart-card"><div class="card-title"><i class="fas fa-users-gear"></i> پاداش ورزشکار در برابر کادر</div><canvas id="chart-athstaff"></canvas></div>
+    </div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-top:0;">
+      <div class="card"><div class="card-title"><i class="fas fa-users"></i> توزیع نقش‌ها</div><div id="role-bars"></div></div>
+      <div class="card"><div class="card-title"><i class="fas fa-birthday-cake"></i> توزیع رده سنی</div><div id="age-bars"></div></div>
+    </div>
+  </div>
+
+  <!-- ==================== PAGE: SETTINGS ==================== -->
+  <div class="page" id="page-settings">
+    <div class="card no-print" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; padding:16px 24px;">
+      <div style="font-weight:700; color:#000; font-size:15px;"><i class="fas fa-sliders-h" style="color:var(--gold);"></i> تنظیمات جداول و ضرایب دستورالعمل</div>
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <button class="btn btn-gold btn-sm" onclick="printSettings()"><i class="fas fa-print"></i> چاپ A4 تنظیمات</button>
+        <button class="btn btn-primary btn-sm" onclick="saveSettings()"><i class="fas fa-save"></i> ذخیره تنظیمات</button>
+      </div>
+    </div>
+    <!-- Event Table (full, all 4 tables) -->
+    <div class="card">
+      <div class="card-title"><i class="fas fa-trophy"></i> جدول ۱ — پاداش رویدادهای چندرشته‌ای (واحد: امتیاز)</div>
+      <div class="table-wrap"><table class="settings-table" id="st-table1"></table></div>
+    </div>
+    <div class="settings-grid">
+      <div class="card">
+        <div class="card-title"><i class="fas fa-globe"></i> جدول ۲ — قهرمانی جهان (واحد: امتیاز)</div>
+        <div class="table-wrap"><table class="settings-table" id="st-table2"></table></div>
+      </div>
+      <div class="card">
+        <div class="card-title"><i class="fas fa-map"></i> جدول ۳ — قهرمانی آسیا (واحد: امتیاز)</div>
+        <div class="table-wrap"><table class="settings-table" id="st-table3"></table></div>
+      </div>
+    </div>
+    <div class="settings-grid">
+      <div class="card">
+        <div class="card-title"><i class="fas fa-dumbbell"></i> جدول ۴ الف — وزنه‌برداری مجموع</div>
+        <div class="table-wrap"><table class="settings-table" id="st-table4a"></table></div>
+      </div>
+      <div class="card">
+        <div class="card-title"><i class="fas fa-dumbbell"></i> جدول ۴ ب — وزنه‌برداری یک‌ضرب / دو‌ضرب</div>
+        <div class="table-wrap"><table class="settings-table" id="st-table4b"></table></div>
+      </div>
+    </div>
+    <div class="settings-grid">
+      <div class="card">
+        <div class="card-title"><i class="fas fa-users"></i> جدول ۵ — ضرایب کادر فنی، پزشکی و مدیریتی</div>
+        <div id="st-table5"></div>
+      </div>
+      <div class="card">
+        <div class="card-title"><i class="fas fa-sliders-h"></i> سایر تنظیمات</div>
+        <div class="settings-row">
+          <span class="settings-label">ارزش ریالی هر امتیاز (ریال)</span>
+          <input type="number" id="base-point-value" class="settings-input" min="0" step="1000">
+        </div>
+        <div class="settings-row">
+          <span class="settings-label">💵 نرخ روز دلار (ریال به ازای هر دلار)</span>
+          <input type="number" id="dollar-rate" class="settings-input" style="width:150px;" min="0" step="1000" placeholder="مثلاً ۷۰۰۰۰۰" oninput="settings.dollarRate=Math.max(0, parseInt(this.value)||0); saveSettingsToStorage(); renderTable(); refreshDashboard();">
+        </div>
+        <div class="section-div" style="margin:14px 0 8px;">ضرایب رده سنی (ماده ۱۷ بند ۴)</div>
+        <div id="st-age-coefs"></div>
+        <div style="margin-top:18px; text-align:left;">
+          <button class="btn btn-primary" onclick="saveSettings()"><i class="fas fa-save"></i> ذخیره تنظیمات</button>
+          <button class="btn btn-cancel" style="margin-right:8px;" onclick="resetSettings()"><i class="fas fa-undo"></i> بازنشانی</button>
+        </div>
+        <div class="password-section" style="margin-top:20px;">
+          <h4><i class="fas fa-lock"></i> تغییر رمز عبور</h4>
+          <div class="form-group" style="margin-bottom:10px;"><label>رمز فعلی</label><input type="password" id="pw-old" class="form-control"></div>
+          <div class="form-group" style="margin-bottom:10px;"><label>رمز جدید</label><input type="password" id="pw-new" class="form-control"></div>
+          <div class="form-group" style="margin-bottom:12px;"><label>تکرار رمز جدید</label><input type="password" id="pw-new2" class="form-control"></div>
+          <button class="btn btn-primary btn-sm" onclick="changePassword()"><i class="fas fa-key"></i> تغییر رمز</button>
+        </div>
+      </div>
+    </div>
+
+    <div style="text-align:center; padding:20px; margin-top:8px; color:var(--text-muted); font-size:13px; border-top:1px solid var(--border);">
+      <i class="fas fa-code" style="color:var(--gold);"></i> تهیه‌کننده: <strong style="color:var(--teal-dark);">امین عزیزی مقدم</strong>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<!-- HELP MODAL -->
+<div class="modal-overlay" id="help-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3><i class="fas fa-question-circle"></i> راهنمای سیستم پاداش</h3>
+      <button class="modal-close" onclick="closeHelp()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="help-section">
+        <h4><i class="fas fa-calculator"></i> فرمول محاسبه (ماده ۱۵)</h4>
+        <div class="formula-box">
+          پاداش = امتیاز جدول × ارزش ریالی هر امتیاز × ضریب رده سنی × ضریب ترتیب مدال
+        </div>
+      </div>
+      <div class="help-section">
+        <h4><i class="fas fa-users"></i> پاداش کادر فنی و پزشکی (ماده ۱۶ — جدول ۵)</h4>
+        <table class="staff-mini-table">
+          <thead><tr><th>سمت</th><th>انفرادی — مدال اول</th><th>انفرادی — مدال‌های بعدی</th><th>تیمی</th></tr></thead>
+          <tbody>
+            <tr><td>سرمربی</td><td>۵۰٪ جایزه ورزشکار</td><td>۱۰٪ جایزه ورزشکار</td><td>معادل ورزشکار</td></tr>
+            <tr><td>مربی</td><td>۳۰٪ جایزه ورزشکار</td><td>۵٪ جایزه ورزشکار</td><td>۴۰٪ جایزه ورزشکار</td></tr>
+            <tr><td>کادر پزشکی</td><td colspan="2">۵٪ جایزه بهترین مدال</td><td>۵٪ جایزه ورزشکار</td></tr>
+            <tr><td>سرپرست</td><td colspan="2">۱۵٪ جایزه بهترین مدال</td><td>۱۰٪ جایزه ورزشکار</td></tr>
+            <tr><td>تکنیسین</td><td colspan="2">۵٪ جایزه بهترین مدال</td><td>۵٪ جایزه ورزشکار</td></tr>
+            <tr><td>آنالیزور</td><td colspan="2">۵٪ جایزه ورزشکار</td><td>۵٪ جایزه بهترین مدال</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="help-section">
+        <h4><i class="fas fa-list-ol"></i> الزامات مهم (ماده ۱۷)</h4>
+        <ul class="help-list">
+          <li>کسب چند مدال در یک رویداد: مدال اول ۱۰۰٪ — مدال‌های بعدی ۳۰٪ ارزش مدال.</li>
+          <li>رده‌های سنی: بزرگسالان ۱۰۰٪ — جوانان و امید ۵۰٪ — نوجوانان ۳۰٪.</li>
+          <li>ناشنوایان: معادل ۶۰٪ سطح دوم فدراسیون‌ها.</li>
+          <li>بیماری‌های خاص: معادل ۲۰٪ سطح دوم فدراسیون‌ها.</li>
+          <li>مسابقات دوبل: معادل فردی — بالاتر از آن معادل تیمی.</li>
+          <li>وزنه‌برداران موفق به کسب مدال در مجموع از جدول الف بهره‌مند می‌شوند.</li>
+          <li>به هر نفر به‌عنوان سرپرست فقط یک بار در سال پاداش تعلق می‌گیرد.</li>
+        </ul>
+      </div>
+      <div class="help-section">
+        <h4><i class="fas fa-key"></i> ورود به سیستم</h4>
+        <ul class="help-list">
+          <li>نام کاربری پیش‌فرض: <strong>admin</strong></li>
+          <li>رمز عبور پیش‌فرض: <strong>admin1234</strong></li>
+          <li>می‌توانید رمز عبور را از بخش «تنظیمات» تغییر دهید.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="text-align:center; padding:14px 8px; font-size:12px; color:var(--text-muted); border-top:1px solid var(--border); margin-top:8px;">
+  دسته‌بندی: پاداش قهرمانان &nbsp;|&nbsp; تنظیم‌کننده: امین عزیزی مقدم
+</div>
+
+<div id="toast-container"></div>
+
+<script>
+// ============================================================
+//  DATA CONSTANTS — All tables from ministry instruction
+// ============================================================
+
+// Table 1: Multi-sport events (امتیاز)
+const DEFAULT_TABLE1 = {
+  'بازی‌های المپیک':                    { فردی:{ طلا:400, نقره:250, برنز:150 }, تیمی:{ طلا:200, نقره:120, برنز:70 } },
+  'بازی‌های پارالمپیک':                   { فردی:{ طلا:400, نقره:250, برنز:150 }, تیمی:{ طلا:200, نقره:120, برنز:70 } },
+  'بازی‌های آسیایی':                     { فردی:{ طلا:180, نقره:100, برنز:50  }, تیمی:{ طلا:90,  نقره:50,  برنز:25  } },
+  'بازی‌های پاراآسیایی':                   { فردی:{ طلا:180, نقره:100, برنز:50  }, تیمی:{ طلا:90,  نقره:50,  برنز:25  } },
+  'بازی‌های المپیک جوانان':                { فردی:{ طلا:40,  نقره:20,  برنز:10  }, تیمی:{ طلا:20,  نقره:10,  برنز:5   } },
+  'بازی‌های پارالمپیک جوانان':              { فردی:{ طلا:40,  نقره:20,  برنز:10  }, تیمی:{ طلا:20,  نقره:10,  برنز:5   } },
+  'کامیت‌گیمز، ورلدگیمز، ساحلی جهان':       { فردی:{ طلا:20,  نقره:10,  برنز:5   }, تیمی:{ طلا:10,  نقره:5,   برنز:2.5 } },
+  'بازی‌های کشورهای اسلامی و آسیایی جوانان': { فردی:{ طلا:18,  نقره:10,  برنز:5   }, تیمی:{ طلا:9,   نقره:5,   برنز:2.5 } },
+  'پاراآسیایی جوانان':                    { فردی:{ طلا:18,  نقره:10,  برنز:5   }, تیمی:{ طلا:9,   نقره:5,   برنز:2.5 } },
+  'ساحلی، سالنی، رزمی آسیا':              { فردی:{ طلا:9,   نقره:5,   برنز:2.5 }, تیمی:{ طلا:4.5, نقره:2.5, برنز:1.25} }
+};
+
+// Table 2: World Championships (امتیاز)
+const DEFAULT_TABLE2 = {
+  'قهرمانی جهان (گروه اول)': { فردی:{ طلا:100, نقره:50, برنز:30 }, تیمی:{ طلا:50, نقره:25, برنز:15 } },
+  'قهرمانی جهان (گروه دوم)': { فردی:{ طلا:60,  نقره:30, برنز:20 }, تیمی:{ طلا:30, نقره:15, برنز:10 } }
+};
+
+// Table 3: Asian Championships (امتیاز)
+const DEFAULT_TABLE3 = {
+  'قهرمانی آسیا (گروه اول)': { فردی:{ طلا:40, نقره:20, برنز:10 }, تیمی:{ طلا:20, نقره:10, برنز:5 } },
+  'قهرمانی آسیا (گروه دوم)': { فردی:{ طلا:25, نقره:10, برنز:5  }, تیمی:{ طلا:12, نقره:5,  برنز:3 } }
+};
+
+// Table 4a: Weightlifting Total (مجموع) (امتیاز)
+const DEFAULT_TABLE4A = {
+  'وزنه‌برداری - قهرمانی جهان (گروه اول) مجموع': { جهان:{ طلا:100, نقره:50, برنز:30 }, آسیا:{ طلا:40, نقره:20, برنز:10 } }
+};
+
+// Table 4b: Weightlifting Snatch/CJ combo (امتیاز)
+// مطابق متن دقیق دستورالعمل (جدول ب): ترکیب مدال‌های یک‌ضرب و دوضرب
+// Key format: "medal1_medal2" (مرتب‌شده نزولی: طلا > نقره > برنز) => { جهان, آسیا }
+// کلید با پسوند "_تنها" یعنی فقط یکی از دو حرکت (یک‌ضرب یا دوضرب) مدال دارد و دیگری بدون مدال است
+const DEFAULT_TABLE4B = {
+  'طلا_طلا':    { جهان:50, آسیا:20 },   // دو مدال طلا (یک‌ضرب و دوضرب)
+  'طلا_برنز':   { جهان:40, آسیا:15 },   // یک طلا + یک برنز
+  'نقره_نقره':  { جهان:40, آسیا:15 },   // دو مدال نقره
+  'نقره_برنز':  { جهان:20, آسیا:10 },   // یک نقره + یک برنز
+  'برنز_برنز':  { جهان:10, آسیا:8  },   // دو مدال برنز
+  'طلا_تنها':   { جهان:20, آسیا:10 },   // فقط یک طلا (در یکی از دو حرکت، دیگری بدون مدال)
+  'نقره_تنها':  { جهان:10, آسیا:8  },   // فقط یک نقره
+  'برنز_تنها':  { جهان:5,  آسیا:4  }    // فقط یک برنز
+};
+
+// Table 5: Staff percentages (ماده ۱۶)
+// Format: { role: { individual: { first: x, next: y }, team: z } }
+// For medical/supervisor/tech: pct of best medal (not sequential)
+const DEFAULT_TABLE5 = {
+  'سرمربی':   { نوع:'sequential', انفرادی:{ اول:0.50, بعدی:0.10 }, تیمی:'معادل_ورزشکار' },
+  'مربی':     { نوع:'sequential', انفرادی:{ اول:0.30, بعدی:0.05 }, تیمی:0.40 },
+  'کادر پزشکی':{ نوع:'best_medal', انفرادی:0.05, تیمی:0.05 },
+  'سرپرست':   { نوع:'best_medal', انفرادی:0.15, تیمی:0.10 },
+  'تکنیسین':  { نوع:'best_medal', انفرادی:0.05, تیمی:0.05 },
+  'آنالیزور':  { نوع:'athlete_pct', انفرادی:0.05, تیمی:'best_medal_0.05' }
+};
+
+// Age group coefficients (ماده ۱۷ بند ۴)
+const DEFAULT_AGE_COEFS = {
+  'بزرگسالان': 1.0,
+  'جوانان':    0.5,
+  'امیدها':    0.5,
+  'نوجوانان':  0.3
+};
+
+// Medal order coefficients (ماده ۱۷ بند ۱)
+const MEDAL_ORDER_COEFS = { 'اول': 1.0, 'بعدی': 0.3 };
+
+// تابع واحد برای خواندن ضریب سنی — جایگزین استفادهٔ ناهماهنگ از `!== undefined` در یک‌جا
+// و `|| 1` در جای دیگر (که اگر ضریبی صفر تعریف می‌شد، عدداً اشتباه محاسبه می‌شد)
+function getAgeCoef(agegroup) {
+  const c = settings.ageCoefs[agegroup];
+  return (c !== undefined && c !== null) ? c : 1;
+}
+
+// Default base point value (ارزش ریالی هر امتیاز)
+const DEFAULT_BASE_POINT = 10000;
+
+// Default daily dollar rate (ریال به ازای هر دلار)
+const DEFAULT_DOLLAR_RATE = 700000;
+
+// ============================================================
+//  فهرست ۵۴ فدراسیون / انجمن ورزشی فعال جمهوری اسلامی ایران
+//  به همراه رشته‌ها / مواد هر فدراسیون
+// ============================================================
+const FEDERATIONS = {
+  'فدراسیون فوتبال': ['فوتبال','فوتسال','فوتبال ساحلی'],
+  'فدراسیون والیبال': ['والیبال','والیبال ساحلی','والیبال نشسته'],
+  'فدراسیون بسکتبال': ['بسکتبال','بسکتبال سه‌نفره','بسکتبال با ویلچر'],
+  'فدراسیون هندبال': ['هندبال','هندبال ساحلی'],
+  'فدراسیون کشتی': ['کشتی آزاد','کشتی فرنگی','کشتی زنان','گرَپلینگ'],
+  'فدراسیون وزنه‌برداری': ['وزنه‌برداری یک‌ضرب','وزنه‌برداری دوضرب','وزنه‌برداری مجموع'],
+  'فدراسیون تکواندو': ['تکواندو کیوروگی','تکواندو پومسه'],
+  'فدراسیون جودو': ['جودو'],
+  'فدراسیون کاراته': ['کاراته کاتا','کاراته کومیته'],
+  'فدراسیون بوکس': ['بوکس'],
+  'فدراسیون دوومیدانی': ['دو سرعت','دو استقامت','پرتاب‌ها','پرش‌ها','دو و میدانی ترکیبی','دوی صحرانوردی'],
+  'فدراسیون شنا، شیرجه و واترپلو': ['شنا','شیرجه','واترپلو','شنای آب‌های آزاد','شنای مترادف'],
+  'فدراسیون ژیمناستیک': ['ژیمناستیک هنری','ژیمناستیک ریتمیک','ترامپولین','ایروبیک ژیمناستیک'],
+  'فدراسیون تیراندازی با کمان': ['ریکرو','کامپوند','بدون بلانس'],
+  'فدراسیون تیراندازی': ['تپانچه','تفنگ','اسکیت (تیراندازی بشقاب پرنده)'],
+  'فدراسیون شمشیربازی': ['فلوره','اپه','سابر'],
+  'فدراسیون دوچرخه‌سواری': ['جاده','پیست','کوهستان','بی‌ام‌اکس'],
+  'فدراسیون تنیس': ['تنیس انفرادی','تنیس دونفره'],
+  'فدراسیون تنیس روی میز': ['تنیس روی میز انفرادی','تنیس روی میز تیمی','پاراتنیس روی میز'],
+  'فدراسیون بدمینتون': ['بدمینتون انفرادی','بدمینتون دونفره'],
+  'فدراسیون اسکی': ['اسکی آلپاین','اسکی صحرانوردی','اسکی پرش با چوب','اسنوبرد'],
+  'فدراسیون قایقرانی': ['کایاک','کانوئه','رویینگ (پاروزنی)','درَگون بوت'],
+  'فدراسیون سوارکاری': ['پرش با اسب','درساژ','استقامت'],
+  'فدراسیون چوگان': ['چوگان (پولو)'],
+  'فدراسیون موتورسواری و اتومبیلرانی': ['موتورسواری','اتومبیلرانی','رالی'],
+  'فدراسیون کوهنوردی و صعودهای ورزشی': ['سنگ‌نوردی','یخ‌نوردی','کوهنوردی'],
+  'فدراسیون شطرنج': ['شطرنج کلاسیک','شطرنج سریع','شطرنج برق‌آسا'],
+  'فدراسیون بولینگ و بیلیارد': ['بولینگ ده‌پین','بیلیارد ۹ توپ','بیلیارد کارامبول','اسنوکر'],
+  'فدراسیون گلف': ['گلف'],
+  'فدراسیون هاکی': ['هاکی روی چمن','هاکی سالنی'],
+  'فدراسیون اسکیت': ['اسکیت سرعت','اسکیت‌بورد','رولر هاکی'],
+  'فدراسیون ووشو': ['ساندا','تالو'],
+  'فدراسیون کونگ‌فو-توآ': ['کونگ‌فو'],
+  'فدراسیون بدنسازی و پرورش‌اندام': ['پرورش اندام','فیتنس مدل','بادی فیتنس'],
+  'فدراسیون آمادگی جسمانی و ایروبیک': ['آمادگی جسمانی','ایروبیک','کراس‌فیت'],
+  'فدراسیون ورزش‌های دانشگاهی': ['چندرشته‌ای دانشگاهی'],
+  'فدراسیون ورزش‌های همگانی': ['پیاده‌روی','دوومیدانی همگانی','طناب زنی همگانی'],
+  'فدراسیون ورزش روستایی و بازی‌های بومی محلی': ['کشتی آلیش','زورخانه‌ای منطقه‌ای'],
+  'فدراسیون پزشکی ورزشی': ['پزشکی ورزشی - تحقیقاتی'],
+  'فدراسیون ورزش‌های جانبازان و معلولین': ['دوومیدانی جانبازان','وزنه‌برداری جانبازان','بوچا','ووکر بسکتبال'],
+  'فدراسیون نابینایان و کم‌بینایان': ['گلبال','جودو نابینایان','فوتبال ۵ نفره','دوومیدانی نابینایان'],
+  'فدراسیون ورزش کارگری': ['چندرشته‌ای کارگری'],
+  'فدراسیون ورزش‌های زورخانه‌ای و کشتی پهلوانی': ['کشتی پهلوانی','ورزش باستانی'],
+  'فدراسیون هنرهای رزمی': ['کیک بوکسینگ','تای‌بوکسینگ (موی‌تای)','جوجیتسو','سامبو','آیکیدو'],
+  'فدراسیون پاراتکواندو و پاراکاراته': ['پاراتکواندو','پاراکاراته'],
+  'فدراسیون راگبی': ['راگبی پانزده‌نفره','راگبی هفت‌نفره'],
+  'فدراسیون اتومبیل‌رانی پیست': ['درگ ریسینگ','رالی کراس'],
+  'فدراسیون انجمن‌های ورزشی': ['بیسبال و سافت‌بال','کریکت','سپک تاکرا','پدل','نتبال','لاکراس','فلوربال','جهت‌یابی','پارکور','اسکی روی آب','طناب‌کشی'],
+  'فدراسیون فلامینگ (کبدی)': ['کبدی'],
+  'فدراسیون اسنوکر و بیلیارد بانوان': ['اسنوکر بانوان'],
+  'فدراسیون اسکواش': ['اسکواش انفرادی'],
+  'فدراسیون پاراکانوئه و پاراقایقرانی': ['پاراکانوئه'],
+  'فدراسیون ورزش‌های الکترونیکی': ['ای‌اسپرتس'],
+  'فدراسیون ورزش‌های هوایی': ['چتربازی','پاراگلایدینگ','موتورپاراگلایدر']
+};
+
+// ============================================================
+//  APP STATE
+// ============================================================
+let records = [];
+let settings = {};
+let editId = null;
+let pendingImport = [];
+let chartComp = null, chartMedal = null, chartGender = null, chartYear = null, chartFed = null, chartTop = null, chartAgeBonus = null, chartAthStaff = null;
+let currentUser = '';
+let sortState = { key: null, dir: 1 };
+
+// ============================================================
+//  INIT
+// ============================================================
+function init() {
+  settings = loadSettings();
+  const stored = localStorage.getItem('bonusRecords');
+  if (stored) { try { records = JSON.parse(stored); } catch { records = []; } }
+  populateCompDropdown('f-comp');
+  populateCompDropdown('filter-comp');
+  populateYearFilter();
+  populateFederationDropdown();
+  onCompChange(); // set correct visibility for medal fields on load
+  renderSettingsUI();
+}
+
+// ============================================================
+//  FEDERATION / DISCIPLINE DROPDOWNS
+// ============================================================
+function populateFederationDropdown() {
+  const sel = document.getElementById('f-federation');
+  sel.innerHTML = '<option value="">انتخاب فدراسیون / انجمن...</option>';
+  Object.keys(FEDERATIONS).sort((a,b) => a.localeCompare(b,'fa')).forEach(name => {
+    const opt = document.createElement('option');
+    opt.value = name;
+    opt.textContent = name;
+    sel.appendChild(opt);
+  });
+  const customOpt = document.createElement('option');
+  customOpt.value = '__custom__';
+  customOpt.textContent = 'سایر (ورود دستی فدراسیون)...';
+  sel.appendChild(customOpt);
+  onFederationChange();
+}
+
+function populateFedFilter() {
+  const sel = document.getElementById('filter-fed');
+  if (!sel) return;
+  const prev = sel.value;
+  const used = [...new Set(records.map(r => r.federation).filter(Boolean))];
+  const all = [...new Set([...Object.keys(FEDERATIONS), ...used])].sort((a,b) => a.localeCompare(b,'fa'));
+  sel.innerHTML = '<option value="">همه فدراسیون‌ها</option>';
+  all.forEach(f => { const o = document.createElement('option'); o.value = f; o.textContent = f; sel.appendChild(o); });
+  if (prev) sel.value = prev;
+}
+
+function onFederationChange() {
+  const fed = document.getElementById('f-federation').value;
+  const sportSel = document.getElementById('f-sport');
+  const fedCustom = document.getElementById('f-federation-custom');
+  const sportCustom = document.getElementById('f-sport-custom');
+  const isCustom = fed === '__custom__';
+  fedCustom.style.display = isCustom ? 'block' : 'none';
+  sportSel.style.display = isCustom ? 'none' : 'block';
+  sportCustom.style.display = isCustom ? 'block' : 'none';
+  sportSel.innerHTML = '';
+  if (isCustom) { updatePreview(); return; }
+  const disciplines = FEDERATIONS[fed] || [];
+  if (!disciplines.length) {
+    sportSel.innerHTML = '<option value="">— ابتدا فدراسیون را انتخاب کنید —</option>';
+    return;
+  }
+  disciplines.forEach(d => {
+    const opt = document.createElement('option');
+    opt.value = d;
+    opt.textContent = d;
+    sportSel.appendChild(opt);
+  });
+}
+
+// ============================================================
+//  SETTINGS PERSISTENCE
+// ============================================================
+function loadSettings() {
+  try {
+    const s = localStorage.getItem('bonusSettings2024');
+    const raw = s ? JSON.parse(s) : {};
+    return {
+      table1: raw.table1 || JSON.parse(JSON.stringify(DEFAULT_TABLE1)),
+      table2: raw.table2 || JSON.parse(JSON.stringify(DEFAULT_TABLE2)),
+      table3: raw.table3 || JSON.parse(JSON.stringify(DEFAULT_TABLE3)),
+      table4a: raw.table4a || JSON.parse(JSON.stringify(DEFAULT_TABLE4A)),
+      table4b: raw.table4b || JSON.parse(JSON.stringify(DEFAULT_TABLE4B)),
+      table5: raw.table5 || JSON.parse(JSON.stringify(DEFAULT_TABLE5)),
+      ageCoefs: raw.ageCoefs || JSON.parse(JSON.stringify(DEFAULT_AGE_COEFS)),
+      basePoint: raw.basePoint || DEFAULT_BASE_POINT,
+      dollarRate: raw.dollarRate != null ? raw.dollarRate : DEFAULT_DOLLAR_RATE
+    };
+  } catch { return {
+    table1: JSON.parse(JSON.stringify(DEFAULT_TABLE1)),
+    table2: JSON.parse(JSON.stringify(DEFAULT_TABLE2)),
+    table3: JSON.parse(JSON.stringify(DEFAULT_TABLE3)),
+    table4a: JSON.parse(JSON.stringify(DEFAULT_TABLE4A)),
+    table4b: JSON.parse(JSON.stringify(DEFAULT_TABLE4B)),
+    table5: JSON.parse(JSON.stringify(DEFAULT_TABLE5)),
+    ageCoefs: JSON.parse(JSON.stringify(DEFAULT_AGE_COEFS)),
+    basePoint: DEFAULT_BASE_POINT,
+    dollarRate: DEFAULT_DOLLAR_RATE
+  }; }
+}
+
+function saveSettingsToStorage() { localStorage.setItem('bonusSettings2024', JSON.stringify(settings)); }
+function saveRecords() { localStorage.setItem('bonusRecords', JSON.stringify(records)); }
+
+// ============================================================
+//  CALCULATION ENGINE
+// ============================================================
+function getAllEvents() {
+  return { ...settings.table1, ...settings.table2, ...settings.table3 };
+}
+
+function getEventData(compName) {
+  const all = { ...settings.table1, ...settings.table2, ...settings.table3 };
+  return all[compName] || null;
+}
+
+function isWeightlifting(compName) {
+  return compName && compName.startsWith('وزنه‌برداری');
+}
+
+// Main calculation: returns bonus in Rials
+function calcBonus(rec) {
+  const ageCoef = getAgeCoef(rec.agegroup);
+  const orderCoef = MEDAL_ORDER_COEFS[rec.medalorder] || 1;
+
+  // --- STAFF ROLES ---
+  if (rec.role !== 'ورزشکار') {
+    return calcStaffBonus(rec);
+  }
+
+  // --- WEIGHTLIFTING ---
+  if (isWeightlifting(rec.comp)) {
+    return calcWlBonus(rec, ageCoef, orderCoef);
+  }
+
+  // --- STANDARD ---
+  const evData = getEventData(rec.comp);
+  if (!evData) return 0;
+  const typeData = evData[rec.type] || evData['فردی'];
+  const pts = typeData[rec.medal] || 0;
+  return pts * settings.basePoint * ageCoef * orderCoef;
+}
+
+// Returns the effective weightlifting result per ماده ۱۷:
+// اگر ورزشکار همزمان در یک‌ضرب، دوضرب و مجموع مدال بگیرد => فقط «مجموع» ملاک است.
+// در غیر این صورت => بهترین مدال میان یک‌ضرب و دوضرب (هرکدام بهتر بود) ملاک است.
+// مدال مجموع به‌تنهایی (بدون یک‌ضرب/دوضرب) هم به‌عنوان مجموع محاسبه می‌شود.
+const MEDAL_RANK = { 'طلا': 3, 'نقره': 2, 'برنز': 1, '—': 0 };
+
+function resolveWlResult(rec) {
+  const snatch = rec.wlSnatch || '—';
+  const cj = rec.wlCj || '—';
+  const total = rec.wlTotal || '—';
+
+  const hasSnatch = snatch !== '—';
+  const hasCj = cj !== '—';
+  const hasTotal = total !== '—';
+
+  // قاعده ۱: اگر هر سه (یک‌ضرب + دوضرب + مجموع) مدال داشته باشند، فقط مجموع ملاک است
+  if (hasSnatch && hasCj && hasTotal) {
+    return { table: 'مجموع', medal: total };
+  }
+
+  // قاعده ۲: در غیر این صورت، بهترین مدال میان یک‌ضرب و دوضرب ملاک است
+  if (hasSnatch || hasCj) {
+    const best = MEDAL_RANK[snatch] >= MEDAL_RANK[cj] ? snatch : cj;
+    return { table: 'ترکیب', medal: best, snatch, cj };
+  }
+
+  // اگر فقط مجموع وارد شده (بدون یک‌ضرب/دوضرب)، مجموع ملاک است
+  if (hasTotal) {
+    return { table: 'مجموع', medal: total };
+  }
+
+  return { table: null, medal: '—' };
+}
+
+function calcWlBonus(rec, ageCoef, orderCoef) {
+  const resolved = resolveWlResult(rec);
+  const isWorld = rec.comp === 'وزنه‌برداری - قهرمانی جهان (گروه اول)';
+
+  if (resolved.table === 'مجموع') {
+    const key = Object.keys(settings.table4a)[0];
+    const row = settings.table4a[key];
+    const col = isWorld ? 'جهان' : 'آسیا';
+    const pts = (row[col] && row[col][resolved.medal]) || 0;
+    return pts * settings.basePoint * ageCoef * orderCoef;
+  }
+
+  if (resolved.table === 'ترکیب') {
+    // جدول ب: کلید بر اساس ترکیب دقیق مدال‌های یک‌ضرب/دوضرب (دو مدال یا یک مدال «تنها»)
+    const pair = [resolved.snatch, resolved.cj].filter(m => m !== '—').sort((a,b) => MEDAL_RANK[b]-MEDAL_RANK[a]);
+    let comboKey;
+    if (pair.length === 2) {
+      comboKey = `${pair[0]}_${pair[1]}`;
+    } else {
+      comboKey = `${pair[0]}_تنها`;
+    }
+    const col = isWorld ? 'جهان' : 'آسیا';
+    const row = settings.table4b[comboKey];
+    if (!row) {
+      console.warn(`ترکیب مدال «${comboKey}» در جدول ب (وزنه‌برداری) تعریف نشده است.`);
+    }
+    const pts = row ? (row[col] || 0) : 0;
+    return pts * settings.basePoint * ageCoef * orderCoef;
+  }
+
+  return 0;
+}
+
+function calcStaffBonus(rec) {
+  // Find the associated athlete record(s) for this event
+  const staffDef = settings.table5[rec.role];
+  if (!staffDef) return 0;
+
+  const ageCoef = getAgeCoef(rec.agegroup);
+  const orderCoef = MEDAL_ORDER_COEFS[rec.medalorder] || 1;
+
+  // Athlete bonus for this same event/type/medal
+  const tempRec = { ...rec, role: 'ورزشکار' };
+  const athleteBonus = calcBonus(tempRec);
+
+  // برای محاسبه «بهترین مدال» (طلای معادل) باید رویداد وزنه‌برداری را هم در نظر گرفت
+  function buildGoldEquivalent(r) {
+    if (isWeightlifting(r.comp)) {
+      return { ...r, role: 'ورزشکار', medalorder: 'اول', wlSnatch: 'طلا', wlCj: 'طلا', wlTotal: 'طلا' };
+    }
+    return { ...r, role: 'ورزشکار', medal: 'طلا', medalorder: 'اول' };
+  }
+
+  if (staffDef.نوع === 'sequential') {
+    // سرمربی و مربی
+    const isFirst = rec.medalorder === 'اول';
+    if (rec.type === 'تیمی') {
+      return staffDef.تیمی === 'معادل_ورزشکار' ? athleteBonus : athleteBonus * staffDef.تیمی;
+    } else {
+      const pct = isFirst ? staffDef.انفرادی.اول : staffDef.انفرادی.بعدی;
+      return athleteBonus * pct;
+    }
+  } else if (staffDef.نوع === 'best_medal') {
+    // کادر پزشکی، سرپرست، تکنیسین
+    // Use gold-equivalent (best medal) of same event/type
+    const tempGold = buildGoldEquivalent(rec);
+    const bestBonus = calcBonus(tempGold);
+    if (rec.type === 'تیمی') {
+      return bestBonus * staffDef.تیمی;
+    } else {
+      return bestBonus * staffDef.انفرادی;
+    }
+  } else if (staffDef.نوع === 'athlete_pct') {
+    // آنالیزور
+    if (rec.type === 'تیمی') {
+      // ۵٪ جایزه بهترین مدال
+      const tempGold = buildGoldEquivalent(rec);
+      return calcBonus(tempGold) * 0.05;
+    } else {
+      return athleteBonus * staffDef.انفرادی;
+    }
+  }
+  return 0;
+}
+
+function getRoleLabel(rec) {
+  if (rec.role !== 'ورزشکار') {
+    const staffDef = settings.table5[rec.role];
+    if (!staffDef) return '—';
+    if (staffDef.نوع === 'sequential') {
+      const isFirst = rec.medalorder === 'اول';
+      if (rec.type === 'تیمی') return staffDef.تیمی === 'معادل_ورزشکار' ? 'معادل ورزشکار' : `${staffDef.تیمی*100}٪ تیمی`;
+      const pct = isFirst ? staffDef.انفرادی.اول : staffDef.انفرادی.بعدی;
+      return `${pct*100}٪ ورزشکار`;
+    } else if (staffDef.نوع === 'best_medal') {
+      return rec.type === 'تیمی' ? `${staffDef.تیمی*100}٪ تیمی` : `${staffDef.انفرادی*100}٪ بهترین مدال`;
+    } else if (staffDef.نوع === 'athlete_pct') {
+      return rec.type === 'تیمی' ? '۵٪ بهترین مدال' : `${staffDef.انفرادی*100}٪ ورزشکار`;
+    }
+    return '—';
+  }
+  const ageC = getAgeCoef(rec.agegroup);
+  const orderC = MEDAL_ORDER_COEFS[rec.medalorder] || 1;
+  return `رده‌سنی:${ageC} × ترتیب:${orderC}`;
+}
+
+// ============================================================
+//  FORMAT
+// ============================================================
+function formatMoney(n) {
+  if (!n) return '۰';
+  return Math.round(n).toLocaleString('fa-IR');
+}
+
+// Dollar helpers
+function rialToDollar(rial) {
+  const rate = settings.dollarRate;
+  if (!rate || rate <= 0) return null;
+  return rial / rate;
+}
+function formatDollar(n) {
+  if (n == null) return '—';
+  return '$' + Math.round(n).toLocaleString('en-US');
+}
+
+function toPersianNum(s) {
+  return String(s).replace(/[0-9]/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+}
+
+// ============================================================
+//  DROPDOWN POPULATION
+// ============================================================
+function populateCompDropdown(id) {
+  const sel = document.getElementById(id);
+  const prev = sel.value;
+  sel.innerHTML = id.startsWith('filter') ? '<option value="">همه رویدادها</option>' : '';
+  const all = getAllEvents();
+  // Add weightlifting
+  const wlEvents = Object.keys(settings.table4a).length
+    ? ['وزنه‌برداری - قهرمانی جهان (گروه اول)', 'وزنه‌برداری - قهرمانی آسیا (گروه اول)']
+    : [];
+  [...Object.keys(all), ...wlEvents].forEach(name => {
+    const opt = document.createElement('option');
+    opt.value = name;
+    opt.textContent = name;
+    sel.appendChild(opt);
+  });
+  if (prev) sel.value = prev;
+}
+
+function populateYearFilter() {
+  const sel = document.getElementById('filter-year');
+  const years = [...new Set(records.map(r => r.year).filter(Boolean))].sort();
+  const prev = sel.value;
+  sel.innerHTML = '<option value="">همه سال‌ها</option>';
+  years.forEach(y => { const o = document.createElement('option'); o.value = y; o.textContent = y; sel.appendChild(o); });
+  if (prev) sel.value = prev;
+  populateFedFilter();
+}
+
+// ============================================================
+//  FORM LOGIC
+// ============================================================
+function onCompChange() {
+  const comp = document.getElementById('f-comp').value;
+  const isWl = isWeightlifting(comp);
+  document.getElementById('wl-section').style.display = isWl ? 'block' : 'none';
+  document.getElementById('standard-medal-group').style.display = isWl ? 'none' : 'flex';
+  updatePreview();
+}
+
+function buildRecord(forPreview = false) {
+  return {
+    id: editId !== null ? editId : (crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`),
+    name: document.getElementById('f-name').value.trim(),
+    gender: document.getElementById('f-gender').value,
+    agegroup: document.getElementById('f-agegroup').value,
+    federation: (document.getElementById('f-federation').value === '__custom__'
+      ? document.getElementById('f-federation-custom').value.trim()
+      : document.getElementById('f-federation').value),
+    sport: (document.getElementById('f-federation').value === '__custom__'
+      ? document.getElementById('f-sport-custom').value.trim()
+      : document.getElementById('f-sport').value),
+    role: document.getElementById('f-role').value,
+    comp: document.getElementById('f-comp').value,
+    type: document.getElementById('f-type').value,
+    medal: document.getElementById('f-medal').value,
+    medalorder: document.getElementById('f-medalorder').value,
+    year: document.getElementById('f-year').value.trim(),
+    location: document.getElementById('f-location').value.trim(),
+    wlSnatch: document.getElementById('f-wl-snatch').value,
+    wlCj: document.getElementById('f-wl-cj').value,
+    wlTotal: document.getElementById('f-wl-total').value
+  };
+}
+
+function updatePreview() {
+  const rec = buildRecord(true);
+  if (!rec.comp || !rec.agegroup) {
+    document.getElementById('bonus-preview').style.display = 'none';
+    return;
+  }
+  const bonus = calcBonus(rec);
+  document.getElementById('bonus-preview').style.display = 'block';
+  const previewDollar = rialToDollar(bonus);
+  document.getElementById('preview-amount').innerHTML = formatMoney(bonus) + ' ریال' + (previewDollar != null ? ` &nbsp;<span style="font-size:16px; color:var(--teal-dark);">≈ ${formatDollar(previewDollar)}</span>` : '');
+
+  // Build formula
+  const ageCoef = getAgeCoef(rec.agegroup);
+  const orderCoef = MEDAL_ORDER_COEFS[rec.medalorder] || 1;
+  let formula = '';
+  if (rec.role === 'ورزشکار' && isWeightlifting(rec.comp)) {
+    const resolved = resolveWlResult(rec);
+    const ruleDiv = document.getElementById('wl-rule-result');
+    if (resolved.table === 'مجموع') {
+      ruleDiv.innerHTML = `<i class="fas fa-check-circle" style="color:var(--success);"></i> طبق تبصره ماده ۱۵: ملاک محاسبه «مجموع» است (مدال: ${resolved.medal === '—' ? 'بدون مدال' : resolved.medal}) — جدول الف`;
+      formula = `جدول الف (مجموع) × ${formatMoney(settings.basePoint)} ریال/امتیاز × ضریب‌سنی(${ageCoef}) × ترتیب(${orderCoef})`;
+    } else if (resolved.table === 'ترکیب') {
+      ruleDiv.innerHTML = `<i class="fas fa-check-circle" style="color:var(--success);"></i> طبق تبصره ماده ۱۵: ملاک محاسبه بهترین مدال میان یک‌ضرب/دوضرب است (یک‌ضرب: ${resolved.snatch === '—' ? 'بدون مدال' : resolved.snatch} — دوضرب: ${resolved.cj === '—' ? 'بدون مدال' : resolved.cj}) — جدول ب`;
+      formula = `جدول ب (یک‌ضرب/دوضرب) × ${formatMoney(settings.basePoint)} ریال/امتیاز × ضریب‌سنی(${ageCoef}) × ترتیب(${orderCoef})`;
+    } else {
+      ruleDiv.innerHTML = '<i class="fas fa-exclamation-circle" style="color:var(--warning);"></i> هیچ مدالی برای محاسبه وارد نشده است.';
+      formula = 'بدون مدال — پاداشی محاسبه نمی‌شود';
+    }
+  } else if (rec.role === 'ورزشکار' && !isWeightlifting(rec.comp)) {
+    const evData = getEventData(rec.comp);
+    const typeData = evData ? (evData[rec.type] || evData['فردی']) : {};
+    const pts = typeData[rec.medal] || 0;
+    formula = `${pts} امتیاز × ${formatMoney(settings.basePoint)} ریال/امتیاز × ضریب‌سنی(${ageCoef}) × ترتیب(${orderCoef})`;
+    document.getElementById('wl-rule-result').innerHTML = '';
+  } else {
+    formula = getRoleLabel(rec);
+    document.getElementById('wl-rule-result').innerHTML = '';
+  }
+  document.getElementById('preview-formula').textContent = formula;
+
+  // Staff preview for athlete
+  const staffDiv = document.getElementById('preview-staff');
+  if (rec.role === 'ورزشکار') {
+    let html = '<strong style="font-size:12px; color:var(--text-muted);">پاداش تخمینی کادر بر اساس این مدال:</strong><br>';
+    ['سرمربی','مربی','سرپرست','کادر پزشکی'].forEach(r => {
+      const mockStaff = { ...rec, role: r };
+      const sb = calcStaffBonus(mockStaff);
+      if (sb > 0) html += `<div class="bonus-preview-staff-row"><span class="role-name">${r}</span><span class="role-amount">${formatMoney(sb)} ریال</span></div>`;
+    });
+    staffDiv.innerHTML = html;
+    staffDiv.style.display = 'block';
+  } else {
+    staffDiv.style.display = 'none';
+  }
+}
+
+function submitForm() {
+  const rec = buildRecord();
+  let hasError = false;
+  ['f-name','f-gender','f-agegroup','f-comp','f-year','f-location'].forEach(id => document.getElementById(id).classList.remove('error'));
+
+  if (!rec.name) { document.getElementById('f-name').classList.add('error'); hasError = true; }
+  if (!rec.gender) { document.getElementById('f-gender').classList.add('error'); hasError = true; }
+  if (!rec.agegroup) { document.getElementById('f-agegroup').classList.add('error'); hasError = true; }
+  if (!rec.comp) { document.getElementById('f-comp').classList.add('error'); hasError = true; }
+  if (!rec.year) { document.getElementById('f-year').classList.add('error'); hasError = true; }
+  if (!rec.location) { document.getElementById('f-location').classList.add('error'); hasError = true; }
+
+  if (hasError) { showToast('لطفاً فیلدهای اجباری را تکمیل کنید.', 'error'); return; }
+
+  if (rec.role === 'ورزشکار' && isWeightlifting(rec.comp)) {
+    const resolved = resolveWlResult(rec);
+    if (resolved.table === null) {
+      showToast('برای رکورد وزنه‌برداری باید حداقل یکی از مدال‌های یک‌ضرب، دوضرب یا مجموع وارد شود.', 'error');
+      return;
+    }
+  }
+
+  if (editId !== null) {
+    const idx = records.findIndex(r => r.id === editId);
+    if (idx !== -1) records[idx] = rec;
+    cancelEdit();
+    showToast('رکورد با موفقیت به‌روزرسانی شد.', 'success');
+  } else {
+    records.push(rec);
+    clearForm();
+    showToast('رکورد با موفقیت ذخیره شد.', 'success');
+  }
+  saveRecords();
+  renderTable();
+  refreshDashboard();
+  populateYearFilter();
+}
+
+function clearForm() {
+  ['f-name','f-year','f-location'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('f-gender').value = '';
+  document.getElementById('f-agegroup').value = '';
+  document.getElementById('f-federation').value = '';
+  document.getElementById('f-federation-custom').value = '';
+  document.getElementById('f-sport-custom').value = '';
+  onFederationChange();
+  const _sb = document.getElementById('submit-btn');
+  if (_sb && editId === null) _sb.innerHTML = '<i class="fas fa-plus-circle"></i> افزودن';
+  document.getElementById('f-role').value = 'ورزشکار';
+  document.getElementById('f-type').value = 'فردی';
+  document.getElementById('f-medal').value = 'طلا';
+  document.getElementById('f-medalorder').value = 'اول';
+  document.getElementById('f-wl-snatch').value = '—';
+  document.getElementById('f-wl-cj').value = '—';
+  document.getElementById('f-wl-total').value = '—';
+  document.getElementById('wl-section').style.display = 'none';
+  document.getElementById('standard-medal-group').style.display = 'flex';
+  document.getElementById('bonus-preview').style.display = 'none';
+  ['f-name','f-gender','f-agegroup','f-comp','f-year','f-location'].forEach(id => document.getElementById(id).classList.remove('error'));
+}
+
+function editRecord(id) {
+  const rec = records.find(r => r.id === id);
+  if (!rec) return;
+  editId = id;
+  document.getElementById('f-name').value = rec.name;
+  document.getElementById('f-gender').value = rec.gender;
+  document.getElementById('f-agegroup').value = rec.agegroup;
+  if (rec.federation && !FEDERATIONS[rec.federation]) {
+    document.getElementById('f-federation').value = '__custom__';
+    onFederationChange();
+    document.getElementById('f-federation-custom').value = rec.federation;
+    document.getElementById('f-sport-custom').value = rec.sport || '';
+  } else {
+    document.getElementById('f-federation').value = rec.federation || '';
+    onFederationChange();
+    document.getElementById('f-sport').value = rec.sport || '';
+  }
+  document.getElementById('f-role').value = rec.role;
+  document.getElementById('f-comp').value = rec.comp;
+  document.getElementById('f-type').value = rec.type || 'فردی';
+  document.getElementById('f-medal').value = rec.medal;
+  document.getElementById('f-medalorder').value = rec.medalorder || 'اول';
+  document.getElementById('f-year').value = rec.year || '';
+  document.getElementById('f-location').value = rec.location || '';
+  document.getElementById('f-wl-snatch').value = rec.wlSnatch || '—';
+  document.getElementById('f-wl-cj').value = rec.wlCj || '—';
+  document.getElementById('f-wl-total').value = rec.wlTotal || '—';
+  const isWl = isWeightlifting(rec.comp);
+  document.getElementById('wl-section').style.display = isWl ? 'block' : 'none';
+  document.getElementById('standard-medal-group').style.display = isWl ? 'none' : 'flex';
+  document.getElementById('edit-indicator').style.display = 'inline-flex';
+  document.getElementById('cancel-edit-btn').style.display = 'inline-flex';
+  document.getElementById('submit-btn').innerHTML = '<i class="fas fa-save"></i> ذخیره تغییرات';
+  showTab('page-form');
+  updatePreview();
+}
+
+function cancelEdit() {
+  editId = null;
+  document.getElementById('edit-indicator').style.display = 'none';
+  document.getElementById('cancel-edit-btn').style.display = 'none';
+  clearForm();
+}
+
+function deleteRecord(id) {
+  if (!confirm('آیا از حذف این رکورد مطمئن هستید؟')) return;
+  records = records.filter(r => r.id !== id);
+  saveRecords();
+  renderTable();
+  refreshDashboard();
+  populateYearFilter();
+  showToast('رکورد حذف شد.', 'warning');
+}
+
+// ============================================================
+//  TABLE RENDER
+// ============================================================
+function getFiltered() {
+  const search = document.getElementById('search-input').value.trim().toLowerCase();
+  const comp = document.getElementById('filter-comp').value;
+  const medal = document.getElementById('filter-medal').value;
+  const role = document.getElementById('filter-role').value;
+  const year = document.getElementById('filter-year').value;
+  const fed = document.getElementById('filter-fed').value;
+  return records.filter(r =>
+    (!search || r.name.toLowerCase().includes(search)) &&
+    (!comp || r.comp === comp) &&
+    (!fed || r.federation === fed) &&
+    (!medal || getEffectiveMedal(r) === medal) &&
+    (!role || r.role === role) &&
+    (!year || r.year === year)
+  );
+}
+
+function sortTable(key) {
+  if (sortState.key === key) sortState.dir *= -1;
+  else { sortState.key = key; sortState.dir = 1; }
+  renderTable();
+}
+
+function applySort(arr) {
+  if (!sortState.key) return arr;
+  const k = sortState.key, dir = sortState.dir;
+  const toNum = s => parseInt(String(s == null ? '' : s).replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d))) || 0;
+  return arr.slice().sort((a, b) => {
+    if (k === 'bonus' || k === 'dollar') return dir * (calcBonus(a) - calcBonus(b));
+    if (k === 'medal') return dir * ((MEDAL_RANK[getEffectiveMedal(a)] || 0) - (MEDAL_RANK[getEffectiveMedal(b)] || 0));
+    if (k === 'year') return dir * (toNum(a.year) - toNum(b.year));
+    return dir * String(a[k] || '').localeCompare(String(b[k] || ''), 'fa');
+  });
+}
+
+function updateSortIndicators() {
+  document.querySelectorAll('.sort-ind').forEach(s => { s.textContent = ''; });
+  if (sortState.key) {
+    const el = document.querySelector(`.sort-ind[data-k="${sortState.key}"]`);
+    if (el) el.textContent = sortState.dir === 1 ? ' ▲' : ' ▼';
+  }
+}
+
+function renderTable() {
+  const tbody = document.getElementById('main-tbody');
+  let filtered = getFiltered();
+  filtered = applySort(filtered);
+  updateSortIndicators();
+
+  // Update stat cards
+  const totalBonus = filtered.reduce((s, r) => s + calcBonus(r), 0);
+  const athleteRecs = filtered.filter(r => r.role === 'ورزشکار');
+  document.getElementById('table-stats').innerHTML = `
+    <div class="stat-card"><div class="stat-icon gold"><i class="fas fa-medal"></i></div><div><div class="stat-value">${toPersianNum(filtered.length)}</div><div class="stat-label">تعداد رکورد</div></div></div>
+    <div class="stat-card"><div class="stat-icon teal"><i class="fas fa-user-athlete"></i></div><div><div class="stat-value">${toPersianNum(athleteRecs.length)}</div><div class="stat-label">ورزشکار</div></div></div>
+    <div class="stat-card"><div class="stat-icon green"><i class="fas fa-coins"></i></div><div><div class="stat-value" style="font-size:16px;">${formatMoney(totalBonus)}</div><div class="stat-label">جمع کل پاداش (ریال)</div></div></div>
+    <div class="stat-card"><div class="stat-icon green"><i class="fas fa-dollar-sign"></i></div><div><div class="stat-value" style="font-size:16px;">${formatDollar(rialToDollar(totalBonus))}</div><div class="stat-label">جمع کل پاداش (دلار)</div></div></div>
+    <div class="stat-card"><div class="stat-icon gold"><i class="fas fa-trophy"></i></div><div><div class="stat-value">${toPersianNum(filtered.filter(r=>getEffectiveMedal(r)==='طلا').length)}</div><div class="stat-label">مدال طلا</div></div></div>
+  `;
+
+  if (!filtered.length) {
+    tbody.innerHTML = `<tr><td colspan="17"><div class="empty-state"><i class="fas fa-database"></i><br>هیچ رکوردی یافت نشد.</div></td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = filtered.map((r, i) => {
+    const bonus = calcBonus(r);
+    const isWl = isWeightlifting(r.comp);
+    let displayMedal = r.medal;
+    let medalDetail = '';
+    if (isWl && r.role === 'ورزشکار') {
+      const resolved = resolveWlResult(r);
+      displayMedal = resolved.medal;
+      medalDetail = resolved.table === 'مجموع' ? '(مجموع)' : resolved.table === 'ترکیب' ? '(یک‌ضرب/دوضرب)' : '';
+    }
+    const mBadge = displayMedal === 'طلا' ? 'badge-gold' : displayMedal === 'نقره' ? 'badge-silver' : displayMedal === 'برنز' ? 'badge-bronze' : 'badge-teal';
+    const mIcon = displayMedal === 'طلا' ? '🥇' : displayMedal === 'نقره' ? '🥈' : displayMedal === 'برنز' ? '🥉' : '—';
+    const gBadge = r.gender === 'آقا' ? 'badge-male' : 'badge-female';
+    const roleBadge = r.role === 'ورزشکار' ? 'badge-teal' : 'badge-orange';
+
+    return `<tr>
+      <td style="font-weight:600;color:var(--text-muted);">${toPersianNum(i+1)}</td>
+      <td style="font-weight:700;">${r.name}</td>
+      <td><span class="badge ${gBadge}">${r.gender === 'آقا' ? '♂' : '♀'} ${r.gender}</span></td>
+      <td><span class="badge badge-teal" style="font-size:11px;">${r.agegroup}</span></td>
+      <td style="font-size:12px; max-width:150px; white-space:normal;">${r.federation || '—'}</td>
+      <td style="font-size:12px;">${r.sport || '—'}</td>
+      <td><span class="badge ${roleBadge}" style="font-size:11px;">${r.role}</span></td>
+      <td style="max-width:160px; white-space:normal; font-size:12px;">${r.comp}</td>
+      <td><span class="badge badge-purple" style="font-size:11px;">${r.type || 'فردی'}</span></td>
+      <td style="direction:ltr; text-align:center;">${r.year || '—'}</td>
+      <td style="font-size:12px;">${r.location || '—'}</td>
+      <td><span class="badge ${mBadge}">${mIcon} ${displayMedal}</span> <span style="font-size:10px; color:var(--text-muted);">${medalDetail}</span></td>
+      <td style="font-size:11px; color:var(--text-muted);">${r.medalorder === 'اول' ? '۱۰۰٪' : '۳۰٪'}</td>
+      <td class="amount-cell">${formatMoney(bonus)}</td>
+      <td class="dollar-cell">${formatDollar(rialToDollar(bonus))}</td>
+      <td style="font-size:11px; color:var(--text-muted);">${getRoleLabel(r)}</td>
+      <td class="no-print" style="white-space:nowrap;">
+        <button class="btn btn-primary btn-sm btn-icon" onclick="editRecord(${r.id})" title="ویرایش"><i class="fas fa-edit"></i></button>
+        <button class="btn btn-danger btn-sm btn-icon" onclick="deleteRecord(${r.id})" title="حذف" style="margin-right:4px;"><i class="fas fa-trash"></i></button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function getEffectiveMedal(r) {
+  if (isWeightlifting(r.comp) && r.role === 'ورزشکار') {
+    return resolveWlResult(r).medal || '—';
+  }
+  return r.medal;
+}
+
+// ============================================================
+//  DASHBOARD
+// ============================================================
+function refreshDashboard() {
+  // stat cards
+  const total = records.reduce((s, r) => s + calcBonus(r), 0);
+  const athletes = records.filter(r => r.role === 'ورزشکار');
+  const golds = records.filter(r => getEffectiveMedal(r) === 'طلا').length;
+  const silvers = records.filter(r => getEffectiveMedal(r) === 'نقره').length;
+  const bronzes = records.filter(r => getEffectiveMedal(r) === 'برنز').length;
+  document.getElementById('dash-stats').innerHTML = `
+    <div class="stat-card"><div class="stat-icon teal"><i class="fas fa-users"></i></div><div><div class="stat-value">${toPersianNum(records.length)}</div><div class="stat-label">کل رکوردها</div></div></div>
+    <div class="stat-card"><div class="stat-icon gold"><i class="fas fa-medal"></i></div><div><div class="stat-value">${toPersianNum(golds)}</div><div class="stat-label">مدال طلا 🥇</div></div></div>
+    <div class="stat-card"><div class="stat-icon silver"><i class="fas fa-medal"></i></div><div><div class="stat-value">${toPersianNum(silvers)}</div><div class="stat-label">مدال نقره 🥈</div></div></div>
+    <div class="stat-card"><div class="stat-icon orange"><i class="fas fa-medal"></i></div><div><div class="stat-value">${toPersianNum(bronzes)}</div><div class="stat-label">مدال برنز 🥉</div></div></div>
+    <div class="stat-card"><div class="stat-icon green"><i class="fas fa-coins"></i></div><div><div class="stat-value" style="font-size:15px;">${formatMoney(total)}</div><div class="stat-label">جمع کل پاداش (ریال)</div></div></div>
+    <div class="stat-card"><div class="stat-icon green"><i class="fas fa-dollar-sign"></i></div><div><div class="stat-value" style="font-size:15px;">${formatDollar(rialToDollar(total))}</div><div class="stat-label">جمع کل پاداش (دلار)</div></div></div>
+  `;
+
+  // Chart: bonus by event
+  const compMap = {};
+  records.forEach(r => {
+    const key = r.comp && r.comp.length > 20 ? r.comp.substring(0, 20) + '...' : (r.comp || '—');
+    compMap[key] = (compMap[key] || 0) + calcBonus(r);
+  });
+  const compLabels = Object.keys(compMap);
+  const compData = compLabels.map(k => compMap[k]);
+
+  if (chartComp) chartComp.destroy();
+  const ctxComp = document.getElementById('chart-comp');
+  if (ctxComp && compLabels.length) {
+    chartComp = new Chart(ctxComp, {
+      type: 'bar',
+      data: { labels: compLabels, datasets: [{ label: 'پاداش (ریال)', data: compData, backgroundColor: '#0d6e8a', borderRadius: 6 }] },
+      options: { responsive: true, plugins: { legend: { display: false } }, scales: { x: { ticks: { font: { size: 10 } } } } }
+    });
+  }
+
+  // Chart: medal distribution
+  const medalCounts = [golds, silvers, bronzes];
+  if (chartMedal) chartMedal.destroy();
+  const ctxMedal = document.getElementById('chart-medal');
+  if (ctxMedal && records.length) {
+    chartMedal = new Chart(ctxMedal, {
+      type: 'doughnut',
+      data: {
+        labels: ['🥇 طلا', '🥈 نقره', '🥉 برنز'],
+        datasets: [{ data: medalCounts, backgroundColor: ['#c9a227', '#8c9ab0', '#a0674a'], borderWidth: 0 }]
+      },
+      options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+    });
+  }
+
+  // Chart: gender distribution
+  const maleCnt = records.filter(r => r.gender === 'آقا').length;
+  const femaleCnt = records.filter(r => r.gender === 'خانم').length;
+  if (chartGender) chartGender.destroy();
+  const ctxGender = document.getElementById('chart-gender');
+  if (ctxGender && records.length) {
+    chartGender = new Chart(ctxGender, {
+      type: 'pie',
+      data: { labels: ['♂ آقایان', '♀ بانوان'], datasets: [{ data: [maleCnt, femaleCnt], backgroundColor: ['#2a6fbf', '#c0398b'], borderWidth: 0 }] },
+      options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+    });
+  }
+
+  // Chart: bonus trend by year (line)
+  const yearMap = {};
+  records.forEach(r => { if (r.year) yearMap[r.year] = (yearMap[r.year] || 0) + calcBonus(r); });
+  const yearLabels = Object.keys(yearMap).sort();
+  if (chartYear) chartYear.destroy();
+  const ctxYear = document.getElementById('chart-year');
+  if (ctxYear && yearLabels.length) {
+    chartYear = new Chart(ctxYear, {
+      type: 'line',
+      data: { labels: yearLabels.map(toPersianNum), datasets: [{ label: 'پاداش (ریال)', data: yearLabels.map(y => yearMap[y]), borderColor: '#c9a227', backgroundColor: 'rgba(201,162,39,.15)', fill: true, tension: .3, pointRadius: 4, pointBackgroundColor: '#c9a227' }] },
+      options: { responsive: true, plugins: { legend: { display: false } } }
+    });
+  }
+
+  // Chart: bonus by federation (top 10, horizontal)
+  const fedMap = {};
+  records.forEach(r => { const f = r.federation || 'نامشخص'; fedMap[f] = (fedMap[f] || 0) + calcBonus(r); });
+  const fedSorted = Object.entries(fedMap).sort((a, b) => b[1] - a[1]).slice(0, 10);
+  if (chartFed) chartFed.destroy();
+  const ctxFed = document.getElementById('chart-fed');
+  if (ctxFed && fedSorted.length) {
+    chartFed = new Chart(ctxFed, {
+      type: 'bar',
+      data: { labels: fedSorted.map(e => e[0].length > 18 ? e[0].slice(0, 18) + '…' : e[0]), datasets: [{ label: 'پاداش (ریال)', data: fedSorted.map(e => e[1]), backgroundColor: '#1a8fab', borderRadius: 5 }] },
+      options: { indexAxis: 'y', responsive: true, plugins: { legend: { display: false } }, scales: { y: { ticks: { font: { size: 10 } } } } }
+    });
+  }
+
+  // Chart: top 10 people by bonus (horizontal)
+  const personMap = {};
+  records.forEach(r => { const n = r.name || '—'; personMap[n] = (personMap[n] || 0) + calcBonus(r); });
+  const personSorted = Object.entries(personMap).sort((a, b) => b[1] - a[1]).slice(0, 10);
+  if (chartTop) chartTop.destroy();
+  const ctxTop = document.getElementById('chart-top');
+  if (ctxTop && personSorted.length) {
+    chartTop = new Chart(ctxTop, {
+      type: 'bar',
+      data: { labels: personSorted.map(e => e[0]), datasets: [{ label: 'پاداش (ریال)', data: personSorted.map(e => e[1]), backgroundColor: '#c9a227', borderRadius: 5 }] },
+      options: { indexAxis: 'y', responsive: true, plugins: { legend: { display: false } }, scales: { y: { ticks: { font: { size: 10 } } } } }
+    });
+  }
+
+  // Chart: dollar bonus by age group
+  const hasRate = rialToDollar(1) != null;
+  const ageDollarMap = { 'بزرگسالان': 0, 'جوانان': 0, 'امیدها': 0, 'نوجوانان': 0 };
+  records.forEach(r => { const d = rialToDollar(calcBonus(r)); if (d != null && ageDollarMap[r.agegroup] !== undefined) ageDollarMap[r.agegroup] += d; });
+  if (chartAgeBonus) chartAgeBonus.destroy();
+  const ctxAgeBonus = document.getElementById('chart-agebonus');
+  if (ctxAgeBonus && records.length && hasRate) {
+    chartAgeBonus = new Chart(ctxAgeBonus, {
+      type: 'bar',
+      data: { labels: Object.keys(ageDollarMap), datasets: [{ label: 'پاداش (دلار)', data: Object.values(ageDollarMap).map(v => Math.round(v)), backgroundColor: '#2a8a5a', borderRadius: 5 }] },
+      options: { responsive: true, plugins: { legend: { display: false } } }
+    });
+  }
+
+  // Chart: athlete vs staff total bonus
+  const athBonus = records.filter(r => r.role === 'ورزشکار').reduce((s, r) => s + calcBonus(r), 0);
+  const staffBonus = records.filter(r => r.role !== 'ورزشکار').reduce((s, r) => s + calcBonus(r), 0);
+  if (chartAthStaff) chartAthStaff.destroy();
+  const ctxAthStaff = document.getElementById('chart-athstaff');
+  if (ctxAthStaff && records.length) {
+    chartAthStaff = new Chart(ctxAthStaff, {
+      type: 'doughnut',
+      data: { labels: ['ورزشکاران', 'کادر فنی/پزشکی'], datasets: [{ data: [athBonus, staffBonus], backgroundColor: ['#0d6e8a', '#e67e22'], borderWidth: 0 }] },
+      options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+    });
+  }
+
+  // Role bars
+  const roles = ['ورزشکار','سرمربی','مربی','کادر پزشکی','سرپرست','تکنیسین','آنالیزور'];
+  const maxRole = Math.max(...roles.map(r => records.filter(x => x.role === r).length), 1);
+  document.getElementById('role-bars').innerHTML = roles.map(r => {
+    const cnt = records.filter(x => x.role === r).length;
+    const pct = Math.round(cnt / maxRole * 100);
+    return `<div class="bar-stat"><div class="bar-stat-header"><span>${r}</span><span>${toPersianNum(cnt)}</span></div><div class="bar-stat-bar"><div class="bar-stat-fill" style="width:${pct}%"></div></div></div>`;
+  }).join('');
+
+  // Age bars
+  const ages = ['بزرگسالان','جوانان','امیدها','نوجوانان'];
+  const maxAge = Math.max(...ages.map(a => records.filter(x => x.agegroup === a).length), 1);
+  document.getElementById('age-bars').innerHTML = ages.map(a => {
+    const cnt = records.filter(x => x.agegroup === a).length;
+    const pct = Math.round(cnt / maxAge * 100);
+    return `<div class="bar-stat"><div class="bar-stat-header"><span>${a}</span><span>${toPersianNum(cnt)}</span></div><div class="bar-stat-bar"><div class="bar-stat-fill" style="width:${pct}%; background:linear-gradient(90deg,var(--gold),var(--gold-light));"></div></div></div>`;
+  }).join('');
+}
+
+// ============================================================
+//  SETTINGS UI
+// ============================================================
+function buildEventTableHTML(tblId, data, showTeam = true) {
+  const cols = ['فردی طلا','فردی نقره','فردی برنز'];
+  if (showTeam) cols.push('تیمی طلا','تیمی نقره','تیمی برنز');
+  let html = `<thead><tr><th>رویداد</th>${cols.map(c=>`<th>${c}</th>`).join('')}</tr></thead><tbody>`;
+  Object.entries(data).forEach(([ev, val]) => {
+    html += `<tr><td style="text-align:right; font-weight:600; min-width:180px; white-space:normal;">${ev}</td>`;
+    const fv = val.فردی || {};
+    html += `<td><input type="number" class="settings-input" data-tbl="${tblId}" data-ev="${ev}" data-type="فردی" data-medal="طلا" value="${fv.طلا||0}" step="0.5"></td>`;
+    html += `<td><input type="number" class="settings-input" data-tbl="${tblId}" data-ev="${ev}" data-type="فردی" data-medal="نقره" value="${fv.نقره||0}" step="0.5"></td>`;
+    html += `<td><input type="number" class="settings-input" data-tbl="${tblId}" data-ev="${ev}" data-type="فردی" data-medal="برنز" value="${fv.برنز||0}" step="0.5"></td>`;
+    if (showTeam) {
+      const tv = val.تیمی || {};
+      html += `<td><input type="number" class="settings-input" data-tbl="${tblId}" data-ev="${ev}" data-type="تیمی" data-medal="طلا" value="${tv.طلا||0}" step="0.5"></td>`;
+      html += `<td><input type="number" class="settings-input" data-tbl="${tblId}" data-ev="${ev}" data-type="تیمی" data-medal="نقره" value="${tv.نقره||0}" step="0.5"></td>`;
+      html += `<td><input type="number" class="settings-input" data-tbl="${tblId}" data-ev="${ev}" data-type="تیمی" data-medal="برنز" value="${tv.برنز||0}" step="0.5"></td>`;
+    }
+    html += `</tr>`;
+  });
+  return html + '</tbody>';
+}
+
+function renderSettingsUI() {
+  document.getElementById('st-table1').innerHTML = buildEventTableHTML('table1', settings.table1);
+  document.getElementById('st-table2').innerHTML = buildEventTableHTML('table2', settings.table2);
+  document.getElementById('st-table3').innerHTML = buildEventTableHTML('table3', settings.table3);
+
+  // Table 4a
+  let html4a = '<thead><tr><th>گروه</th><th>جهان طلا</th><th>جهان نقره</th><th>جهان برنز</th><th>آسیا طلا</th><th>آسیا نقره</th><th>آسیا برنز</th></tr></thead><tbody>';
+  Object.entries(settings.table4a).forEach(([k, v]) => {
+    const j = v.جهان || {}; const a = v.آسیا || {};
+    html4a += `<tr><td style="font-weight:600; min-width:80px;">${k}</td>
+      <td><input type="number" class="settings-input" data-tbl4a="${k}" data-col="جهان" data-medal="طلا" value="${j.طلا||0}"></td>
+      <td><input type="number" class="settings-input" data-tbl4a="${k}" data-col="جهان" data-medal="نقره" value="${j.نقره||0}"></td>
+      <td><input type="number" class="settings-input" data-tbl4a="${k}" data-col="جهان" data-medal="برنز" value="${j.برنز||0}"></td>
+      <td><input type="number" class="settings-input" data-tbl4a="${k}" data-col="آسیا" data-medal="طلا" value="${a.طلا||0}"></td>
+      <td><input type="number" class="settings-input" data-tbl4a="${k}" data-col="آسیا" data-medal="نقره" value="${a.نقره||0}"></td>
+      <td><input type="number" class="settings-input" data-tbl4a="${k}" data-col="آسیا" data-medal="برنز" value="${a.برنز||0}"></td>
+    </tr>`;
+  });
+  document.getElementById('st-table4a').innerHTML = html4a + '</tbody>';
+
+  // Table 4b
+  const labels4b = {
+    'طلا_طلا':'طلا + طلا (یک‌ضرب و دوضرب هردو طلا)',
+    'طلا_برنز':'طلا + برنز',
+    'نقره_نقره':'نقره + نقره (هردو نقره)',
+    'نقره_برنز':'نقره + برنز',
+    'برنز_برنز':'برنز + برنز (هردو برنز)',
+    'طلا_تنها':'فقط طلا (در یک حرکت)',
+    'نقره_تنها':'فقط نقره (در یک حرکت)',
+    'برنز_تنها':'فقط برنز (در یک حرکت)'
+  };
+  let html4b = '<thead><tr><th>ترکیب (یک‌ضرب–دو‌ضرب)</th><th>قهرمانی جهان</th><th>قهرمانی آسیا</th></tr></thead><tbody>';
+  Object.entries(settings.table4b).forEach(([k, v]) => {
+    html4b += `<tr><td style="font-weight:600;">${labels4b[k] || k}</td>
+      <td><input type="number" class="settings-input" data-tbl4b="${k}" data-col="جهان" value="${v.جهان||0}"></td>
+      <td><input type="number" class="settings-input" data-tbl4b="${k}" data-col="آسیا" value="${v.آسیا||0}"></td>
+    </tr>`;
+  });
+  document.getElementById('st-table4b').innerHTML = html4b + '</tbody>';
+
+  // Table 5
+  const t5defs = [
+    { role:'سرمربی', f1:'۵۰٪', fn:'۱۰٪', team:'معادل ورزشکار', note:'sequential' },
+    { role:'مربی', f1:'۳۰٪', fn:'۵٪', team:'۴۰٪ جایزه ورزشکار', note:'sequential' },
+    { role:'کادر پزشکی', f1:'۵٪ بهترین مدال', fn:'—', team:'۵٪ جایزه ورزشکار', note:'best_medal' },
+    { role:'سرپرست', f1:'۱۵٪ بهترین مدال', fn:'—', team:'۱۰٪ جایزه ورزشکار', note:'best_medal' },
+    { role:'تکنیسین', f1:'۵٪ بهترین مدال', fn:'—', team:'۵٪ جایزه ورزشکار', note:'best_medal' },
+    { role:'آنالیزور', f1:'۵٪ جایزه ورزشکار', fn:'—', team:'۵٪ بهترین مدال', note:'athlete_pct' }
+  ];
+  let html5 = '<table class="settings-table" style="font-size:12px;"><thead><tr><th>سمت</th><th>انفرادی — مدال اول</th><th>انفرادی — مدال بعدی</th><th>تیمی</th></tr></thead><tbody>';
+  t5defs.forEach(d => {
+    html5 += `<tr><td style="font-weight:700; color:var(--teal-dark);">${d.role}</td><td>${d.f1}</td><td>${d.fn}</td><td>${d.team}</td></tr>`;
+  });
+  html5 += '</tbody></table><div style="font-size:11px; color:var(--text-muted); margin-top:8px;">مقادیر جدول ۵ بر اساس دستورالعمل ثابت هستند و از طریق این رابط کاربری ویرایش می‌شوند با ویرایش کد.</div>';
+  document.getElementById('st-table5').innerHTML = html5;
+
+  // Age coefs
+  let htmlAge = '';
+  Object.entries(settings.ageCoefs).forEach(([name, coef]) => {
+    htmlAge += `<div class="settings-row"><span class="settings-label">${name}</span><input type="number" class="settings-input" data-agecoef="${name}" value="${coef}" min="0" max="1" step="0.05"></div>`;
+  });
+  document.getElementById('st-age-coefs').innerHTML = htmlAge;
+
+  document.getElementById('base-point-value').value = settings.basePoint;
+  document.getElementById('dollar-rate').value = settings.dollarRate || '';
+}
+
+function saveSettings() {
+  // Read table1/2/3
+  ['table1','table2','table3'].forEach(tbl => {
+    document.querySelectorAll(`[data-tbl="${tbl}"]`).forEach(inp => {
+      const ev = inp.dataset.ev, type = inp.dataset.type, medal = inp.dataset.medal;
+      if (settings[tbl][ev] && settings[tbl][ev][type]) {
+        settings[tbl][ev][type][medal] = parseFloat(inp.value) || 0;
+      }
+    });
+  });
+  // Table 4a
+  document.querySelectorAll('[data-tbl4a]').forEach(inp => {
+    const k = inp.dataset.tbl4a, col = inp.dataset.col, medal = inp.dataset.medal;
+    if (settings.table4a[k] && settings.table4a[k][col]) settings.table4a[k][col][medal] = parseFloat(inp.value) || 0;
+  });
+  // Table 4b
+  document.querySelectorAll('[data-tbl4b]').forEach(inp => {
+    const k = inp.dataset.tbl4b, col = inp.dataset.col;
+    if (settings.table4b[k]) settings.table4b[k][col] = parseFloat(inp.value) || 0;
+  });
+  // Age coefs
+  document.querySelectorAll('[data-agecoef]').forEach(inp => {
+    settings.ageCoefs[inp.dataset.agecoef] = parseFloat(inp.value) || 0;
+  });
+  settings.basePoint = parseInt(document.getElementById('base-point-value').value) || 0;
+  settings.dollarRate = Math.max(0, parseInt(document.getElementById('dollar-rate').value) || 0);
+  saveSettingsToStorage();
+  populateCompDropdown('f-comp');
+  populateCompDropdown('filter-comp');
+  renderTable();
+  refreshDashboard();
+  showToast('تنظیمات با موفقیت ذخیره شد.', 'success');
+}
+
+function resetSettings() {
+  if (!confirm('آیا می‌خواهید تمام تنظیمات را به مقادیر پیش‌فرض دستورالعمل بازنشانی کنید؟')) return;
+  localStorage.removeItem('bonusSettings2024');
+  settings = loadSettings();
+  renderSettingsUI();
+  populateCompDropdown('f-comp');
+  populateCompDropdown('filter-comp');
+  renderTable();
+  refreshDashboard();
+  showToast('تنظیمات به مقادیر پیش‌فرض دستورالعمل بازنشانی شد.', 'info');
+}
+
+// ============================================================
+//  IMPORT / EXPORT
+// ============================================================
+function handleImportFile(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const wb = XLSX.read(e.target.result, { type: 'binary' });
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(ws, { header: 1 });
+      if (rows.length < 2) { showToast('فایل خالی است.', 'error'); return; }
+      const headers = (rows[0] || []).map(h => String(h || '').trim());
+      const colMap = {};
+      const cols = {
+        name:['نام','اسم'], gender:['جنسیت'], agegroup:['رده سنی','گروه سنی','سنی'],
+        federation:['فدراسیون','انجمن'],
+        role:['نقش','سمت'], comp:['رویداد','مسابقه','رقابت'],
+        type:['نوع شرکت','نوع'], medal:['مدال'],
+        medalorder:['ترتیب مدال','ترتیب'],
+        year:['سال'], location:['محل','محل برگزاری'], sport:['رشته'],
+        wlSnatch:['یک‌ضرب','یک ضرب'], wlCj:['دوضرب','دو‌ضرب','دو ضرب'], wlTotal:['مجموع']
+      };
+      Object.entries(cols).forEach(([key, variants]) => {
+        const idx = headers.findIndex(h => variants.some(v => h.includes(v)));
+        if (idx !== -1) colMap[key] = idx;
+      });
+      if (colMap.name === undefined) { showToast('ستون «نام» یافت نشد.', 'error'); return; }
+      const eventNames = [...Object.keys(getAllEvents()),
+        'وزنه‌برداری - قهرمانی جهان (گروه اول)', 'وزنه‌برداری - قهرمانی آسیا (گروه اول)'];
+      const fedNames = Object.keys(FEDERATIONS);
+      const parsed = [];
+      let fallbackCount = 0;
+      for (let i = 1; i < rows.length; i++) {
+        const row = rows[i];
+        if (!row || row.every(c => !c)) continue;
+        const name = String(row[colMap.name] || '').trim();
+        if (!name) continue;
+        const rec = {
+          id: crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${i}-${Math.random().toString(36).slice(2)}`,
+          name,
+          gender: String(row[colMap.gender] || 'آقا').trim() || 'آقا',
+          agegroup: String(row[colMap.agegroup] || 'بزرگسالان').trim() || 'بزرگسالان',
+          federation: colMap.federation !== undefined ? String(row[colMap.federation] || '').trim() : '',
+          role: String(row[colMap.role] || 'ورزشکار').trim() || 'ورزشکار',
+          comp: String(row[colMap.comp] || eventNames[0]).trim() || eventNames[0],
+          type: String(row[colMap.type] || 'فردی').trim() || 'فردی',
+          medal: String(row[colMap.medal] || 'طلا').trim() || 'طلا',
+          medalorder: String(row[colMap.medalorder] || 'اول').trim() || 'اول',
+          year: String(row[colMap.year] || '').trim(),
+          location: String(row[colMap.location] || '').trim(),
+          sport: colMap.sport !== undefined ? String(row[colMap.sport] || '').trim() : '',
+          wlSnatch: colMap.wlSnatch !== undefined ? String(row[colMap.wlSnatch] || '—').trim() : '—',
+          wlCj: colMap.wlCj !== undefined ? String(row[colMap.wlCj] || '—').trim() : '—',
+          wlTotal: colMap.wlTotal !== undefined ? String(row[colMap.wlTotal] || '—').trim() : '—'
+        };
+        let rowHadFallback = false;
+        if (!['آقا','خانم'].includes(rec.gender)) { rec.gender = 'آقا'; rowHadFallback = true; }
+        if (!['بزرگسالان','جوانان','امیدها','نوجوانان'].includes(rec.agegroup)) { rec.agegroup = 'بزرگسالان'; rowHadFallback = true; }
+        if (!fedNames.includes(rec.federation)) { rec.federation = ''; rowHadFallback = true; }
+        if (!['فردی','تیمی'].includes(rec.type)) { rec.type = 'فردی'; rowHadFallback = true; }
+        if (!['طلا','نقره','برنز'].includes(rec.medal)) { rec.medal = 'طلا'; rowHadFallback = true; }
+        if (!['اول','بعدی'].includes(rec.medalorder)) { rec.medalorder = 'اول'; rowHadFallback = true; }
+        if (!eventNames.includes(rec.comp)) { rec.comp = eventNames[0]; rowHadFallback = true; }
+        if (!['طلا','نقره','برنز','—'].includes(rec.wlSnatch)) { rec.wlSnatch = '—'; rowHadFallback = true; }
+        if (!['طلا','نقره','برنز','—'].includes(rec.wlCj)) { rec.wlCj = '—'; rowHadFallback = true; }
+        if (!['طلا','نقره','برنز','—'].includes(rec.wlTotal)) { rec.wlTotal = '—'; rowHadFallback = true; }
+        if (rowHadFallback) fallbackCount++;
+        parsed.push(rec);
+      }
+      if (!parsed.length) { showToast('ردیف معتبری یافت نشد.', 'error'); return; }
+      if (fallbackCount > 0) {
+        showToast(`توجه: در ${toPersianNum(fallbackCount)} ردیف، حداقل یک مقدار نامعتبر بود و با مقدار پیش‌فرض جایگزین شد. قبل از تأیید، جدول پیش‌نمایش را بررسی کنید.`, 'warning');
+      }
+      pendingImport = parsed;
+      showImportPreview(parsed);
+    } catch(err) { showToast('خطا در خواندن فایل: ' + err.message, 'error'); }
+  };
+  reader.readAsBinaryString(file);
+  event.target.value = '';
+}
+
+function showImportPreview(parsed) {
+  const tbody = document.getElementById('import-tbody');
+  tbody.innerHTML = parsed.map((r, i) => {
+    const bonus = calcBonus(r);
+    const mIcon = r.medal === 'طلا' ? '🥇' : r.medal === 'نقره' ? '🥈' : '🥉';
+    return `<tr>
+      <td>${toPersianNum(i+1)}</td><td>${r.name}</td><td>${r.gender}</td><td>${r.agegroup}</td>
+      <td>${r.role}</td><td style="font-size:11px;">${r.comp}</td><td>${r.type}</td>
+      <td>${mIcon} ${r.medal}</td><td>${r.medalorder === 'اول' ? '۱۰۰٪' : '۳۰٪'}</td>
+      <td>${r.year || '—'}</td><td>${r.location || '—'}</td>
+      <td style="font-weight:700; color:var(--teal-dark);">${formatMoney(bonus)}</td>
+      <td><span class="badge badge-green">آماده</span></td>
+    </tr>`;
+  }).join('');
+  document.getElementById('import-preview-card').style.display = 'block';
+  showToast(`${toPersianNum(parsed.length)} ردیف آماده بارگذاری است.`, 'info');
+}
+
+function confirmImport() {
+  if (!pendingImport.length) return;
+  records.push(...pendingImport);
+  saveRecords();
+  renderTable();
+  refreshDashboard();
+  populateYearFilter();
+  document.getElementById('import-preview-card').style.display = 'none';
+  pendingImport = [];
+  showToast('داده‌ها با موفقیت وارد شدند.', 'success');
+}
+
+function cancelImport() {
+  pendingImport = [];
+  document.getElementById('import-preview-card').style.display = 'none';
+}
+
+function downloadTemplate() {
+  const data = [
+    ['نام','جنسیت','رده سنی','فدراسیون','رشته','نقش','رویداد','نوع شرکت','مدال','ترتیب مدال','سال','محل'],
+    ['علی احمدی','آقا','بزرگسالان','فدراسیون کشتی','کشتی آزاد','ورزشکار','بازی‌های المپیک','فردی','طلا','اول','۱۴۰۳','پاریس'],
+    ['فاطمه نوری','خانم','بزرگسالان','فدراسیون تیراندازی','تپانچه','ورزشکار','قهرمانی جهان (گروه اول)','فردی','نقره','اول','۱۴۰۳','توکیو'],
+    ['محمد رضایی','آقا','بزرگسالان','فدراسیون کشتی','کشتی آزاد','سرمربی','بازی‌های المپیک','فردی','طلا','اول','۱۴۰۳','پاریس']
+  ];
+  const ws = XLSX.utils.aoa_to_sheet(data);
+  ws['!cols'] = [{wch:16},{wch:8},{wch:12},{wch:22},{wch:16},{wch:10},{wch:28},{wch:10},{wch:8},{wch:12},{wch:8},{wch:12}];
+  styleExcelSheet(ws, 1);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'پاداش');
+  XLSX.writeFile(wb, 'نمونه_پاداش.xlsx');
+}
+
+// Apply borders (خط‌کشی) + B Nazanin font + RTL to every cell of a worksheet
+function styleExcelSheet(ws, headerRows) {
+  headerRows = headerRows || 1;
+  const bd = { style: 'thin', color: { rgb: '000000' } };
+  const range = XLSX.utils.decode_range(ws['!ref']);
+  for (let R = range.s.r; R <= range.e.r; R++) {
+    for (let C = range.s.c; C <= range.e.c; C++) {
+      const addr = XLSX.utils.encode_cell({ r: R, c: C });
+      if (!ws[addr]) ws[addr] = { t: 's', v: '' };
+      const isHead = R < headerRows;
+      ws[addr].s = {
+        font: { name: 'B Nazanin', sz: isHead ? 12 : 11, bold: isHead, color: { rgb: isHead ? 'FFFFFF' : '000000' } },
+        fill: { patternType: 'solid', fgColor: { rgb: isHead ? '084F64' : 'FFFFFF' } },
+        alignment: { horizontal: 'center', vertical: 'center', wrapText: true, readingOrder: 2 },
+        border: { top: bd, bottom: bd, left: bd, right: bd }
+      };
+    }
+  }
+  ws['!views'] = [{ RTL: true }];
+}
+
+function exportToExcel() {
+  const filtered = getFiltered();
+  const data = [['ردیف','نام','جنسیت','رده سنی','فدراسیون/انجمن','رشته','نقش','رویداد','نوع','سال','محل','مدال (مؤثر)','یک‌ضرب','دوضرب','مجموع','ملاک محاسبه','ترتیب مدال','پاداش (ریال)','پاداش (دلار)','ضریب اعمال‌شده']];
+  filtered.forEach((r, i) => {
+    const effMedal = getEffectiveMedal(r);
+    let basis = '';
+    if (isWeightlifting(r.comp) && r.role === 'ورزشکار') {
+      const res = resolveWlResult(r);
+      basis = res.table === 'مجموع' ? 'جدول الف (مجموع)' : res.table === 'ترکیب' ? 'جدول ب (یک‌ضرب/دوضرب)' : '—';
+    }
+    const bonusVal = calcBonus(r);
+    const dollarVal = rialToDollar(bonusVal);
+    data.push([i+1, r.name, r.gender, r.agegroup, r.federation||'', r.sport||'', r.role, r.comp, r.type||'فردی',
+      r.year||'', r.location||'', effMedal,
+      r.wlSnatch||'', r.wlCj||'', r.wlTotal||'', basis,
+      r.medalorder||'اول', bonusVal, (dollarVal != null ? Math.round(dollarVal) : ''), getRoleLabel(r)]);
+  });
+  const ws = XLSX.utils.aoa_to_sheet(data);
+  ws['!cols'] = [{wch:5},{wch:18},{wch:8},{wch:12},{wch:22},{wch:16},{wch:10},{wch:28},{wch:8},{wch:8},{wch:12},{wch:8},{wch:8},{wch:8},{wch:8},{wch:18},{wch:12},{wch:18},{wch:14},{wch:18}];
+  styleExcelSheet(ws, 1);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'پاداش');
+  XLSX.writeFile(wb, 'لیست_پاداش.xlsx');
+  showToast('فایل اکسل دانلود شد.', 'success');
+}
+
+// ============================================================
+//  AUTH
+//  توجه: این لاگین کاملاً سمت کلاینت است و جای یک بک‌اند واقعی
+//  را نمی‌گیرد؛ هش‌کردن رمز فقط از ذخیرهٔ متن‌سادهٔ آن در
+//  localStorage جلوگیری می‌کند، نه جایگزین احراز هویت سرور.
+// ============================================================
+async function hashPassword(pass) {
+  if (!window.crypto || !window.crypto.subtle) {
+    // محیط ناامن (مثل باز کردن فایل با file://) از Web Crypto پشتیبانی نمی‌کند
+    console.warn('Web Crypto در دسترس نیست؛ رمز بدون هش مقایسه می‌شود. برای امنیت بهتر، فایل را از طریق یک سرور محلی (http/https) باز کنید.');
+    return 'plain:' + pass;
+  }
+  const data = new TextEncoder().encode(pass);
+  const hashBuf = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(hashBuf)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function getStoredPasswordHash() {
+  const storedHash = localStorage.getItem('adminPasswordHash');
+  if (storedHash) return storedHash;
+  // Migration از نسخهٔ قدیمی که رمز را متن‌ساده ذخیره می‌کرد
+  const legacyPlain = localStorage.getItem('adminPassword') || 'admin1234';
+  const migratedHash = await hashPassword(legacyPlain);
+  localStorage.setItem('adminPasswordHash', migratedHash);
+  localStorage.removeItem('adminPassword');
+  return migratedHash;
+}
+
+async function doLogin() {
+  const user = document.getElementById('login-user').value.trim();
+  const pass = document.getElementById('login-pass').value;
+  const storedHash = await getStoredPasswordHash();
+  const passHash = await hashPassword(pass);
+  if (user === 'admin' && passHash === storedHash) {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('main-header').style.display = 'flex';
+    document.getElementById('main-nav').style.display = 'flex';
+    document.getElementById('main-content').style.display = 'block';
+    document.getElementById('header-username').textContent = user;
+    currentUser = user;
+    init();
+    refreshDashboard();
+  } else {
+    document.getElementById('login-error').style.display = 'block';
+    document.getElementById('login-user').classList.add('error');
+    document.getElementById('login-pass').classList.add('error');
+  }
+}
+
+function doLogout() {
+  if (!confirm('از سیستم خارج می‌شوید؟')) return;
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('main-header').style.display = 'none';
+  document.getElementById('main-nav').style.display = 'none';
+  document.getElementById('main-content').style.display = 'none';
+  document.getElementById('login-user').value = '';
+  document.getElementById('login-pass').value = '';
+  document.getElementById('login-error').style.display = 'none';
+}
+
+async function changePassword() {
+  const old = document.getElementById('pw-old').value;
+  const nw = document.getElementById('pw-new').value;
+  const nw2 = document.getElementById('pw-new2').value;
+  const storedHash = await getStoredPasswordHash();
+  const oldHash = await hashPassword(old);
+  if (oldHash !== storedHash) { showToast('رمز فعلی اشتباه است.', 'error'); return; }
+  if (nw.length < 6) { showToast('رمز جدید باید حداقل ۶ کاراکتر باشد.', 'error'); return; }
+  if (nw !== nw2) { showToast('تکرار رمز جدید مطابقت ندارد.', 'error'); return; }
+  localStorage.setItem('adminPasswordHash', await hashPassword(nw));
+  ['pw-old','pw-new','pw-new2'].forEach(id => document.getElementById(id).value = '');
+  showToast('رمز عبور با موفقیت تغییر یافت.', 'success');
+}
+
+// ============================================================
+//  UI HELPERS
+// ============================================================
+function showTab(pageId) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(pageId).classList.add('active');
+  const tabEl = document.getElementById('tab-' + pageId);
+  if (tabEl) tabEl.classList.add('active');
+  if (pageId === 'page-table') renderTable();
+  if (pageId === 'page-dashboard') refreshDashboard();
+  if (pageId === 'page-settings') renderSettingsUI();
+}
+
+function openHelp() { document.getElementById('help-modal').classList.add('open'); }
+function closeHelp() { document.getElementById('help-modal').classList.remove('open'); }
+
+function printReport() {
+  document.getElementById('print-date').textContent = new Date().toLocaleDateString('fa-IR');
+  showTab('page-table');
+  renderTable();
+  setTimeout(() => window.print(), 200);
+}
+
+function printSettings() {
+  showTab('page-settings');
+  document.body.classList.add('print-settings');
+  setTimeout(() => {
+    window.print();
+    setTimeout(() => document.body.classList.remove('print-settings'), 500);
+  }, 250);
+}
+
+function showToast(msg, type = 'info') {
+  const c = document.getElementById('toast-container');
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  const icon = { success:'check-circle', error:'times-circle', warning:'exclamation-triangle', info:'info-circle' }[type] || 'info-circle';
+  t.innerHTML = `<i class="fas fa-${icon}"></i> ${msg}`;
+  c.appendChild(t);
+  setTimeout(() => { t.style.opacity = '0'; t.style.transition = 'opacity .4s'; setTimeout(() => t.remove(), 400); }, 3500);
+}
+
+// Close modal on overlay click
+document.getElementById('help-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeHelp();
+});
+
+// ============================================================
+//  PRESET FORM LISTENERS
+// ============================================================
+document.getElementById('f-comp').addEventListener('change', onCompChange);
+['f-type','f-medal','f-medalorder','f-agegroup','f-role'].forEach(id => {
+  document.getElementById(id).addEventListener('change', updatePreview);
+});
+</script>
+</body>
+</html>

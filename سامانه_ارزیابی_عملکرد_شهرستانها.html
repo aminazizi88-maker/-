@@ -1,0 +1,1974 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>سامانه ارزیابی عملکرد ورزشی — سیستان و بلوچستان</title>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
+<style>
+:root{
+  --pr:#1a6b5a;--pr-l:#2a8a74;--pr-d:#104840;
+  --ac:#c9a227;--ac-l:#e8bc3a;
+  --bl:#1e5f8e;--bl-l:#2676ae;
+  --rd:#d63030;--gr:#22a25a;--or:#e8861a;
+  --bg:#f0f4f8;--card:rgba(255,255,255,0.92);
+  --brd:rgba(26,107,90,0.15);--sh:0 4px 24px rgba(26,107,90,0.10);
+  --r:14px;--rs:8px;
+  /* رنگ گروه‌ها */
+  --champ:#1a6b5a;--pub:#1e5f8e;--rural:#8a5a0a;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Vazirmatn',Tahoma,sans-serif;background:var(--bg);
+  background-image:radial-gradient(ellipse at 20% 20%,rgba(26,107,90,0.07) 0%,transparent 55%),
+    radial-gradient(ellipse at 80% 80%,rgba(30,95,142,0.07) 0%,transparent 55%);
+  min-height:100vh;color:#1a2332;direction:rtl;}
+
+/* سایدبار */
+#sb{position:fixed;right:0;top:0;bottom:0;width:248px;
+  background:linear-gradient(170deg,var(--pr-d) 0%,var(--pr) 60%,var(--bl) 100%);
+  z-index:1000;display:flex;flex-direction:column;box-shadow:-4px 0 30px rgba(0,0,0,0.2);
+  transition:transform .3s;}
+#sb .logo{padding:20px 16px 14px;border-bottom:1px solid rgba(255,255,255,0.12);}
+#sb .logo h1{font-size:12.5px;font-weight:700;color:#fff;line-height:1.65;}
+#sb .logo .ba{display:inline-block;margin-top:5px;background:var(--ac);color:#fff;font-size:10px;padding:2px 8px;border-radius:20px;}
+#sb nav{flex:1;padding:10px 0;overflow-y:auto;}
+#sb nav a{display:flex;align-items:center;gap:9px;padding:11px 16px;color:rgba(255,255,255,0.72);
+  font-size:13px;font-weight:500;cursor:pointer;border-right:3px solid transparent;transition:all .2s;}
+#sb nav a:hover{color:#fff;background:rgba(255,255,255,0.08);}
+#sb nav a.act{color:#fff;background:rgba(255,255,255,0.14);border-right-color:var(--ac);}
+#sb nav .sep{padding:8px 16px 4px;font-size:10px;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:.05em;}
+#sb .up{padding:12px 16px;border-top:1px solid rgba(255,255,255,0.12);font-size:12px;color:rgba(255,255,255,0.65);}
+#sb .up .un{font-weight:700;color:#fff;font-size:13px;margin-bottom:2px;}
+
+/* محتوا */
+#main{margin-right:248px;min-height:100vh;display:flex;flex-direction:column;}
+.topbar{background:var(--card);backdrop-filter:blur(10px);padding:13px 26px;
+  display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid var(--brd);position:sticky;top:0;z-index:100;
+  box-shadow:0 2px 12px rgba(0,0,0,0.06);}
+.topbar h2{font-size:16px;font-weight:700;color:var(--pr-d);}
+.content{padding:26px;flex:1;}
+
+/* صفحات */
+.pg{display:none;}.pg.act{display:block;}
+
+/* کارت */
+.card{background:var(--card);backdrop-filter:blur(12px);border:1px solid var(--brd);
+  border-radius:var(--r);padding:20px;box-shadow:var(--sh);}
+.ct{font-size:14.5px;font-weight:700;color:var(--pr-d);margin-bottom:14px;
+  padding-bottom:11px;border-bottom:2px solid rgba(26,107,90,0.1);
+  display:flex;align-items:center;gap:7px;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+
+/* دکمه */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--rs);
+  font-family:'Vazirmatn',sans-serif;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all .2s;}
+.bp{background:var(--pr);color:#fff;}.bp:hover{background:var(--pr-l);transform:translateY(-1px);box-shadow:0 4px 14px rgba(26,107,90,0.3);}
+.ba{background:var(--ac);color:#fff;}.ba:hover{background:var(--ac-l);}
+.bb{background:var(--bl);color:#fff;}.bb:hover{background:var(--bl-l);}
+.bo{background:transparent;color:var(--pr);border:1.5px solid var(--pr);}.bo:hover{background:var(--pr);color:#fff;}
+.blg{padding:12px 26px;font-size:14.5px;border-radius:10px;}
+.bsm{padding:6px 11px;font-size:12px;}
+.brd-btn{background:rgba(214,48,48,0.1);color:var(--rd);border:1px solid rgba(214,48,48,0.2);}
+.brd-btn:hover{background:var(--rd);color:#fff;}
+
+/* KPI */
+.kpi{background:var(--card);border-radius:var(--r);padding:18px 20px;border:1px solid var(--brd);
+  box-shadow:var(--sh);position:relative;overflow:hidden;}
+.kpi::before{content:'';position:absolute;top:0;right:0;width:4px;height:100%;}
+.kpi.g::before{background:var(--gr);}
+.kpi.a::before{background:var(--ac);}
+.kpi.b::before{background:var(--bl);}
+.kpi.r::before{background:var(--rd);}
+.kpi.c::before{background:var(--champ);}
+.kpi.p::before{background:var(--pub);}
+.kpi.ru::before{background:var(--rural);}
+.kpi .lb{font-size:11.5px;color:#5a6a7a;margin-bottom:5px;}
+.kpi .vl{font-size:24px;font-weight:800;color:var(--pr-d);}
+.kpi .sb{font-size:11px;color:#5a6a7a;margin-top:3px;}
+.kpi .ib{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:32px;opacity:0.1;}
+
+/* رنگ گروه‌ها */
+.gc{color:var(--champ);font-weight:700;}
+.gp{color:var(--pub);font-weight:700;}
+.gr-color{color:var(--rural);font-weight:700;}
+.tag-c{background:rgba(26,107,90,0.1);color:var(--champ);padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700;}
+.tag-p{background:rgba(30,95,142,0.1);color:var(--pub);padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700;}
+.tag-r{background:rgba(138,90,10,0.1);color:var(--rural);padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700;}
+
+/* جدول */
+.tw{overflow-x:auto;border-radius:var(--rs);}
+table{width:100%;border-collapse:collapse;font-size:12.5px;}
+th{background:linear-gradient(135deg,var(--pr-d),var(--pr));color:#fff;padding:10px 12px;text-align:right;font-weight:600;white-space:nowrap;}
+td{padding:9px 12px;border-bottom:1px solid rgba(0,0,0,0.055);}
+tr:hover td{background:rgba(26,107,90,0.035);}
+tr:last-child td{border-bottom:none;}
+.r1 td{background:rgba(201,162,39,0.07);}
+.r2 td{background:rgba(138,154,170,0.07);}
+.r3 td{background:rgba(176,112,64,0.07);}
+
+/* فرم */
+.fg{margin-bottom:14px;}
+.fl{display:block;font-size:12.5px;font-weight:600;color:#1a2332;margin-bottom:5px;}
+.fi,.fs,.fta{width:100%;padding:8px 11px;border-radius:var(--rs);
+  border:1.5px solid rgba(0,0,0,0.12);font-family:'Vazirmatn',sans-serif;
+  font-size:13px;background:#fff;color:#1a2332;transition:border-color .2s;direction:rtl;}
+.fi:focus,.fs:focus,.fta:focus{outline:none;border-color:var(--pr);box-shadow:0 0 0 3px rgba(26,107,90,0.1);}
+.fta{min-height:75px;resize:vertical;}
+
+/* آپلود */
+.uz{border:2px dashed rgba(26,107,90,0.28);border-radius:var(--rs);padding:16px;
+  text-align:center;cursor:pointer;transition:all .2s;background:rgba(26,107,90,0.025);position:relative;}
+.uz:hover,.uz.dg{border-color:var(--pr);background:rgba(26,107,90,0.06);}
+.uz input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;}
+.uz .ic{font-size:24px;margin-bottom:6px;}
+.uz p{font-size:12px;color:#5a6a7a;}
+.uz .fn{font-size:11.5px;color:var(--pr);font-weight:600;margin-top:5px;}
+.uz.done{border-color:var(--gr);background:rgba(34,162,90,0.05);}
+
+/* تب */
+.tabs{display:flex;gap:3px;margin-bottom:18px;border-bottom:2px solid var(--brd);}
+.tab{padding:8px 14px;cursor:pointer;font-size:13px;font-weight:500;color:#5a6a7a;
+  border-radius:8px 8px 0 0;transition:all .2s;border-bottom:2px solid transparent;margin-bottom:-2px;}
+.tab:hover{color:var(--pr);background:rgba(26,107,90,0.04);}
+.tab.act{color:var(--pr);font-weight:700;border-bottom-color:var(--pr);background:rgba(26,107,90,0.05);}
+.tc{display:none;}.tc.act{display:block;}
+
+/* اعلان */
+.al{padding:11px 14px;border-radius:var(--rs);font-size:12.5px;margin-bottom:10px;display:flex;align-items:flex-start;gap:8px;}
+.al-s{background:rgba(34,162,90,0.09);border:1px solid rgba(34,162,90,0.28);color:#0f6a35;}
+.al-w{background:rgba(232,134,26,0.09);border:1px solid rgba(232,134,26,0.28);color:#7a4800;}
+.al-d{background:rgba(214,48,48,0.09);border:1px solid rgba(214,48,48,0.28);color:#8a0000;}
+.al-i{background:rgba(30,95,142,0.07);border:1px solid rgba(30,95,142,0.22);color:#0a3d65;}
+
+/* progress step */
+.ps{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:var(--rs);
+  font-size:12.5px;margin-bottom:7px;border:1px solid var(--brd);}
+.ps .dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.ps.done .dot{background:var(--gr);}
+.ps.pend .dot{background:rgba(0,0,0,0.18);}
+.ps.run .dot{background:var(--ac);animation:pulse 1.2s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+
+/* slider */
+.sw{display:flex;align-items:center;gap:10px;}
+.sw input[type=range]{flex:1;accent-color:var(--pr);}
+.sv{font-weight:700;color:var(--pr);min-width:36px;text-align:center;font-size:13px;}
+
+/* نقشه */
+#map-cont{background:linear-gradient(135deg,#e8f4f0,#dce8f5);border-radius:var(--r);
+  border:1px solid var(--brd);position:relative;overflow:hidden;min-height:460px;}
+#map-svg{width:100%;height:460px;}
+.mtt{position:absolute;background:rgba(10,30,50,0.9);color:#fff;padding:10px 13px;
+  border-radius:8px;font-size:12px;pointer-events:none;display:none;z-index:10;
+  min-width:170px;box-shadow:0 8px 30px rgba(0,0,0,0.25);}
+.mtt .mtt-title{font-size:13.5px;font-weight:700;margin-bottom:6px;border-bottom:1px solid rgba(255,255,255,0.2);padding-bottom:5px;}
+.mtt .mtt-row{display:flex;justify-content:space-between;gap:14px;margin-top:3px;font-size:11.5px;}
+
+/* نردبان */
+.li{display:flex;align-items:center;gap:9px;padding:7px 10px;border-radius:8px;
+  margin-bottom:5px;border:1px solid var(--brd);background:var(--card);transition:all .2s;}
+.li:hover{transform:translateX(-2px);box-shadow:var(--sh);}
+.li .rk{font-size:17px;font-weight:800;min-width:30px;color:#5a6a7a;}
+.li .nm{flex:1;font-weight:600;font-size:13px;}
+.li .sc{font-weight:700;color:var(--pr);}
+.li .br{flex:2;}
+.sb2{height:5px;border-radius:3px;background:rgba(0,0,0,0.07);}
+.sf{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--pr),var(--ac));transition:width .6s;}
+
+/* عملکرد */
+.ph{color:var(--gr);font-weight:700;}
+.pm{color:var(--or);font-weight:600;}
+.pl{color:var(--rd);font-weight:700;}
+
+/* ورود */
+#lo{position:fixed;inset:0;z-index:9999;
+  background:linear-gradient(135deg,var(--pr-d) 0%,var(--pr) 45%,var(--bl) 100%);
+  display:flex;align-items:center;justify-content:center;}
+.lb{background:rgba(255,255,255,0.97);border-radius:20px;padding:40px 38px;width:380px;
+  box-shadow:0 20px 60px rgba(0,0,0,0.25);}
+.lb h1{font-size:17px;font-weight:800;color:var(--pr-d);margin-bottom:3px;}
+.lb p{font-size:12.5px;color:#5a6a7a;margin-bottom:26px;}
+
+/* badge تیپ */
+.bt{display:inline-block;padding:2px 7px;border-radius:20px;font-size:11px;font-weight:700;}
+.bt1{background:rgba(30,95,142,0.1);color:var(--bl);}
+.bt2{background:rgba(26,107,90,0.1);color:var(--pr);}
+.bt3{background:rgba(201,162,39,0.14);color:#8a6800;}
+
+/* موبایل */
+#mt{display:none;background:none;border:none;font-size:24px;cursor:pointer;padding:4px;}
+#ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:999;}
+@media(max-width:768px){
+  #sb{transform:translateX(100%);}#sb.open{transform:translateX(0);}
+  #main{margin-right:0;}#mt{display:block;}#ov.show{display:block;}
+  .g2,.g3,.g4{grid-template-columns:1fr;}.content{padding:14px;}.topbar{padding:11px 14px;}
+}
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-thumb{background:rgba(26,107,90,0.28);border-radius:3px;}
+@keyframes fi{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+.fade{animation:fi .3s ease forwards;}
+
+/* ===== شیوه‌نامه — ویژه ===== */
+.manual-group{border-radius:var(--r);border:2px solid;padding:0;overflow:hidden;margin-bottom:18px;}
+.manual-group.champ{border-color:rgba(26,107,90,0.3);}
+.manual-group.pub{border-color:rgba(30,95,142,0.3);}
+.manual-group.rural{border-color:rgba(138,90,10,0.3);}
+.mg-head{padding:13px 18px;font-size:14px;font-weight:700;display:flex;align-items:center;gap:8px;}
+.manual-group.champ .mg-head{background:rgba(26,107,90,0.08);color:var(--champ);}
+.manual-group.pub .mg-head{background:rgba(30,95,142,0.08);color:var(--pub);}
+.manual-group.rural .mg-head{background:rgba(138,90,10,0.08);color:var(--rural);}
+.mg-body{padding:14px 16px;}
+.ind-row{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--rs);
+  border:1px solid var(--brd);margin-bottom:7px;background:#fff;}
+.ind-row .ind-name{flex:1;font-size:13px;font-weight:500;}
+.ind-row .ind-pts{min-width:80px;text-align:center;}
+.ind-row .ind-cap{min-width:80px;text-align:center;font-size:11.5px;color:#5a6a7a;}
+.ind-pts .fi{width:70px;text-align:center;padding:5px 8px;font-size:13px;font-weight:700;}
+.cap-badge{background:rgba(232,134,26,0.1);color:#7a4800;padding:2px 7px;border-radius:20px;font-size:11px;font-weight:600;}
+
+/* نمودارهای گروه جدا */
+.group-section{border-radius:var(--r);border:1.5px solid var(--brd);padding:16px;margin-bottom:16px;}
+.gs-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.gs-title{font-size:14px;font-weight:700;}
+.gs-total{font-size:20px;font-weight:800;}
+</style>
+</head>
+<body>
+
+<!-- ورود -->
+<div id="lo">
+  <div class="lb">
+    <div style="font-size:46px;text-align:center;margin-bottom:14px">🏟️</div>
+    <h1>سامانه ارزیابی عملکرد ورزشی</h1>
+    <p>سیستان و بلوچستان — اداره کل ورزش و جوانان</p>
+    <div class="fg"><label class="fl">نام کاربری</label><input class="fi" id="lu" value="admin"></div>
+    <div class="fg"><label class="fl">رمز عبور</label><input class="fi" id="lp" type="password" value="1234"></div>
+    <div id="le" class="al al-d" style="display:none"></div>
+    <button class="btn bp blg" style="width:100%;justify-content:center;margin-top:6px" onclick="doLogin()">ورود به سامانه</button>
+    <p style="font-size:11px;color:#bbb;text-align:center;margin-top:14px">admin/1234 &nbsp;|&nbsp; expert/5678 &nbsp;|&nbsp; city1/0000</p>
+  </div>
+</div>
+
+<!-- سایدبار -->
+<div id="sb">
+  <div class="logo">
+    <div style="font-size:26px;margin-bottom:5px">🏆</div>
+    <h1>ارزیابی عملکرد ورزشی<br>شهرستان‌های استان</h1>
+    <span class="ba">سیستان و بلوچستان</span>
+  </div>
+  <nav>
+    <div class="sep">اصلی</div>
+    <a class="act" onclick="SP('dashboard')"><span>📊</span> داشبورد تحلیلی</a>
+    <a onclick="SP('input')"><span>📂</span> بارگذاری داده‌ها</a>
+    <div class="sep">ارزیابی</div>
+    <a onclick="SP('scores')"><span>🔢</span> ورود امتیازات</a>
+    <a onclick="SP('ranking')"><span>🏅</span> رتبه‌بندی و مقام‌ها</a>
+    <a onclick="SP('map')"><span>🗺️</span> نقشه تعاملی</a>
+    <div class="sep">خروجی</div>
+    <a onclick="SP('reports')"><span>📄</span> گزارش‌ساز</a>
+    <a id="sn-settings" onclick="SP('settings')" style="display:none"><span>⚙️</span> تنظیمات</a>
+    <a id="sn-manual" onclick="SP('manual')" style="display:none"><span>📋</span> شیوه‌نامه</a>
+  </nav>
+  <div class="up">
+    <div class="un" id="sb-name">مدیرکل</div>
+    <div id="sb-role">دسترسی کامل</div>
+    <button class="btn bo bsm" style="margin-top:8px;width:100%;justify-content:center" onclick="doLogout()">خروج</button>
+  </div>
+</div>
+
+<div id="ov" onclick="closeSB()"></div>
+
+<!-- محتوا -->
+<div id="main">
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:10px">
+      <button id="mt" onclick="toggleSB()">☰</button>
+      <h2 id="pt">داشبورد تحلیلی</h2>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <span id="cs" style="font-size:11.5px;color:#5a6a7a"></span>
+      <button class="btn ba bsm" onclick="SP('scores')">⚡ ورود امتیاز</button>
+    </div>
+  </div>
+  <div class="content">
+
+  <!-- ======== داشبورد ======== -->
+  <div class="pg act" id="pg-dashboard">
+    <!-- سه گروه جداگانه -->
+    <div class="g3" style="margin-bottom:18px">
+      <div class="kpi c"><div class="lb2">گروه قهرمانی ورزشی</div><div class="vl" id="kd-champ-avg">—</div><div class="sb">میانگین استان</div><div class="ib">🏋️</div></div>
+      <div class="kpi p"><div class="lb2">گروه همگانی</div><div class="vl" id="kd-pub-avg">—</div><div class="sb">میانگین استان</div><div class="ib">🤸</div></div>
+      <div class="kpi ru"><div class="lb2">گروه روستایی/عشایری</div><div class="vl" id="kd-rural-avg">—</div><div class="sb">میانگین استان</div><div class="ib">🌾</div></div>
+    </div>
+    <div class="g4" style="margin-bottom:20px">
+      <div class="kpi g"><div class="lb2">بالاترین مجموع</div><div class="vl" id="kd-max">—</div><div class="sb" id="kd-max-n">—</div><div class="ib">🥇</div></div>
+      <div class="kpi a"><div class="lb2">میانگین مجموع</div><div class="vl" id="kd-avg">—</div><div class="sb">۲۶ شهرستان</div><div class="ib">📊</div></div>
+      <div class="kpi r"><div class="lb2">هشدارهای فعال</div><div class="vl" id="kd-alerts">۰</div><div class="sb">نیاز به پیگیری</div><div class="ib">⚠️</div></div>
+      <div class="kpi b"><div class="lb2">شهرستان‌های ارزیابی‌شده</div><div class="vl" id="kd-count">۰</div><div class="sb">از ۲۶ شهرستان</div><div class="ib">🏙️</div></div>
+    </div>
+    <div id="alert-panel" style="display:none;margin-bottom:16px"></div>
+    <div class="tabs">
+      <div class="tab act" onclick="ST(this,'dt-charts')">📊 نمودارها</div>
+      <div class="tab" onclick="ST(this,'dt-table')">📋 جدول کامل</div>
+      <div class="tab" onclick="ST(this,'dt-groups')">📈 امتیازات گروهی</div>
+    </div>
+    <div class="tc act" id="dt-charts">
+      <div class="g2" style="margin-bottom:16px">
+        <div class="card">
+          <div class="ct">📊 مقایسه سه گروه — نمودار میله‌ای گروهی
+            <div style="margin-right:auto;display:flex;gap:6px">
+              <button class="btn bp bsm" onclick="filterChart(0)">همه</button>
+              <button class="btn bo bsm" onclick="filterChart(1)">تیپ ۱</button>
+              <button class="btn bo bsm" onclick="filterChart(2)">تیپ ۲</button>
+              <button class="btn bo bsm" onclick="filterChart(3)">تیپ ۳</button>
+            </div>
+          </div>
+          <canvas id="ch-bar" height="270"></canvas>
+        </div>
+        <div class="card">
+          <div class="ct">🎯 رادار — نقاط قوت/ضعف شهرستان</div>
+          <select class="fs" id="radar-sel" onchange="updateRadar()" style="margin-bottom:12px"><option value="">انتخاب شهرستان...</option></select>
+          <canvas id="ch-radar" height="240"></canvas>
+        </div>
+      </div>
+      <div class="g2">
+        <div class="card">
+          <div class="ct">🥧 سهم هر گروه از مجموع امتیاز استان</div>
+          <canvas id="ch-pie" height="230"></canvas>
+        </div>
+        <div class="card">
+          <div class="ct">🏆 رتبه‌بندی کلی نردبانی (بر اساس مجموع)</div>
+          <div id="ladder" style="max-height:285px;overflow-y:auto"></div>
+        </div>
+      </div>
+    </div>
+    <div class="tc" id="dt-table">
+      <div class="card">
+        <div class="ct" style="justify-content:space-between">
+          <span>📋 جدول کامل — مجموع گروه‌ها جداست، رتبه‌بندی بر مجموع نهایی</span>
+          <input class="fi" id="ts" placeholder="جستجو..." style="width:180px" oninput="renderTable()">
+        </div>
+        <div class="tw" id="main-tw"></div>
+      </div>
+    </div>
+    <div class="tc" id="dt-groups">
+      <div id="group-sections"></div>
+    </div>
+  </div>
+
+  <!-- ======== بارگذاری ======== -->
+  <div class="pg" id="pg-input">
+    <div id="ia"></div>
+    <div class="g2" style="margin-bottom:18px">
+      <div class="card">
+        <div class="ct">📁 فایل‌های ورودی</div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div>
+            <label style="font-size:12.5px;font-weight:700;color:var(--pr);margin-bottom:5px;display:block">۱. دسته‌بندی تیپ شهرستان‌ها (Excel)</label>
+            <div class="uz" id="uz-tip" ondragover="event.preventDefault();this.classList.add('dg')" ondragleave="this.classList.remove('dg')" ondrop="hDrop(event,'tip')">
+              <input type="file" accept=".xlsx,.xls" onchange="hFile(event,'tip')">
+              <div class="ic">📊</div><p>ستون‌های: شهرستان | تیپ (۱/۲/۳)</p>
+              <div class="fn" id="fn-tip">فایلی انتخاب نشده</div>
+            </div>
+          </div>
+          <div>
+            <label style="font-size:12.5px;font-weight:700;color:var(--pr);margin-bottom:5px;display:block">۲. داده‌های قهرمانی شهرستان‌ها (Excel) — شاخص‌های غیر خودکار</label>
+            <div class="uz" id="uz-mobin" ondragover="event.preventDefault();this.classList.add('dg')" ondragleave="this.classList.remove('dg')" ondrop="hDrop(event,'mobin')">
+              <input type="file" accept=".xlsx,.xls" onchange="hFile(event,'mobin')">
+              <div class="ic">💻</div><p>هر ستون = یک شاخص | هر ردیف = یک شهرستان</p>
+              <div class="fn" id="fn-mobin">فایلی انتخاب نشده</div>
+            </div>
+          </div>
+          <div>
+            <label style="font-size:12.5px;font-weight:700;color:var(--pr);margin-bottom:5px;display:block">۳. ضرایب سامانه مبین (Excel) — شاخص | ضریب</label>
+            <div class="uz" id="uz-mg" ondragover="event.preventDefault();this.classList.add('dg')" ondragleave="this.classList.remove('dg')" ondrop="hDrop(event,'mg')">
+              <input type="file" accept=".xlsx,.xls" onchange="hFile(event,'mg')">
+              <div class="ic">🔢</div><p>ستون‌های: شاخص | ضریب</p>
+              <div class="fn" id="fn-mg">فایلی انتخاب نشده</div>
+            </div>
+          </div>
+          <div>
+            <label style="font-size:12.5px;font-weight:700;color:var(--pr);margin-bottom:5px;display:block">۴. پزشکی ورزشی سال جاری (Excel)</label>
+            <div class="uz" id="uz-med" ondragover="event.preventDefault();this.classList.add('dg')" ondragleave="this.classList.remove('dg')" ondrop="hDrop(event,'med')">
+              <input type="file" accept=".xlsx,.xls" onchange="hFile(event,'med')">
+              <div class="ic">🏥</div><p>داده‌های پزشکی ورزشی ۱۴۰۵</p>
+              <div class="fn" id="fn-med">فایلی انتخاب نشده</div>
+            </div>
+          </div>
+          <div>
+            <label style="font-size:12.5px;font-weight:700;color:var(--pr);margin-bottom:5px;display:block">۵. پزشکی ورزشی سال گذشته (Excel)</label>
+            <div class="uz" id="uz-medp" ondragover="event.preventDefault();this.classList.add('dg')" ondragleave="this.classList.remove('dg')" ondrop="hDrop(event,'medp')">
+              <input type="file" accept=".xlsx,.xls" onchange="hFile(event,'medp')">
+              <div class="ic">📅</div><p>داده‌های پزشکی ۱۴۰۴ (برای مقایسه روند)</p>
+              <div class="fn" id="fn-medp">فایلی انتخاب نشده</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card" style="display:flex;flex-direction:column;gap:14px">
+        <div class="ct">📝 وضعیت</div>
+        <div>
+          <div class="ps pend" id="ps-tip"><div class="dot"></div>تیپ شهرستان‌ها</div>
+          <div class="ps pend" id="ps-mobin"><div class="dot"></div>سامانه مبین</div>
+          <div class="ps pend" id="ps-mg"><div class="dot"></div>ضرایب مبین</div>
+          <div class="ps pend" id="ps-med"><div class="dot"></div>پزشکی ورزشی جاری</div>
+          <div class="ps pend" id="ps-medp"><div class="dot"></div>پزشکی ورزشی گذشته</div>
+        </div>
+        <div style="border-top:1px solid var(--brd);padding-top:14px">
+          <p style="font-size:12px;color:#5a6a7a;margin-bottom:10px">بدون فایل: از داده نمونه استفاده کنید</p>
+          <button class="btn bo bsm" style="width:100%;justify-content:center;margin-bottom:7px" onclick="loadSample()">📥 داده نمونه (۲۶ شهرستان)</button>
+          <button class="btn brd-btn bsm" style="width:100%;justify-content:center" onclick="clearAll()">🗑️ پاک‌سازی کامل</button>
+        </div>
+        <div style="border-top:1px solid var(--brd);padding-top:14px">
+          <div class="al al-i" style="margin-bottom:10px;font-size:11.5px">
+            ⚠️ <b>نکته مهم:</b> سامانه مبین فقط در محاسبه گروه قهرمانی استفاده می‌شود. هر گروه امتیاز مستقل دارد و فقط برای اعلام شهرستان‌های برتر مجموع می‌شوند.
+          </div>
+          <button class="btn ba blg" style="width:100%;justify-content:center" onclick="runCalc()">⚡ اجرای محاسبات و به‌روزرسانی داشبورد</button>
+        </div>
+        <div id="calc-log" style="font-size:11.5px;color:#5a6a7a;background:rgba(0,0,0,0.03);border-radius:8px;padding:10px;max-height:160px;overflow-y:auto;display:none"></div>
+      </div>
+    </div>
+    <!-- پیش‌نمایش -->
+    <div class="card">
+      <div class="ct">👁️ پیش‌نمایش داده‌های بارگذاری‌شده</div>
+      <div class="tabs">
+        <div class="tab act" onclick="ST(this,'pv-tip')">تیپ‌ها</div>
+        <div class="tab" onclick="ST(this,'pv-mobin')">مبین</div>
+        <div class="tab" onclick="ST(this,'pv-med')">پزشکی</div>
+      </div>
+      <div class="tc act" id="pv-tip"><div class="tw" id="pvt-tip"><p style="color:#5a6a7a;text-align:center;padding:20px">بارگذاری نشده</p></div></div>
+      <div class="tc" id="pv-mobin"><div class="tw" id="pvt-mobin"><p style="color:#5a6a7a;text-align:center;padding:20px">بارگذاری نشده</p></div></div>
+      <div class="tc" id="pv-med"><div class="tw" id="pvt-med"><p style="color:#5a6a7a;text-align:center;padding:20px">بارگذاری نشده</p></div></div>
+    </div>
+  </div>
+
+  <!-- ======== ورود امتیازات (صفحه اصلی کار) ======== -->
+  <div class="pg" id="pg-scores">
+    <div class="al al-i" style="margin-bottom:16px">
+      📌 در این صفحه می‌توانید امتیاز هر شاخص را برای هر شهرستان وارد کنید. هر گروه مستقل است. مجموع فقط در رتبه‌بندی نهایی استفاده می‌شود.
+    </div>
+    <div class="tabs">
+      <div class="tab act" onclick="ST(this,'sc-champ')"><span class="tag-c">قهرمانی</span></div>
+      <div class="tab" onclick="ST(this,'sc-pub')"><span class="tag-p">همگانی</span></div>
+      <div class="tab" onclick="ST(this,'sc-rural')"><span class="tag-r">روستایی/عشایری</span></div>
+    </div>
+    <div class="tc act" id="sc-champ">
+      <div class="card">
+        <div class="ct" style="justify-content:space-between">
+          <span>🏋️ ورود امتیازات گروه قهرمانی
+            <small style="font-size:11px;font-weight:400;color:#5a6a7a;margin-right:6px">— سامانه مبین در این گروه محاسبه می‌شود</small>
+          </span>
+          <div style="display:flex;gap:7px">
+            <select class="fs" id="champ-city-sel" style="width:160px" onchange="loadCityScores('champ')"></select>
+            <button class="btn bp bsm" onclick="saveCityScores('champ')">💾 ذخیره</button>
+          </div>
+        </div>
+        <div id="champ-form"></div>
+        <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--brd);display:flex;align-items:center;gap:14px">
+          <span style="font-size:13px;color:#5a6a7a">امتیاز محاسبه‌شده گروه قهرمانی:</span>
+          <span id="champ-total" style="font-size:22px;font-weight:800;color:var(--champ)">—</span>
+          <span style="font-size:11.5px;color:#5a6a7a">(شامل امتیاز سامانه مبین)</span>
+        </div>
+      </div>
+    </div>
+    <div class="tc" id="sc-pub">
+      <div class="card">
+        <div class="ct" style="justify-content:space-between">
+          <span>🤸 ورود امتیازات گروه همگانی</span>
+          <div style="display:flex;gap:7px">
+            <select class="fs" id="pub-city-sel" style="width:160px" onchange="loadCityScores('pub')"></select>
+            <button class="btn bb bsm" onclick="saveCityScores('pub')">💾 ذخیره</button>
+          </div>
+        </div>
+        <div id="pub-form"></div>
+        <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--brd);display:flex;align-items:center;gap:14px">
+          <span style="font-size:13px;color:#5a6a7a">امتیاز محاسبه‌شده گروه همگانی:</span>
+          <span id="pub-total" style="font-size:22px;font-weight:800;color:var(--pub)">—</span>
+        </div>
+      </div>
+    </div>
+    <div class="tc" id="sc-rural">
+      <div class="card">
+        <div class="ct" style="justify-content:space-between">
+          <span>🌾 ورود امتیازات گروه روستایی/عشایری</span>
+          <div style="display:flex;gap:7px">
+            <select class="fs" id="rural-city-sel" style="width:160px" onchange="loadCityScores('rural')"></select>
+            <button class="btn bsm" style="background:var(--rural);color:#fff" onclick="saveCityScores('rural')">💾 ذخیره</button>
+          </div>
+        </div>
+        <div id="rural-form"></div>
+        <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--brd);display:flex;align-items:center;gap:14px">
+          <span style="font-size:13px;color:#5a6a7a">امتیاز محاسبه‌شده گروه روستایی:</span>
+          <span id="rural-total" style="font-size:22px;font-weight:800;color:var(--rural)">—</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======== رتبه‌بندی ======== -->
+  <div class="pg" id="pg-ranking">
+    <div class="al al-i" style="margin-bottom:14px;font-size:12px">
+      🏆 رتبه‌بندی هر تیپ و هر گروه <b>مستقل</b> است. مجموع سه گروه فقط برای «رتبه‌بندی نهایی برای اعلام شهرستان‌های برتر» استفاده می‌شود.
+    </div>
+    <div class="tabs">
+      <div class="tab act" onclick="ST(this,'rk-final')">🏆 نهایی (مجموع)</div>
+      <div class="tab" onclick="ST(this,'rk-champ')"><span class="tag-c">قهرمانی</span></div>
+      <div class="tab" onclick="ST(this,'rk-pub')"><span class="tag-p">همگانی</span></div>
+      <div class="tab" onclick="ST(this,'rk-rural')"><span class="tag-r">روستایی</span></div>
+      <div class="tab" onclick="ST(this,'rk-medals')">🥇 مدال‌ها</div>
+    </div>
+    <div class="tc act" id="rk-final">
+      <div class="tabs" id="final-tip-tabs">
+        <div class="tab act" onclick="renderFinalRank(0,this)">همه شهرستان‌ها</div>
+        <div class="tab" onclick="renderFinalRank(1,this)">تیپ ۱</div>
+        <div class="tab" onclick="renderFinalRank(2,this)">تیپ ۲</div>
+        <div class="tab" onclick="renderFinalRank(3,this)">تیپ ۳</div>
+      </div>
+      <div class="card"><div class="tw" id="rk-final-tbl"></div></div>
+    </div>
+    <div class="tc" id="rk-champ">
+      <div class="tabs">
+        <div class="tab act" onclick="renderGroupRank('champ',0,this)">همه</div>
+        <div class="tab" onclick="renderGroupRank('champ',1,this)">تیپ ۱</div>
+        <div class="tab" onclick="renderGroupRank('champ',2,this)">تیپ ۲</div>
+        <div class="tab" onclick="renderGroupRank('champ',3,this)">تیپ ۳</div>
+      </div>
+      <div class="card"><div class="tw" id="rk-champ-tbl"></div></div>
+    </div>
+    <div class="tc" id="rk-pub">
+      <div class="tabs">
+        <div class="tab act" onclick="renderGroupRank('pub',0,this)">همه</div>
+        <div class="tab" onclick="renderGroupRank('pub',1,this)">تیپ ۱</div>
+        <div class="tab" onclick="renderGroupRank('pub',2,this)">تیپ ۲</div>
+        <div class="tab" onclick="renderGroupRank('pub',3,this)">تیپ ۳</div>
+      </div>
+      <div class="card"><div class="tw" id="rk-pub-tbl"></div></div>
+    </div>
+    <div class="tc" id="rk-rural">
+      <div class="tabs">
+        <div class="tab act" onclick="renderGroupRank('rural',0,this)">همه</div>
+        <div class="tab" onclick="renderGroupRank('rural',1,this)">تیپ ۱</div>
+        <div class="tab" onclick="renderGroupRank('rural',2,this)">تیپ ۲</div>
+        <div class="tab" onclick="renderGroupRank('rural',3,this)">تیپ ۳</div>
+      </div>
+      <div class="card"><div class="tw" id="rk-rural-tbl"></div></div>
+    </div>
+    <div class="tc" id="rk-medals"><div id="medals-grid" class="g2"></div></div>
+  </div>
+
+  <!-- ======== نقشه ======== -->
+  <div class="pg" id="pg-map">
+    <div class="card" style="margin-bottom:14px">
+      <div class="ct">🗺️ نقشه تعاملی شهرستان‌های سیستان و بلوچستان</div>
+      <div class="mtt" id="mtt"></div>
+      <div id="map-cont">
+        <svg id="map-svg" viewBox="0 0 620 500"></svg>
+      </div>
+      <div style="display:flex;gap:14px;margin-top:10px;flex-wrap:wrap;align-items:center">
+        <span style="font-size:12px;font-weight:600;color:#5a6a7a">نمایش بر اساس:</span>
+        <button class="btn bp bsm" onclick="renderMap('total')">مجموع</button>
+        <button class="btn bsm" style="background:var(--champ);color:#fff" onclick="renderMap('champ')">قهرمانی</button>
+        <button class="btn bsm" style="background:var(--pub);color:#fff" onclick="renderMap('pub')">همگانی</button>
+        <button class="btn bsm" style="background:var(--rural);color:#fff" onclick="renderMap('rural')">روستایی</button>
+        <div style="margin-right:auto;display:flex;gap:10px;align-items:center;font-size:12px">
+          <span><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:var(--rd);vertical-align:middle"></span> پایین</span>
+          <span><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:var(--or);vertical-align:middle"></span> متوسط</span>
+          <span><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:var(--ac);vertical-align:middle"></span> خوب</span>
+          <span><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:var(--gr);vertical-align:middle"></span> عالی</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======== گزارش‌ساز ======== -->
+  <div class="pg" id="pg-reports">
+    <div class="g2">
+      <div class="card">
+        <div class="ct">⚙️ تنظیمات گزارش</div>
+        <div class="fg"><label class="fl">عنوان گزارش</label><input class="fi" id="rt" value="گزارش ارزیابی عملکرد ورزشی شهرستان‌های سیستان و بلوچستان — ۱۴۰۵"></div>
+        <div class="fg"><label class="fl">مقدمه</label><textarea class="fta" id="ri">این گزارش حاصل ارزیابی عملکرد ورزشی ۲۶ شهرستان استان سیستان و بلوچستان در سال ۱۴۰۵ بر اساس شیوه‌نامه امتیازی سه‌گانه (قهرمانی، همگانی، روستایی/عشایری) می‌باشد.</textarea></div>
+        <div class="fg">
+          <label class="fl">بخش‌های گزارش</label>
+          <label style="display:flex;align-items:center;gap:7px;font-size:12.5px;margin-bottom:7px"><input type="checkbox" id="rp-kpi" checked> کارت‌های KPI</label>
+          <label style="display:flex;align-items:center;gap:7px;font-size:12.5px;margin-bottom:7px"><input type="checkbox" id="rp-grp" checked> امتیازات گروهی جداگانه</label>
+          <label style="display:flex;align-items:center;gap:7px;font-size:12.5px;margin-bottom:7px"><input type="checkbox" id="rp-rank" checked> جداول رتبه‌بندی</label>
+          <label style="display:flex;align-items:center;gap:7px;font-size:12.5px;margin-bottom:7px"><input type="checkbox" id="rp-med" checked> مدال‌ها</label>
+          <label style="display:flex;align-items:center;gap:7px;font-size:12.5px"><input type="checkbox" id="rp-notes" checked> یادداشت‌های کیفی</label>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;margin-top:6px">
+          <button class="btn bp" onclick="exportExcel()">📊 دانلود Excel (راستچین)</button>
+          <button class="btn bb" onclick="exportPDF()">📄 دانلود PDF</button>
+          <button class="btn bo" onclick="window.print()">🖨️ چاپ</button>
+          <button class="btn bsm" style="background:#c9531e;color:#fff" onclick="exportPPT()">📊 دانلود PowerPoint</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="ct">📋 پیش‌نمایش</div>
+        <div id="rpt-prev"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======== تنظیمات ======== -->
+  <div class="pg" id="pg-settings">
+    <div class="g2" style="margin-bottom:16px">
+      <div class="card">
+        <div class="ct">⚖️ وزن گروه‌ها در رتبه‌بندی نهایی</div>
+        <div class="al al-i" style="margin-bottom:12px;font-size:11.5px">
+          این وزن‌ها فقط برای محاسبه <b>مجموع نهایی</b> (اعلام شهرستان‌های برتر) استفاده می‌شوند. امتیاز هر گروه جداگانه است.
+        </div>
+        <div class="fg"><label class="fl">وزن گروه قهرمانی (%)</label>
+          <div class="sw"><input type="range" id="wc" min="0" max="100" value="35" oninput="syncW('c')"><span class="sv" id="sv-c">۳۵</span></div></div>
+        <div class="fg"><label class="fl">وزن گروه همگانی (%)</label>
+          <div class="sw"><input type="range" id="wp" min="0" max="100" value="40" oninput="syncW('p')"><span class="sv" id="sv-p">۴۰</span></div></div>
+        <div class="fg"><label class="fl">وزن گروه روستایی/عشایری (%)</label>
+          <div class="sw"><input type="range" id="wr" min="0" max="100" value="25" oninput="syncW('r')"><span class="sv" id="sv-r">۲۵</span></div></div>
+        <div id="ww" class="al al-w" style="display:none">مجموع وزن‌ها باید ۱۰۰٪ باشد</div>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button class="btn bp" onclick="applyW()">✅ اعمال</button>
+          <button class="btn bo bsm" onclick="resetW()">↩️ پیش‌فرض</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="ct">📝 یادداشت کیفی شهرستان</div>
+        <div class="fg"><label class="fl">شهرستان</label><select class="fs" id="nc-sel" onchange="loadNote()"></select></div>
+        <div class="fg"><label class="fl">یادداشت کارشناسی</label><textarea class="fta" id="nc-txt" rows="4" placeholder="یادداشت خود را وارد کنید..."></textarea></div>
+        <button class="btn bp bsm" onclick="saveNote()">💾 ذخیره یادداشت</button>
+      </div>
+    </div>
+
+    <!-- ویرایش شیوه‌نامه -->
+    <div class="card" style="margin-bottom:16px">
+      <div class="ct">📋 ویرایش امتیاز شاخص‌های شیوه‌نامه</div>
+      <div class="al al-w" style="margin-bottom:14px;font-size:12px">
+        ⚠️ تغییر در این بخش روی محاسبه همه شهرستان‌ها تأثیر می‌گذارد. بعد از تغییر، دکمه «اعمال و بازمحاسبه» را بزنید.
+      </div>
+      <div class="tabs">
+        <div class="tab act" onclick="ST(this,'me-champ')"><span class="tag-c">قهرمانی</span></div>
+        <div class="tab" onclick="ST(this,'me-pub')"><span class="tag-p">همگانی</span></div>
+        <div class="tab" onclick="ST(this,'me-rural')"><span class="tag-r">روستایی/عشایری</span></div>
+      </div>
+      <div class="tc act" id="me-champ"><div id="me-champ-form"></div></div>
+      <div class="tc" id="me-pub"><div id="me-pub-form"></div></div>
+      <div class="tc" id="me-rural"><div id="me-rural-form"></div></div>
+      <div style="display:flex;gap:8px;margin-top:14px">
+        <button class="btn ba" onclick="applyManualChanges()">⚡ اعمال و بازمحاسبه</button>
+        <button class="btn bo bsm" onclick="resetManual()">↩️ بازنشانی شیوه‌نامه</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="ct">📜 تاریخچه تغییرات (Audit Log)</div>
+      <div class="tw" id="audit-tbl"><p style="color:#5a6a7a;text-align:center;padding:20px">تغییری ثبت نشده</p></div>
+    </div>
+  </div>
+
+  <!-- ======== شیوه‌نامه (نمایش) ======== -->
+  <div class="pg" id="pg-manual">
+    <div class="al al-i" style="margin-bottom:16px">
+      📋 این شیوه‌نامه بر اساس دستورالعمل رسمی وزارت ورزش پیاده‌سازی شده. برای ویرایش امتیازها به تنظیمات مراجعه کنید.
+    </div>
+    <div id="manual-view"></div>
+  </div>
+
+  </div><!-- end content -->
+</div><!-- end main -->
+
+<!-- فوتر -->
+<div style="text-align:center;font-size:11px;color:#8a9aaa;padding:14px;margin-right:248px;border-top:1px solid var(--brd);background:rgba(255,255,255,0.6)">
+  تنظیم‌کننده: امین عزیزی مقدم &nbsp;|&nbsp; اداره کل ورزش و جوانان — سیستان و بلوچستان &nbsp;|&nbsp; آمار ورزشی ۱۴۰۵
+</div>
+
+<script>
+/* =====================================================
+   شیوه‌نامه رسمی — سه گروه کاملاً جداگانه
+   ===================================================== */
+const DEFAULT_MANUAL = {
+  champ: [
+    // ردیف، عنوان، امتیاز پایه، سقف، توضیح محاسبه
+    { id:'c1',  label:'ورزشکاران سازمان‌یافته (پزشکی ورزشی)', pts:100, cap:100, note:'۳۰ امتیاز درصد تغییر + ۷۰ امتیاز درصد هدف بیمه', unit:'درصد', auto:true },
+    { id:'c2',  label:'سامانه مبین (نسبت ثبت به بیمه)', pts:90,  cap:90,  note:'نسبت تعداد ثبت در مبین به تعداد بیمه ورزشی', unit:'درصد', isMobin:true },
+    { id:'c3',  label:'دعوت‌شده به تیم ملی (هر نفر ۵ امتیاز)', pts:5,   cap:60,  note:'به ازاء هر نفر ۵ امتیاز', unit:'نفر' },
+    { id:'c4',  label:'برگزیدگان تیم ملی (هر نفر ۱۰ امتیاز)', pts:10,  cap:70,  note:'به ازاء هر نفر ۱۰ امتیاز', unit:'نفر' },
+    { id:'c5',  label:'عناوین جهانی — طلا', pts:10, cap:60, note:'هر مدال طلا ۱۰ امتیاز', unit:'مدال' },
+    { id:'c6',  label:'عناوین جهانی — نقره', pts:7,  cap:60, note:'هر مدال نقره ۷ امتیاز', unit:'مدال' },
+    { id:'c7',  label:'عناوین جهانی — برنز', pts:5,  cap:60, note:'هر مدال برنز ۵ امتیاز', unit:'مدال' },
+    { id:'c8',  label:'عناوین آسیایی — طلا', pts:7,  cap:60, note:'هر مدال طلا ۷ امتیاز', unit:'مدال' },
+    { id:'c9',  label:'عناوین آسیایی — نقره', pts:5, cap:60, note:'هر مدال نقره ۵ امتیاز', unit:'مدال' },
+    { id:'c10', label:'عناوین آسیایی — برنز', pts:3, cap:60, note:'هر مدال برنز ۳ امتیاز', unit:'مدال' },
+    { id:'c11', label:'عناوین بین‌المللی — طلا', pts:5, cap:50, note:'هر مدال طلا ۵ امتیاز', unit:'مدال' },
+    { id:'c12', label:'عناوین بین‌المللی — نقره', pts:3, cap:50, note:'هر مدال نقره ۳ امتیاز', unit:'مدال' },
+    { id:'c13', label:'عناوین بین‌المللی — برنز', pts:2, cap:50, note:'هر مدال برنز ۲ امتیاز', unit:'مدال' },
+    { id:'c14', label:'عناوین کشوری — طلا', pts:5, cap:40, note:'هر مدال طلا ۵ امتیاز', unit:'مدال' },
+    { id:'c15', label:'عناوین کشوری — نقره', pts:3, cap:40, note:'هر مدال نقره ۳ امتیاز', unit:'مدال' },
+    { id:'c16', label:'عناوین کشوری — برنز', pts:2, cap:40, note:'هر مدال برنز ۲ امتیاز', unit:'مدال' },
+    { id:'c17', label:'عناوین استانی/منطقه‌ای — طلا', pts:3, cap:40, note:'هر طلا ۳ امتیاز', unit:'مدال' },
+    { id:'c18', label:'عناوین استانی/منطقه‌ای — نقره', pts:2, cap:40, note:'هر نقره ۲ امتیاز', unit:'مدال' },
+    { id:'c19', label:'عناوین استانی/منطقه‌ای — برنز', pts:1, cap:40, note:'هر برنز ۱ امتیاز', unit:'مدال' },
+    { id:'c20', label:'اعزام مسابقات استانی (هر اعزام ۱)', pts:1, cap:30, note:'به ازاء هر اعزام ۱ امتیاز', unit:'اعزام' },
+    { id:'c21', label:'اعزام مسابقات کشوری (هر اعزام ۲)', pts:2, cap:40, note:'به ازاء هر اعزام ۲ امتیاز', unit:'اعزام' },
+    { id:'c22', label:'اعزام مسابقات بین‌المللی (هر اعزام ۳)', pts:3, cap:40, note:'به ازاء هر اعزام ۳ امتیاز', unit:'اعزام' },
+    { id:'c23', label:'اعزام مسابقات آسیایی (هر اعزام ۴)', pts:4, cap:50, note:'به ازاء هر اعزام ۴ امتیاز', unit:'اعزام' },
+    { id:'c24', label:'اعزام مسابقات جهانی (هر اعزام ۵)', pts:5, cap:50, note:'به ازاء هر اعزام ۵ امتیاز', unit:'اعزام' },
+    { id:'c25', label:'برگزاری مسابقات استانی/منطقه‌ای (هر میزبانی ۳)', pts:3, cap:30, note:'هر میزبانی ۳ امتیاز', unit:'میزبانی' },
+    { id:'c26', label:'برگزاری مسابقات کشوری (هر میزبانی ۱۰)', pts:10, cap:50, note:'هر میزبانی ۱۰ امتیاز', unit:'میزبانی' },
+    { id:'c27', label:'برگزاری مسابقات بین‌المللی (هر میزبانی ۱۰)', pts:10, cap:40, note:'هر میزبانی ۱۰ امتیاز', unit:'میزبانی' },
+    { id:'c28', label:'ورزشکاران حرفه‌ای در لیگ (هر نفر ۲)', pts:2, cap:20, note:'به ازاء هر نفر ۲ امتیاز', unit:'نفر' },
+    { id:'c29', label:'دوره‌های آموزشی مربیگری/داوری (هر دوره ۱۰)', pts:10, cap:40, note:'هر دوره ۱۰ امتیاز، کارگاه ۱ امتیاز', unit:'دوره' },
+    { id:'c30', label:'باشگاه‌های ورزشی (هر باشگاه ۲)', pts:2, cap:20, note:'تأسیس هر باشگاه ۲ امتیاز', unit:'باشگاه' },
+    { id:'c31', label:'تکمیل چارت هیأت ورزشی (هر هیأت ۱)', pts:1, cap:20, note:'تکمیل کامل چارت هر هیأت ۱ امتیاز', unit:'هیأت' },
+  ],
+  pub: [
+    { id:'p1',  label:'جشنواره بومی/محلی — تیپ ۱ (۴ امتیاز)', pts:4, cap:null, note:'اجرای ۴ بازی بومی، بالای ۱۰۰ شرکت‌کننده', unit:'جشنواره' },
+    { id:'p2',  label:'جشنواره بومی/محلی — تیپ ۲ (۲ امتیاز)', pts:2, cap:null, note:'۸۰ تا ۱۰۰ نفر شرکت‌کننده، ۴ بازی', unit:'جشنواره' },
+    { id:'p3',  label:'مسابقات بومی/محلی (۰.۵ امتیاز)', pts:0.5, cap:null, note:'بالای ۲۰ نفر شرکت‌کننده', unit:'مسابقه' },
+    { id:'p4',  label:'برگزاری جام در رشته‌های مختلف (۲ امتیاز)', pts:2, cap:null, note:'هر جام ۲ امتیاز', unit:'جام' },
+    { id:'p5',  label:'همایش‌های مختلف (۲ امتیاز)', pts:2, cap:null, note:'جمعیت بالای ۷۰ نفر', unit:'همایش' },
+    { id:'p6',  label:'اعزام مسابقات کشوری (۴ امتیاز)', pts:4, cap:null, note:'تصویر دعوتنامه فدراسیون', unit:'اعزام' },
+    { id:'p7',  label:'اعزام مسابقات استانی (۲ امتیاز)', pts:2, cap:null, note:'تصویر نامه اداره شهرستان', unit:'اعزام' },
+    { id:'p8',  label:'میزبانی مسابقات بومی/استانی/کشوری (۴ امتیاز)', pts:4, cap:null, note:'تصویر نامه فدراسیون یا هیأت استان', unit:'میزبانی' },
+    { id:'p9',  label:'همایش همگانی (دوچرخه، رزمی، ...) (۴ امتیاز)', pts:4, cap:null, note:'بنر با زمان، مکان، مناسبت، عنوان', unit:'همایش' },
+    { id:'p10', label:'جشنواره همگانی (پرواز بادبادک‌ها، ...) (۵ امتیاز)', pts:5, cap:null, note:'بنر + مستندات', unit:'جشنواره' },
+    { id:'p11', label:'همایش پیاده‌روی عمومی (۴ امتیاز)', pts:4, cap:null, note:'بنر + مستندات + جوایز', unit:'همایش' },
+    { id:'p12', label:'همایش کوهپیمایی/طبیعت‌گردی (۳ امتیاز)', pts:3, cap:null, note:'بنر + مستندات', unit:'همایش' },
+    { id:'p13', label:'مسابقات کارکنان دولت (۲ امتیاز)', pts:2, cap:null, note:'بنر + جمعیت حداکثری کارکنان', unit:'مسابقه' },
+    { id:'p14', label:'مسابقات مناسبتی تقویمی (۳ امتیاز)', pts:3, cap:null, note:'هفته تربیت بدنی، دفاع مقدس، دولت...', unit:'مناسبت' },
+    { id:'p15', label:'همایش ورزش صبحگاهی/عصرگاهی', pts:2, cap:null, note:'بنر + جمعیت حداکثری', unit:'همایش' },
+    { id:'p16', label:'طرح‌های ملی (محله‌محور، سپاس، ...) (۱۰ امتیاز)', pts:10, cap:null, note:'۴ رشته ورزشی + مستندات', unit:'طرح' },
+    { id:'p17', label:'برنامه‌های همگانی خلاقانه (۵ امتیاز)', pts:5, cap:null, note:'دستورالعمل اجرایی + بنر + مستندات', unit:'برنامه' },
+    { id:'p18', label:'تولید محتوا (پوستر، بروشور، انیمیشن) (۱۰ امتیاز)', pts:10, cap:null, note:'پوستر، بروشور، موشن گرافی', unit:'محتوا' },
+  ],
+  rural: [
+    { id:'r1',  label:'برگزاری مسابقات روستایی استانی', pts:4, cap:null, note:'نامه هیأت استان', unit:'مسابقه' },
+    { id:'r2',  label:'برگزاری مسابقات روستایی شهرستانی', pts:2, cap:null, note:'نامه اداره شهرستان', unit:'مسابقه' },
+    { id:'r3',  label:'جشنواره بازی‌های بومی/محلی روستایی', pts:3, cap:null, note:'مستندات + بنر', unit:'جشنواره' },
+    { id:'r4',  label:'اعزام تیم روستایی به مسابقات کشوری', pts:4, cap:null, note:'دعوتنامه فدراسیون', unit:'اعزام' },
+    { id:'r5',  label:'اعزام تیم روستایی به مسابقات استانی', pts:2, cap:null, note:'نامه هیأت استان', unit:'اعزام' },
+    { id:'r6',  label:'کسب مقام در مسابقات روستایی کشوری', pts:5, cap:null, note:'حکم قهرمانی', unit:'مقام' },
+    { id:'r7',  label:'کسب مقام در مسابقات روستایی استانی', pts:3, cap:null, note:'حکم قهرمانی', unit:'مقام' },
+    { id:'r8',  label:'برگزاری دوره آموزشی ورزش روستایی', pts:3, cap:null, note:'کد دوره + لیست کلاس', unit:'دوره' },
+    { id:'r9',  label:'ساخت یا تجهیز اماکن ورزشی روستایی', pts:5, cap:null, note:'مستندات پیشرفت کار', unit:'مکان' },
+    { id:'r10', label:'جذب ورزشکار روستایی به فدراسیون‌ها', pts:2, cap:null, note:'لیست ثبت‌نام', unit:'نفر' },
+    { id:'r11', label:'همایش سلامت روستایی', pts:3, cap:null, note:'بنر + مستندات', unit:'همایش' },
+    { id:'r12', label:'ایجاد تیم ورزشی در روستا', pts:2, cap:null, note:'مستندات تأسیس', unit:'تیم' },
+  ]
+};
+
+/* =====================================================
+   حالت برنامه
+   ===================================================== */
+let APP = {
+  user: null,
+  data: { tip:[], mobin:[], mg:[], med:[], medp:[] },
+  manual: JSON.parse(JSON.stringify(DEFAULT_MANUAL)),
+  // امتیازات وارد‌شده: { cityName: { champ:{c1:val,...}, pub:{p1:val,...}, rural:{r1:val,...}, mobinScore:0 } }
+  cityScores: {},
+  // نتایج محاسبه: [{ city, tip, champTotal, pubTotal, ruralTotal, total, champRaw, pubRaw, ruralRaw }]
+  results: [],
+  weights: { c:35, p:40, r:25 },
+  notes: {},
+  auditLog: [],
+  charts: {},
+  currentMapMode: 'total',
+};
+
+const CITIES = [
+  'زاهدان','زابل','ایرانشهر','خاش','سراوان','نیکشهر','کنارک','چابهار',
+  'دلگان','سرباز','میرجاوه','زهک','هیرمند','هامون','مهرستان','نصرت‌آباد',
+  'شیب‌آب','ریگان','بمپور','بزمان','قصرقند','فنوج','سوران','راسک',
+  'خاشمر','تفتان'
+];
+
+const CITY_COORDS = {
+  'زاهدان':[305,118],'زابل':[282,75],'ایرانشهر':[248,295],'خاش':[195,228],
+  'سراوان':[362,258],'نیکشهر':[298,358],'کنارک':[178,418],'چابهار':[218,458],
+  'دلگان':[348,328],'سرباز':[378,378],'میرجاوه':[428,188],'زهک':[258,88],
+  'هیرمند':[228,98],'هامون':[198,112],'مهرستان':[168,198],'نصرت‌آباد':[378,128],
+  'شیب‌آب':[448,238],'ریگان':[138,278],'بمپور':[198,338],'بزمان':[278,428],
+  'قصرقند':[398,418],'فنوج':[328,418],'سوران':[458,338],'راسک':[438,288],
+  'خاشمر':[155,248],'تفتان':[148,168]
+};
+
+const USERS = {
+  admin:  { pass:'1234', role:'مدیرکل',          access:'full',   name:'admin' },
+  expert: { pass:'5678', role:'کارشناس ارزیابی', access:'expert', name:'کارشناس ارزیابی' },
+  city1:  { pass:'0000', role:'کارشناس شهرستان', access:'city',   name:'کارشناس شهرستان' },
+};
+
+/* ===== ورود ===== */
+function doLogin() {
+  const u = document.getElementById('lu').value.trim();
+  const p = document.getElementById('lp').value;
+  if (USERS[u] && USERS[u].pass === p) {
+    APP.user = {...USERS[u], username:u};
+    document.getElementById('lo').style.display = 'none';
+    document.getElementById('sb-name').textContent = APP.user.name;
+    document.getElementById('sb-role').textContent = APP.user.role;
+    if (APP.user.access === 'full') {
+      document.getElementById('sn-settings').style.display = 'flex';
+      document.getElementById('sn-manual').style.display = 'flex';
+    }
+    loadStorage();
+    initScoreForms();
+    populateCitySelects();
+    SP('dashboard');
+    addAudit('ورود به سیستم', APP.user.name);
+  } else {
+    const el = document.getElementById('le');
+    el.style.display = 'flex';
+    el.textContent = '⚠️ نام کاربری یا رمز عبور اشتباه است';
+  }
+}
+function doLogout() {
+  APP.user = null;
+  document.getElementById('lo').style.display = 'flex';
+  document.getElementById('sn-settings').style.display = 'none';
+  document.getElementById('sn-manual').style.display = 'none';
+}
+
+/* ===== ناوبری ===== */
+const PTITLES = {dashboard:'داشبورد تحلیلی',input:'بارگذاری داده‌ها',scores:'ورود امتیازات',ranking:'رتبه‌بندی و مقام‌ها',map:'نقشه تعاملی',reports:'گزارش‌ساز',settings:'تنظیمات',manual:'شیوه‌نامه'};
+function SP(id) {
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('act'));
+  document.querySelectorAll('#sb nav a').forEach(a=>a.classList.remove('act'));
+  document.getElementById('pg-'+id).classList.add('act');
+  document.getElementById('pt').textContent = PTITLES[id]||id;
+  document.querySelectorAll('#sb nav a').forEach(a=>{
+    const oc = a.getAttribute('onclick')||'';
+    // تطابق دقیق: SP('scores') نه SP('scores_something')
+    if(oc.match(new RegExp("SP\\('"+id+"'\\)"))) a.classList.add('act');
+  });
+  if(id==='map') renderMap(APP.currentMapMode||'total');
+  if(id==='reports') renderReportPreview();
+  if(id==='ranking') { renderFinalRank(0); renderGroupRank('champ',0); renderGroupRank('pub',0); renderGroupRank('rural',0); renderMedals(); }
+  if(id==='settings') { populateNoteCities(); renderAuditLog(); renderManualEditForms(); }
+  if(id==='manual') renderManualView();
+  if(id==='scores') {
+    initScoreForms();
+    populateCitySelects();
+    // reset تب‌های scores به حالت اول
+    const scoresTabs = document.querySelectorAll('#pg-scores > .tabs .tab');
+    const scoresTcs  = document.querySelectorAll('#pg-scores > .tc');
+    scoresTabs.forEach((t,i)=>{ t.classList.toggle('act',i===0); });
+    scoresTcs.forEach((tc,i)=>{ tc.classList.toggle('act',i===0); });
+  }
+  closeSB();
+}
+function ST(el,cid) {
+  // پیدا کردن container مستقیم تب (div.tabs)
+  const tabsContainer = el.parentElement;
+  tabsContainer.querySelectorAll('.tab').forEach(t=>t.classList.remove('act'));
+  el.classList.add('act');
+  // پیدا کردن parent که tc ها را نگه می‌دارد
+  const par = el.closest('.card,.pg');
+  par.querySelectorAll(':scope > .tc, :scope > * > .tc').forEach(tc=>tc.classList.remove('act'));
+  document.getElementById(cid).classList.add('act');
+}
+function toggleSB(){document.getElementById('sb').classList.toggle('open');document.getElementById('ov').classList.toggle('show');}
+function closeSB(){document.getElementById('sb').classList.remove('open');document.getElementById('ov').classList.remove('show');}
+
+/* ===== آپلود ===== */
+function hDrop(e,key){e.preventDefault();e.currentTarget.classList.remove('dg');const f=e.dataTransfer.files[0];if(f)procFile(f,key);}
+function hFile(e,key){const f=e.target.files[0];if(f)procFile(f,key);}
+function procFile(file,key){
+  const r=new FileReader();
+  r.onload=function(e){
+    try{
+      const wb=XLSX.read(e.target.result,{type:'binary'});
+      const ws=wb.Sheets[wb.SheetNames[0]];
+      const data=XLSX.utils.sheet_to_json(ws,{defval:''});
+      APP.data[key]=data;
+      saveStorage();
+      const el=document.getElementById('fn-'+key);
+      if(el){el.textContent='✅ '+file.name;}
+      const uz=document.getElementById('uz-'+key);
+      if(uz) uz.classList.add('done');
+      const ps=document.getElementById('ps-'+key);
+      if(ps) ps.className='ps done';
+      showIA('✅ فایل «'+file.name+'» بارگذاری شد ('+data.length+' ردیف)','s');
+      renderPreviews();
+      // اگر فایل قهرمانی (mobin) بود، شاخص‌ها را استخراج و تطبیق بده
+      if(key==='mobin' && data.length>0) autoMapChampCols(data);
+    }catch(err){ showIA('❌ خطا در خواندن فایل: '+file.name,'d'); }
+  };
+  r.readAsBinaryString(file);
+}
+/* ===== تطبیق خودکار ستون‌های Excel قهرمانی با شاخص‌های شیوه‌نامه ===== */
+function autoMapChampCols(data){
+  if(!data || !data.length) return;
+  const cols = Object.keys(data[0]);
+  // ستون اول = شهرستان، بقیه = شاخص‌ها
+  const dataCols = cols.slice(1);
+  // نگاشت شاخص‌ها: شاخص‌های قابل ورود دستی (غیر خودکار و غیر مبین)
+  const manualInds = APP.manual.champ.filter(i=>!i.auto && !i.isMobin);
+  let mapped=0, notMapped=[];
+  data.forEach(row=>{
+    const cityKey = Object.values(row)[0];
+    const city = String(cityKey||'').trim();
+    if(!city) return;
+    if(!APP.cityScores[city]) APP.cityScores[city]={champ:{},pub:{},rural:{}};
+    dataCols.forEach(col=>{
+      const val = parseFloat(row[col])||0;
+      if(!val) return;
+      // جستجوی فازی: پیدا کردن نزدیک‌ترین شاخص
+      const matched = manualInds.find(ind=>
+        col.includes(ind.id) ||
+        ind.label.includes(col) ||
+        col.includes(ind.unit) ||
+        // تطبیق بر اساس کلیدواژه
+        matchChampCol(col, ind)
+      );
+      if(matched){
+        APP.cityScores[city].champ[matched.id] = val;
+        mapped++;
+      } else {
+        if(!notMapped.includes(col)) notMapped.push(col);
+      }
+    });
+  });
+  saveStorage();
+  const msg = mapped>0
+    ? '✅ '+fN(mapped)+' مقدار از Excel قهرمانی تطبیق یافت'+(notMapped.length?' | ستون‌های تطبیق‌نیافته: '+notMapped.join('، '):'')
+    : '⚠️ ستون‌های Excel با شاخص‌های شیوه‌نامه تطبیق نیافت. لطفاً از صفحه «ورود امتیازات» وارد کنید.';
+  showIA(msg, mapped>0?'s':'w');
+}
+function matchChampCol(col, ind){
+  const kw = {
+    'جهانی طلا':['c5'],'جهانی نقره':['c6'],'جهانی برنز':['c7'],
+    'آسیایی طلا':['c8'],'آسیایی نقره':['c9'],'آسیایی برنز':['c10'],
+    'بین‌المللی طلا':['c11'],'بین‌المللی نقره':['c12'],'بین‌المللی برنز':['c13'],
+    'کشوری طلا':['c14'],'کشوری نقره':['c15'],'کشوری برنز':['c16'],
+    'استانی طلا':['c17'],'استانی نقره':['c18'],'استانی برنز':['c19'],
+    'تیم ملی دعوت':['c3'],'تیم ملی برگزیده':['c4'],
+    'اعزام استانی':['c20'],'اعزام کشوری':['c21'],'اعزام بین‌المللی':['c22'],
+    'اعزام آسیایی':['c23'],'اعزام جهانی':['c24'],
+    'برگزاری استانی':['c25'],'برگزاری کشوری':['c26'],'برگزاری بین‌المللی':['c27'],
+    'لیگ':['c28'],'آموزشی':['c29'],'باشگاه':['c30'],'چارت':['c31'],
+  };
+  for(const [k,ids] of Object.entries(kw)){
+    if(col.includes(k) && ids.includes(ind.id)) return true;
+  }
+  return false;
+}
+
+function showIA(msg,t='i'){
+  const el=document.getElementById('ia');
+  if(!el)return;
+  el.innerHTML='<div class="al al-'+t+'">'+msg+'</div>';
+  setTimeout(()=>{el.innerHTML='';},4500);
+}
+
+/* ===== داده نمونه ===== */
+function loadSample(){
+  APP.data.tip = CITIES.map((c,i)=>({'شهرستان':c,'تیپ':i<5?1:i<14?2:3}));
+  APP.data.mobin = CITIES.map(c=>({'شهرستان':c,'ثبت مبین':Math.floor(100+Math.random()*800),'اعزام ثبت‌شده':Math.floor(5+Math.random()*40)}));
+  APP.data.mg = [{'شاخص':'ثبت مبین','ضریب':0.05},{'شاخص':'اعزام ثبت‌شده','ضریب':1.2}];
+  APP.data.med = CITIES.map(c=>({'شهرستان':c,'تعداد اعضا':Math.floor(400+Math.random()*2000),'هدف سال':Math.floor(600+Math.random()*2500)}));
+  APP.data.medp = CITIES.map(c=>({'شهرستان':c,'تعداد اعضا':Math.floor(350+Math.random()*1800)}));
+
+  // امتیازات نمونه برای هر شهرستان
+  CITIES.forEach(city=>{
+    if(!APP.cityScores[city]) APP.cityScores[city]={champ:{},pub:{},rural:{}};
+    // قهرمانی — با سقف شیوه‌نامه
+    APP.manual.champ.forEach(ind=>{
+      if(!ind.isMobin && !ind.auto && ind.cap!==null)
+        APP.cityScores[city].champ[ind.id] = Math.floor(Math.random()*(Math.ceil(ind.cap/ind.pts)+1));
+    });
+    // همگانی — بدون سقف، تعداد رویداد
+    APP.manual.pub.forEach(ind=>{
+      APP.cityScores[city].pub[ind.id] = Math.floor(Math.random()*7);
+    });
+    // روستایی — بدون سقف، تعداد رویداد
+    APP.manual.rural.forEach(ind=>{
+      APP.cityScores[city].rural[ind.id] = Math.floor(Math.random()*6);
+    });
+  });
+
+  ['tip','mobin','mg','med','medp'].forEach(k=>{
+    const ps=document.getElementById('ps-'+k);if(ps)ps.className='ps done';
+    const fn=document.getElementById('fn-'+k);if(fn)fn.textContent='✅ داده نمونه';
+    const uz=document.getElementById('uz-'+k);if(uz)uz.classList.add('done');
+  });
+  saveStorage();
+  renderPreviews();
+  showIA('✅ داده‌های نمونه بارگذاری شد','s');
+}
+
+function clearAll(){
+  if(!confirm('همه داده‌ها پاک شوند؟')) return;
+  localStorage.clear(); location.reload();
+}
+
+/* ===== محاسبات اصلی ===== */
+/* 
+   ساختار امتیازدهی:
+   - گروه قهرمانی: بر اساس شیوه‌نامه + سامانه مبین
+   - گروه همگانی: بر اساس شیوه‌نامه (مستقل از مبین)
+   - گروه روستایی: بر اساس شیوه‌نامه (مستقل)
+   - مجموع نهایی = champTotal*wC + pubTotal*wP + ruralTotal*wR (فقط برای رتبه‌بندی)
+*/
+function runCalc(){
+  const log = document.getElementById('calc-log');
+  log.style.display='block'; log.innerHTML='';
+  const addL=(m)=>{log.innerHTML+='<div>'+m+'</div>';log.scrollTop=log.scrollHeight;};
+
+  addL('🔄 شروع محاسبات...');
+
+  // نقشه تیپ
+  const tipMap={};
+  (APP.data.tip||[]).forEach(row=>{
+    const keys=Object.keys(row);
+    const city=String(row[keys[0]]||'').trim();
+    const tip=parseInt(row[keys[1]])||2;
+    if(city) tipMap[city]=tip;
+  });
+
+  // ضرایب مبین
+  const mobinCoefs={};
+  (APP.data.mg||[]).forEach(row=>{
+    const keys=Object.keys(row);
+    mobinCoefs[String(row[keys[0]]||'').trim()]=parseFloat(row[keys[1]])||1;
+  });
+
+  // امتیاز مبین هر شهرستان
+  const mobinScoreMap={};
+  (APP.data.mobin||[]).forEach(row=>{
+    const keys=Object.keys(row);
+    const city=String(row[keys[0]]||'').trim();
+    let score=0;
+    keys.slice(1).forEach(k=>{ score+=(parseFloat(row[k])||0)*(mobinCoefs[k]||1); });
+    mobinScoreMap[city]=score;
+  });
+
+  // امتیاز پزشکی (ردیف اول شیوه‌نامه قهرمانی — ورزشکاران سازمان‌یافته)
+  const medCurMap={}, medPrevMap={};
+  (APP.data.med||[]).forEach(row=>{
+    const keys=Object.keys(row);
+    const city=String(row[keys[0]]||'').trim();
+    medCurMap[city]={ cur: parseInt(row[keys[1]])||0, target: parseInt(row[keys[2]])||0 };
+  });
+  (APP.data.medp||[]).forEach(row=>{
+    const keys=Object.keys(row);
+    const city=String(row[keys[0]]||'').trim();
+    medPrevMap[city]={ prev: parseInt(row[keys[1]])||0 };
+  });
+
+  APP.results = [];
+  let warns = [];
+
+  CITIES.forEach(city=>{
+    const tip = tipMap[city]||2;
+    if(!tipMap[city]) warns.push('⚠️ تیپ «'+city+'» مشخص نیست → تیپ ۲ فرض شد');
+
+    const cityData = APP.cityScores[city]||{champ:{},pub:{},rural:{}};
+
+    /* --- گروه قهرمانی --- */
+    let champRaw=0, champCapped=0;
+    APP.manual.champ.forEach(ind=>{
+      if(ind.isMobin){
+        // سامانه مبین فقط در قهرمانی
+        const ms = mobinScoreMap[city]||0;
+        const cappedMs = Math.min(ms, ind.cap);
+        champRaw += cappedMs;
+        champCapped += cappedMs;
+        addL('  مبین ['+city+']: امتیاز خام='+ms.toFixed(1)+' → سقف='+cappedMs.toFixed(1));
+      } else if(ind.auto){
+        // ورزشکاران سازمان‌یافته (پزشکی ورزشی)
+        const med = medCurMap[city]||{cur:0,target:0};
+        const prev = medPrevMap[city]||{prev:0};
+        let pts70=0, pts30=0;
+        if(med.target>0) pts70 = Math.min(70, Math.round((med.cur/med.target)*70));
+        if(prev.prev>0) pts30 = Math.min(30, Math.round(((med.cur-prev.prev)/prev.prev)*30));
+        const auto_pts = Math.max(0, pts70+pts30);
+        champRaw += auto_pts;
+        champCapped += auto_pts;
+      } else {
+        const qty = parseInt(cityData.champ[ind.id])||0;
+        const raw_pts = qty * ind.pts;
+        const capped = Math.min(raw_pts, ind.cap);
+        champRaw += raw_pts;
+        champCapped += capped;
+      }
+    });
+
+    /* --- گروه همگانی — بدون سقف طبق شیوه‌نامه --- */
+    let pubRaw=0, pubCapped=0;
+    APP.manual.pub.forEach(ind=>{
+      const qty = parseInt(cityData.pub[ind.id])||0;
+      const raw_pts = qty * ind.pts;
+      pubRaw += raw_pts; pubCapped += raw_pts; // بدون سقف
+    });
+
+    /* --- گروه روستایی — بدون سقف طبق شیوه‌نامه --- */
+    let ruralRaw=0, ruralCapped=0;
+    APP.manual.rural.forEach(ind=>{
+      const qty = parseInt(cityData.rural[ind.id])||0;
+      const raw_pts = qty * ind.pts;
+      ruralRaw += raw_pts; ruralCapped += raw_pts; // بدون سقف
+    });
+
+    // مجموع نهایی — وزن‌دار (فقط برای رتبه‌بندی نهایی)
+    const wC = APP.weights.c/100, wP = APP.weights.p/100, wR = APP.weights.r/100;
+    const total = Math.round(champCapped*wC + pubCapped*wP + ruralCapped*wR);
+
+    APP.results.push({
+      city, tip,
+      champTotal: Math.round(champCapped), champRaw: Math.round(champRaw),
+      pubTotal:   Math.round(pubCapped),   pubRaw:   Math.round(pubRaw),
+      ruralTotal: Math.round(ruralCapped), ruralRaw: Math.round(ruralRaw),
+      total, mobinScore: Math.round(mobinScoreMap[city]||0),
+    });
+  });
+
+  warns.forEach(w=>addL(w));
+  APP.results.sort((a,b)=>b.total-a.total);
+  APP.results.forEach((r,i)=>{r.rank=i+1;});
+  addL('✅ محاسبه '+APP.results.length+' شهرستان انجام شد.');
+  addL('📊 سامانه مبین فقط در گروه قهرمانی محاسبه شد.');
+
+  saveStorage();
+  updateDashboard();
+  addAudit('اجرای محاسبات', APP.user?APP.user.name:'سیستم');
+  document.getElementById('cs').textContent='✅ '+new Date().toLocaleTimeString('fa-IR');
+}
+
+/* ===== داشبورد ===== */
+function updateDashboard(){
+  if(!APP.results.length) return;
+  const rs = APP.results;
+  const avgC = Math.round(rs.reduce((a,b)=>a+b.champTotal,0)/rs.length);
+  const avgP = Math.round(rs.reduce((a,b)=>a+b.pubTotal,0)/rs.length);
+  const avgR = Math.round(rs.reduce((a,b)=>a+b.ruralTotal,0)/rs.length);
+  const avgT = Math.round(rs.reduce((a,b)=>a+b.total,0)/rs.length);
+  const maxR = rs[0];
+
+  // هشدارها
+  const alerts = rs.filter(r=>r.total < avgT*0.5);
+
+  Q('kd-champ-avg').textContent=fN(avgC);
+  Q('kd-pub-avg').textContent=fN(avgP);
+  Q('kd-rural-avg').textContent=fN(avgR);
+  Q('kd-max').textContent=fN(maxR.total);
+  Q('kd-max-n').textContent=maxR.city;
+  Q('kd-avg').textContent=fN(avgT);
+  Q('kd-alerts').textContent=fN(alerts.length);
+  Q('kd-count').textContent=fN(rs.length);
+
+  if(alerts.length){
+    const ap=Q('alert-panel');
+    ap.style.display='block';
+    ap.innerHTML=alerts.map(a=>'<div class="al al-w">⚠️ شهرستان «'+a.city+'» امتیاز پایین‌تر از ۵۰٪ میانگین دارد (مجموع: '+fN(a.total)+')</div>').join('');
+  }
+
+  renderCharts();
+  renderTable();
+  renderGroupSections();
+  renderLadder();
+  populateRadarSelect();
+}
+
+/* ===== نمودارها ===== */
+function renderCharts(tipF=0){
+  const src = tipF ? APP.results.filter(r=>r.tip===tipF) : APP.results;
+  if(!src.length) return;
+  const sl = src.slice(0,14);
+
+  if(APP.charts.bar) APP.charts.bar.destroy();
+  APP.charts.bar = new Chart(Q('ch-bar'),{
+    type:'bar',
+    data:{
+      labels: sl.map(x=>x.city),
+      datasets:[
+        {label:'قهرمانی',data:sl.map(x=>x.champTotal),backgroundColor:'rgba(26,107,90,0.72)',borderRadius:4},
+        {label:'همگانی', data:sl.map(x=>x.pubTotal),  backgroundColor:'rgba(30,95,142,0.72)', borderRadius:4},
+        {label:'روستایی',data:sl.map(x=>x.ruralTotal),backgroundColor:'rgba(138,90,10,0.72)',borderRadius:4},
+      ]
+    },
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{labels:{font:{family:'Vazirmatn'}}}},
+      scales:{x:{ticks:{font:{family:'Vazirmatn'},maxRotation:45}},y:{beginAtZero:true}}}
+  });
+
+  const tC=src.reduce((a,b)=>a+b.champTotal,0);
+  const tP=src.reduce((a,b)=>a+b.pubTotal,0);
+  const tR=src.reduce((a,b)=>a+b.ruralTotal,0);
+  if(APP.charts.pie) APP.charts.pie.destroy();
+  APP.charts.pie = new Chart(Q('ch-pie'),{
+    type:'doughnut',
+    data:{labels:['قهرمانی','همگانی','روستایی/عشایری'],
+      datasets:[{data:[tC,tP,tR],backgroundColor:['rgba(26,107,90,0.8)','rgba(30,95,142,0.8)','rgba(138,90,10,0.8)'],borderWidth:0}]},
+    options:{responsive:true,plugins:{legend:{labels:{font:{family:'Vazirmatn'}}}}}
+  });
+}
+function filterChart(tip){ renderCharts(tip); }
+
+function populateRadarSelect(){
+  const sel=Q('radar-sel'); if(!sel)return;
+  const v=sel.value;
+  sel.innerHTML='<option value="">انتخاب شهرستان...</option>';
+  APP.results.forEach(r=>{const o=document.createElement('option');o.value=r.city;o.textContent=r.city;sel.appendChild(o);});
+  if(v) sel.value=v;
+}
+function updateRadar(){
+  const city=Q('radar-sel').value; if(!city)return;
+  const r=APP.results.find(x=>x.city===city); if(!r)return;
+  if(APP.charts.radar) APP.charts.radar.destroy();
+  APP.charts.radar=new Chart(Q('ch-radar'),{
+    type:'radar',
+    data:{
+      labels:['قهرمانی','همگانی','روستایی','مبین'],
+      datasets:[{label:city,
+        data:[r.champTotal, r.pubTotal, r.ruralTotal, Math.min(r.mobinScore,90)],
+        fill:true,backgroundColor:'rgba(26,107,90,0.18)',borderColor:'rgba(26,107,90,0.85)',
+        pointBackgroundColor:'rgba(201,162,39,1)'}]},
+    options:{responsive:true,plugins:{legend:{labels:{font:{family:'Vazirmatn'}}}},scales:{r:{min:0}}}
+  });
+}
+
+/* ===== جدول اصلی ===== */
+function renderTable(){
+  const q=(Q('ts')||{value:''}).value.trim();
+  const rows=APP.results.filter(r=>!q||r.city.includes(q));
+  if(!rows.length){Q('main-tw').innerHTML='<p style="color:#5a6a7a;text-align:center;padding:30px">داده‌ای موجود نیست</p>';return;}
+  const maxT=rows[0].total;
+  let h='<table><thead><tr><th>رتبه</th><th>شهرستان</th><th>تیپ</th><th class="gc">قهرمانی</th><th class="gp">همگانی</th><th class="gr-color">روستایی</th><th>مجموع نهایی</th><th>نمودار</th></tr></thead><tbody>';
+  rows.forEach((r,i)=>{
+    const cls=i===0?'r1':i===1?'r2':i===2?'r3':'';
+    const med=i===0?'🥇':i===1?'🥈':i===2?'🥉':'';
+    const pct=Math.round(r.total/maxT*100);
+    h+=`<tr class="${cls}">
+      <td><b>${med}${fN(r.rank)}</b></td>
+      <td><b>${r.city}</b></td>
+      <td><span class="bt bt${r.tip}">تیپ ${fN(r.tip)}</span></td>
+      <td><b class="gc">${fN(r.champTotal)}</b></td>
+      <td><b class="gp">${fN(r.pubTotal)}</b></td>
+      <td><b class="gr-color">${fN(r.ruralTotal)}</b></td>
+      <td><b style="font-size:14px">${fN(r.total)}</b></td>
+      <td style="min-width:100px"><div class="sb2"><div class="sf" style="width:${pct}%"></div></div></td>
+    </tr>`;
+  });
+  h+='</tbody></table>';
+  Q('main-tw').innerHTML=h;
+}
+
+/* ===== امتیاز گروهی جداگانه ===== */
+function renderGroupSections(){
+  const groups=[
+    {key:'champTotal',label:'قهرمانی ورزشی',color:getComputedStyle(document.documentElement).getPropertyValue('--champ').trim()||'#1a6b5a',tag:'tag-c',note:'شامل سامانه مبین'},
+    {key:'pubTotal',label:'ورزش همگانی',color:'#1e5f8e',tag:'tag-p',note:''},
+    {key:'ruralTotal',label:'روستایی/عشایری',color:'#8a5a0a',tag:'tag-r',note:''},
+  ];
+  let html='';
+  groups.forEach(g=>{
+    const sorted=[...APP.results].sort((a,b)=>b[g.key]-a[g.key]);
+    const maxV=sorted[0]?.[g.key]||1;
+    const avg=Math.round(sorted.reduce((a,b)=>a+b[g.key],0)/sorted.length);
+    html+=`<div class="group-section"><div class="gs-head">
+      <div class="gs-title"><span class="${g.tag}">${g.label}</span>${g.note?'<small style="font-weight:400;font-size:11px;color:#5a6a7a;margin-right:6px">— '+g.note+'</small>':''}</div>
+      <div class="gs-total" style="color:${g.color}">${fN(sorted[0]?.[g.key]||0)} <small style="font-size:12px;font-weight:400;color:#5a6a7a">بالاترین | میانگین: ${fN(avg)}</small></div>
+    </div>`;
+    html+='<div class="tw"><table><thead><tr><th>رتبه</th><th>شهرستان</th><th>تیپ</th><th>امتیاز</th><th>نمودار</th></tr></thead><tbody>';
+    sorted.slice(0,10).forEach((r,i)=>{
+      const cls=i===0?'r1':i===1?'r2':i===2?'r3':'';
+      const med=i===0?'🥇':i===1?'🥈':i===2?'🥉':'';
+      const pct=Math.round(r[g.key]/maxV*100);
+      html+=`<tr class="${cls}"><td>${med}<b>${fN(i+1)}</b></td><td><b>${r.city}</b></td>
+        <td><span class="bt bt${r.tip}">تیپ ${fN(r.tip)}</span></td>
+        <td><b style="color:${g.color};font-size:15px">${fN(r[g.key])}</b></td>
+        <td style="min-width:80px"><div class="sb2"><div class="sf" style="width:${pct}%;background:${g.color}"></div></div></td></tr>`;
+    });
+    html+='</tbody></table></div></div>';
+  });
+  Q('group-sections').innerHTML=html||'<p style="color:#5a6a7a;text-align:center;padding:30px">داده‌ای موجود نیست</p>';
+}
+
+/* ===== نردبان ===== */
+function renderLadder(){
+  if(!APP.results.length)return;
+  const max=APP.results[0].total;
+  const cols=['#c9a227','#8a9aaa','#b07040'];
+  let h='';
+  APP.results.slice(0,16).forEach((r,i)=>{
+    const pct=Math.round(r.total/max*100);
+    const col=i<3?cols[i]:'var(--pr)';
+    h+=`<div class="li">
+      <div class="rk" style="color:${col}">${i<3?['🥇','🥈','🥉'][i]:fN(i+1)}</div>
+      <div class="nm">${r.city}</div>
+      <div class="br"><div class="sb2"><div class="sf" style="width:${pct}%;background:${col}"></div></div></div>
+      <div class="sc" style="color:${col}">${fN(r.total)}</div>
+    </div>`;
+  });
+  Q('ladder').innerHTML=h;
+}
+
+/* ===== ورود امتیازات — فرم‌ها ===== */
+function initScoreForms(){
+  buildGroupForm('champ', 'champ-form', APP.manual.champ);
+  buildGroupForm('pub', 'pub-form', APP.manual.pub);
+  buildGroupForm('rural', 'rural-form', APP.manual.rural);
+  // populate select بعد از build فرم
+  populateCitySelects();
+}
+
+function buildGroupForm(group, elId, indicators){
+  const el=document.getElementById(elId); if(!el)return;
+  const colorMap={champ:'var(--champ)',pub:'var(--pub)',rural:'var(--rural)'};
+  const col=colorMap[group]||'var(--pr)';
+  // هدر جدول
+  let h=`<div style="display:grid;grid-template-columns:1fr 90px 130px 80px;gap:0;border:1px solid var(--brd);border-radius:var(--rs);overflow:hidden;">
+    <div style="background:linear-gradient(135deg,var(--pr-d),var(--pr));color:#fff;padding:9px 14px;font-size:12px;font-weight:700;">عنوان شاخص</div>
+    <div style="background:linear-gradient(135deg,var(--pr-d),var(--pr));color:#fff;padding:9px 8px;font-size:12px;font-weight:700;text-align:center;">سقف</div>
+    <div style="background:linear-gradient(135deg,var(--pr-d),var(--pr));color:#fff;padding:9px 8px;font-size:12px;font-weight:700;text-align:center;">تعداد / مقدار</div>
+    <div style="background:linear-gradient(135deg,var(--pr-d),var(--pr));color:#fff;padding:9px 8px;font-size:12px;font-weight:700;text-align:center;">امتیاز</div>`;
+  indicators.forEach((ind,i)=>{
+    const isAuto = ind.auto || ind.isMobin;
+    const bg = i%2===0 ? '#fff' : '#f8faf9';
+    const tagHtml = ind.isMobin
+      ? '<span style="font-size:10px;background:rgba(30,95,142,0.12);color:var(--bl);padding:1px 7px;border-radius:12px;display:inline-block;margin-left:5px">مبین</span>'
+      : ind.auto
+      ? '<span style="font-size:10px;background:rgba(26,107,90,0.12);color:var(--pr);padding:1px 7px;border-radius:12px;display:inline-block;margin-left:5px">خودکار</span>'
+      : '';
+    const capCell = ind.cap!==null
+      ? `<div style="padding:9px 8px;text-align:center;border-right:1px solid var(--brd);background:${bg}"><span style="background:rgba(232,134,26,0.1);color:#7a4800;padding:2px 7px;border-radius:12px;font-size:11.5px;font-weight:700">${fN(ind.cap)}</span></div>`
+      : `<div style="padding:9px 8px;text-align:center;border-right:1px solid var(--brd);background:${bg};font-size:11px;color:#aaa">—</div>`;
+    const inputCell = isAuto
+      ? `<div style="padding:9px 8px;text-align:center;border-right:1px solid var(--brd);background:${bg};font-size:11.5px;color:#5a6a7a">خودکار</div>`
+      : `<div style="padding:6px 8px;border-right:1px solid var(--brd);background:${bg};display:flex;align-items:center;gap:5px;justify-content:center">
+           <input type="number" id="${group}-${ind.id}" min="0" step="1"
+             style="width:58px;text-align:center;padding:5px 6px;border:1.5px solid var(--brd);border-radius:6px;font-family:Vazirmatn,sans-serif;font-size:13px;background:#fff"
+             placeholder="0" oninput="calcGroupTotal('${group}')">
+           <span style="font-size:10.5px;color:#8a9aaa;white-space:nowrap">${ind.unit}</span>
+         </div>`;
+    const ptsCell = `<div style="padding:9px 8px;text-align:center;background:${bg};font-size:13px;font-weight:700;color:${col}" id="pts-${group}-${ind.id}">—</div>`;
+    h+=`<div style="display:contents">
+      <div style="padding:9px 14px;font-size:12.5px;border-top:1px solid var(--brd);border-right:1px solid var(--brd);background:${bg}">${tagHtml}${ind.label}</div>
+      ${capCell}${inputCell}${ptsCell}
+    </div>`;
+  });
+  h+='</div>';
+  el.innerHTML=h;
+}
+
+function populateCitySelects(){
+  ['champ','pub','rural'].forEach(g=>{
+    const sel=document.getElementById(g+'-city-sel'); if(!sel)return;
+    sel.innerHTML='<option value="">انتخاب شهرستان...</option>';
+    CITIES.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;sel.appendChild(o);});
+  });
+}
+
+function loadCityScores(group){
+  const city=document.getElementById(group+'-city-sel').value; if(!city)return;
+  const cityData=APP.cityScores[city]||{champ:{},pub:{},rural:{}};
+  APP.manual[group].forEach(ind=>{
+    if(ind.auto||ind.isMobin)return;
+    const el=document.getElementById(group+'-'+ind.id); if(!el)return;
+    el.value=cityData[group][ind.id]||'';
+  });
+  calcGroupTotal(group);
+}
+
+function calcGroupTotal(group){
+  const selEl=document.getElementById(group+'-city-sel');
+  const city=selEl?selEl.value:'';
+  let total=0;
+  APP.manual[group].forEach(ind=>{
+    if(ind.auto||ind.isMobin)return;
+    const el=document.getElementById(group+'-'+ind.id); if(!el)return;
+    const qty=parseInt(el.value)||0;
+    const rawPts=qty*ind.pts;
+    // فقط گروه قهرمانی سقف دارد
+    const pts = (group==='champ' && ind.cap!==null) ? Math.min(rawPts, ind.cap) : rawPts;
+    total+=pts;
+    const ptEl=document.getElementById('pts-'+group+'-'+ind.id);
+    if(ptEl) ptEl.textContent=fN(pts);
+  });
+  const totEl=document.getElementById(group+'-total');
+  if(totEl) totEl.textContent=fN(Math.round(total));
+}
+
+function saveCityScores(group){
+  const city=document.getElementById(group+'-city-sel').value;
+  if(!city){alert('ابتدا شهرستان را انتخاب کنید');return;}
+  if(!APP.cityScores[city]) APP.cityScores[city]={champ:{},pub:{},rural:{}};
+  APP.manual[group].forEach(ind=>{
+    if(ind.auto||ind.isMobin)return;
+    const el=document.getElementById(group+'-'+ind.id); if(!el)return;
+    APP.cityScores[city][group][ind.id]=parseInt(el.value)||0;
+  });
+  saveStorage();
+  addAudit('ذخیره امتیاز گروه '+group+' برای '+city, APP.user?APP.user.name:'سیستم');
+  alert('✅ امتیازات «'+city+'» ذخیره شد');
+}
+
+/* ===== رتبه‌بندی ===== */
+function renderFinalRank(tip=0, clickedTab=null){
+  if(clickedTab){
+    const par=clickedTab.closest('.tc,.pg');
+    par.querySelectorAll('#final-tip-tabs .tab').forEach(t=>t.classList.remove('act'));
+    clickedTab.classList.add('act');
+  }
+  const rows = tip ? APP.results.filter(r=>r.tip===tip) : APP.results;
+  const sorted=[...rows].sort((a,b)=>b.total-a.total);
+  if(!sorted.length){Q('rk-final-tbl').innerHTML='<p style="color:#5a6a7a;text-align:center;padding:20px">داده‌ای موجود نیست</p>';return;}
+  let h='<table><thead><tr><th>رتبه</th><th>شهرستان</th><th>تیپ</th><th class="gc">قهرمانی</th><th class="gp">همگانی</th><th class="gr-color">روستایی</th><th>مجموع (وزن‌دار)</th></tr></thead><tbody>';
+  sorted.forEach((r,i)=>{
+    const cls=i===0?'r1':i===1?'r2':i===2?'r3':'';
+    const med=i===0?'🥇':i===1?'🥈':i===2?'🥉':'';
+    h+=`<tr class="${cls}"><td>${med}<b>${fN(i+1)}</b></td><td><b>${r.city}</b></td>
+      <td><span class="bt bt${r.tip}">تیپ ${fN(r.tip)}</span></td>
+      <td class="gc">${fN(r.champTotal)}</td><td class="gp">${fN(r.pubTotal)}</td>
+      <td class="gr-color">${fN(r.ruralTotal)}</td>
+      <td><b style="font-size:14px">${fN(r.total)}</b></td></tr>`;
+  });
+  h+='</tbody></table>';
+  Q('rk-final-tbl').innerHTML=h;
+}
+
+function renderGroupRank(group, tip=0, clickedTab=null){
+  const elId='rk-'+group+'-tbl';
+  if(clickedTab){
+    const par=clickedTab.closest('.tc');
+    par.querySelectorAll('.tabs .tab').forEach(t=>t.classList.remove('act'));
+    clickedTab.classList.add('act');
+  }
+  const key=group+'Total';
+  const colorMap={champ:'var(--champ)',pub:'var(--pub)',rural:'var(--rural)'};
+  const col=colorMap[group];
+  const rows=tip ? APP.results.filter(r=>r.tip===tip) : APP.results;
+  const sorted=[...rows].sort((a,b)=>b[key]-a[key]);
+  if(!sorted.length){Q(elId).innerHTML='<p style="color:#5a6a7a;text-align:center;padding:20px">داده‌ای موجود نیست</p>';return;}
+  const maxV=sorted[0][key]||1;
+  let h='<table><thead><tr><th>رتبه</th><th>شهرستان</th><th>تیپ</th><th>امتیاز '+{champ:'قهرمانی',pub:'همگانی',rural:'روستایی'}[group]+'</th><th>نمودار</th></tr></thead><tbody>';
+  sorted.forEach((r,i)=>{
+    const cls=i===0?'r1':i===1?'r2':i===2?'r3':'';
+    const med=i===0?'🥇':i===1?'🥈':i===2?'🥉':'';
+    const pct=Math.round(r[key]/maxV*100);
+    h+=`<tr class="${cls}"><td>${med}<b>${fN(i+1)}</b></td><td><b>${r.city}</b></td>
+      <td><span class="bt bt${r.tip}">تیپ ${fN(r.tip)}</span></td>
+      <td><b style="color:${col};font-size:15px">${fN(r[key])}</b></td>
+      <td style="min-width:90px"><div class="sb2"><div class="sf" style="width:${pct}%;background:${col}"></div></div></td></tr>`;
+  });
+  h+='</tbody></table>';
+  Q(elId).innerHTML=h;
+}
+
+function renderMedals(){
+  const grid=Q('medals-grid'); if(!grid)return;
+  const groups=[
+    {key:'champTotal',label:'قهرمانی',tag:'tag-c',icon:'🏋️'},
+    {key:'pubTotal',label:'همگانی',tag:'tag-p',icon:'🤸'},
+    {key:'ruralTotal',label:'روستایی',tag:'tag-r',icon:'🌾'},
+  ];
+  let h='';
+  [1,2,3].forEach(tip=>{
+    const tipRows=APP.results.filter(r=>r.tip===tip);
+    if(!tipRows.length)return;
+    groups.forEach(g=>{
+      const sorted=[...tipRows].sort((a,b)=>b[g.key]-a[g.key]);
+      h+=`<div class="card"><div class="ct">${g.icon} <span class="${g.tag}">${g.label}</span> — تیپ ${fN(tip)}</div>
+        <table><thead><tr><th>مدال</th><th>شهرستان</th><th>امتیاز</th></tr></thead><tbody>`;
+      ['🥇','🥈','🥉'].forEach((m,i)=>{
+        if(sorted[i]) h+=`<tr class="r${i+1}"><td style="font-size:18px">${m}</td><td><b>${sorted[i].city}</b></td><td><b>${fN(sorted[i][g.key])}</b></td></tr>`;
+      });
+      h+='</tbody></table></div>';
+    });
+  });
+  grid.innerHTML=h||'<p style="color:#5a6a7a;text-align:center;padding:30px;grid-column:1/-1">داده‌ای موجود نیست</p>';
+}
+
+/* ===== نقشه ===== */
+function renderMap(mode='total'){
+  APP.currentMapMode=mode;
+  const svg=Q('map-svg');
+  if(!APP.results.length){svg.innerHTML='<text x="310" y="240" text-anchor="middle" font-family="Vazirmatn" font-size="15" fill="#888">ابتدا محاسبات را اجرا کنید</text>';return;}
+  const keyMap={total:'total',champ:'champTotal',pub:'pubTotal',rural:'ruralTotal'};
+  const k=keyMap[mode]||'total';
+  const maxV=Math.max(...APP.results.map(r=>r[k]),1);
+  const getCol=(v)=>{
+    const pct=v/maxV;
+    if(pct>=0.7)return'#22a25a';if(pct>=0.5)return'#c9a227';if(pct>=0.3)return'#e8861a';return'#d63030';
+  };
+  let h='<rect width="620" height="500" fill="transparent"/>';
+  // خطوط اتصال
+  h+='<g opacity="0.1">';
+  const coords=Object.entries(CITY_COORDS);
+  for(let i=0;i<coords.length;i++)for(let j=i+1;j<Math.min(i+3,coords.length);j++){
+    const d=Math.sqrt((coords[i][1][0]-coords[j][1][0])**2+(coords[i][1][1]-coords[j][1][1])**2);
+    if(d<115) h+=`<line x1="${coords[i][1][0]}" y1="${coords[i][1][1]}" x2="${coords[j][1][0]}" y2="${coords[j][1][1]}" stroke="#1a6b5a" stroke-width="1.2"/>`;
+  }
+  h+='</g>';
+  APP.results.forEach(r=>{
+    const [cx,cy]=CITY_COORDS[r.city]||[310,240];
+    const v=r[k];
+    const rad=11+Math.round(v/maxV*13);
+    const col=getCol(v);
+    const sc=mode==='total'?r.total:r[k];
+    h+=`<g style="cursor:pointer" onmouseenter="showMTT(event,'${r.city}',${r.champTotal},${r.pubTotal},${r.ruralTotal},${r.total},${r.rank},'${r.tip}')" onmouseleave="hideMTT()">
+      <circle cx="${cx}" cy="${cy}" r="${rad}" fill="${col}" opacity="0.82" stroke="white" stroke-width="1.5"/>
+      <text x="${cx}" y="${cy+3}" text-anchor="middle" font-family="Vazirmatn" font-size="${rad>18?9:8}" fill="white" font-weight="bold">${r.city.length>4?r.city.slice(0,4):r.city}</text>
+    </g>`;
+  });
+  svg.innerHTML=h;
+}
+function showMTT(e,city,ch,pub,rural,total,rank,tip){
+  const tt=Q('mtt');
+  tt.innerHTML=`<div class="mtt-title">📍 ${city} <span class="bt bt${tip}" style="font-size:10px">تیپ ${fN(parseInt(tip))}</span></div>
+    <div class="mtt-row"><span>🏋️ قهرمانی</span><b>${fN(ch)}</b></div>
+    <div class="mtt-row"><span>🤸 همگانی</span><b>${fN(pub)}</b></div>
+    <div class="mtt-row"><span>🌾 روستایی</span><b>${fN(rural)}</b></div>
+    <div style="border-top:1px solid rgba(255,255,255,0.2);margin-top:6px;padding-top:5px;display:flex;justify-content:space-between">
+      <span>مجموع نهایی</span><b style="color:var(--ac)">${fN(total)}</b></div>
+    <div class="mtt-row"><span>رتبه کلی</span><b>${fN(rank)}</b></div>`;
+  const r=Q('map-cont').getBoundingClientRect();
+  tt.style.right=(r.right-e.clientX+10)+'px';
+  tt.style.top=(e.clientY-r.top+12)+'px';
+  tt.style.display='block';
+}
+function hideMTT(){Q('mtt').style.display='none';}
+
+/* ===== شیوه‌نامه — نمایش ===== */
+function renderManualView(){
+  const groups=[
+    {key:'champ',label:'گروه قهرمانی ورزشی',cls:'champ',icon:'🏋️',note:'سامانه مبین فقط در این گروه محاسبه می‌شود'},
+    {key:'pub',label:'گروه ورزش همگانی',cls:'pub',icon:'🤸',note:''},
+    {key:'rural',label:'گروه روستایی و عشایری',cls:'rural',icon:'🌾',note:''},
+  ];
+  let h='';
+  groups.forEach(g=>{
+    h+=`<div class="manual-group ${g.cls}"><div class="mg-head">${g.icon} ${g.label}
+      ${g.note?'<small style="font-size:11px;font-weight:400;margin-right:8px;opacity:.75">— '+g.note+'</small>':''}
+    </div><div class="mg-body"><div style="display:grid;grid-template-columns:1fr auto auto;gap:6px;font-size:11.5px;font-weight:700;color:#5a6a7a;padding:4px 12px;margin-bottom:4px"><span>عنوان شاخص</span><span style="text-align:center">امتیاز هر واحد</span><span style="text-align:center">سقف</span></div>`;
+    APP.manual[g.key].forEach(ind=>{
+      const autoTag=ind.isMobin?'<span style="font-size:10px;background:rgba(30,95,142,0.1);color:var(--bl);padding:1px 6px;border-radius:12px">مبین</span>':
+                    ind.auto?'<span style="font-size:10px;background:rgba(26,107,90,0.1);color:var(--pr);padding:1px 6px;border-radius:12px">خودکار</span>':'';
+      h+=`<div class="ind-row"><div class="ind-name">${autoTag} ${ind.label}</div>
+        <div class="ind-pts" style="text-align:center;font-weight:700;color:var(--pr)">${fN(ind.pts)}</div>
+        <div class="ind-cap" style="text-align:center">${ind.cap!==null ? '<span class="cap-badge">'+fN(ind.cap)+'</span>' : '<span style="font-size:10px;color:#5a6a7a">—</span>'}</div></div>`;
+    });
+    h+='</div></div>';
+  });
+  Q('manual-view').innerHTML=h;
+}
+
+/* ===== ویرایش شیوه‌نامه ===== */
+function renderManualEditForms(){
+  ['champ','pub','rural'].forEach(g=>{
+    const el=document.getElementById('me-'+g+'-form'); if(!el)return;
+    let h='<div style="display:flex;flex-direction:column;gap:7px">';
+    const showCap=(g==='champ');
+    h+='<div style="display:grid;grid-template-columns:1fr 90px'+(showCap?' 90px':'')+';gap:8px;font-size:11.5px;font-weight:700;color:#5a6a7a;padding:4px 12px;margin-bottom:2px"><span>شاخص</span><span style="text-align:center">امتیاز هر واحد</span>'+(showCap?'<span style="text-align:center">سقف</span>':'')+'</div>';
+    APP.manual[g].forEach(ind=>{
+      const autoTag=ind.isMobin?'<span style="font-size:10px;background:rgba(30,95,142,0.1);color:var(--bl);padding:1px 5px;border-radius:12px">مبین</span>':
+                    ind.auto?'<span style="font-size:10px;background:rgba(26,107,90,0.1);color:var(--pr);padding:1px 5px;border-radius:12px">خودکار</span>':'';
+      h+=`<div style="display:grid;grid-template-columns:1fr 90px ${showCap?'90px':''};gap:8px;align-items:center;padding:8px 10px;border-radius:var(--rs);border:1px solid var(--brd);background:#fff">
+        <div style="font-size:12.5px">${autoTag} ${ind.label}</div>
+        <input type="number" id="me-pts-${ind.id}" value="${ind.pts}" step="0.5" min="0" class="fi" style="text-align:center;padding:5px 7px;font-size:13px;font-weight:700">
+        ${showCap ? (ind.cap!==null ? '<input type="number" id="me-cap-'+ind.id+'" value="'+ind.cap+'" min="0" class="fi" style="text-align:center;padding:5px 7px;font-size:13px;font-weight:700">' : '<div style="text-align:center;font-size:11px;color:#5a6a7a">بدون سقف</div>') : ''}
+      </div>`;
+    });
+    h+='</div>';
+    el.innerHTML=h;
+  });
+}
+
+function applyManualChanges(){
+  ['champ','pub','rural'].forEach(g=>{
+    APP.manual[g].forEach(ind=>{
+      const pEl=document.getElementById('me-pts-'+ind.id);
+      const cEl=document.getElementById('me-cap-'+ind.id);
+      if(pEl) ind.pts=parseFloat(pEl.value)||ind.pts;
+      if(cEl && ind.cap!==null) ind.cap=parseFloat(cEl.value)||ind.cap;
+    });
+  });
+  saveStorage();
+  addAudit('ویرایش شیوه‌نامه', APP.user?APP.user.name:'سیستم');
+  alert('✅ شیوه‌نامه به‌روز شد. در حال بازمحاسبه...');
+  runCalc();
+}
+
+function resetManual(){
+  if(!confirm('شیوه‌نامه به حالت پیش‌فرض برگردد؟'))return;
+  APP.manual=JSON.parse(JSON.stringify(DEFAULT_MANUAL));
+  saveStorage();
+  renderManualEditForms();
+  addAudit('بازنشانی شیوه‌نامه', APP.user?APP.user.name:'سیستم');
+  alert('✅ شیوه‌نامه پیش‌فرض بازنشانی شد');
+}
+
+/* ===== تنظیمات ===== */
+function syncW(t){
+  const v=parseInt(document.getElementById('w'+t).value);
+  Q('sv-'+t).textContent=fN(v);
+  const tot=parseInt(Q('wc').value)+parseInt(Q('wp').value)+parseInt(Q('wr').value);
+  Q('ww').style.display=tot!==100?'flex':'none';
+}
+function applyW(){
+  const wc=parseInt(Q('wc').value),wp=parseInt(Q('wp').value),wr=parseInt(Q('wr').value);
+  if(wc+wp+wr!==100){alert('مجموع وزن‌ها باید ۱۰۰٪ باشد');return;}
+  APP.weights={c:wc,p:wp,r:wr};
+  saveStorage();
+  addAudit(`وزن: قهرمانی=${wc}% همگانی=${wp}% روستایی=${wr}%`, APP.user?APP.user.name:'سیستم');
+  if(APP.results.length) runCalc();
+}
+function resetW(){
+  APP.weights={c:35,p:40,r:25};
+  Q('wc').value=35;Q('wp').value=40;Q('wr').value=25;
+  ['c','p','r'].forEach(t=>syncW(t));
+  addAudit('بازنشانی وزن‌ها', APP.user?APP.user.name:'سیستم');
+}
+function populateNoteCities(){
+  const sel=Q('nc-sel'); if(!sel)return;
+  sel.innerHTML='<option value="">انتخاب...</option>';
+  CITIES.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;sel.appendChild(o);});
+}
+function loadNote(){const c=Q('nc-sel').value;Q('nc-txt').value=APP.notes[c]||'';}
+function saveNote(){
+  const c=Q('nc-sel').value; if(!c)return;
+  APP.notes[c]=Q('nc-txt').value;
+  saveStorage();
+  addAudit('یادداشت '+c, APP.user?APP.user.name:'سیستم');
+  alert('✅ یادداشت ذخیره شد');
+}
+
+/* ===== پیش‌نمایش داده ===== */
+function renderPreviews(){
+  renderPT('pvt-tip', APP.data.tip, 7);
+  renderPT('pvt-mobin', APP.data.mobin, 7);
+  renderPT('pvt-med', APP.data.med, 7);
+}
+function renderPT(id, data, lim){
+  const el=document.getElementById(id); if(!el||!data||!data.length)return;
+  const cols=Object.keys(data[0]);
+  let h='<table><thead><tr>'+cols.map(c=>'<th>'+c+'</th>').join('')+'</tr></thead><tbody>';
+  data.slice(0,lim).forEach(row=>{h+='<tr>'+cols.map(c=>'<td>'+row[c]+'</td>').join('')+'</tr>';});
+  if(data.length>lim) h+=`<tr><td colspan="${cols.length}" style="text-align:center;color:#5a6a7a;font-size:11.5px">... و ${fN(data.length-lim)} ردیف دیگر</td></tr>`;
+  h+='</tbody></table>';
+  el.innerHTML=h;
+}
+
+/* ===== گزارش‌ساز ===== */
+function renderReportPreview(){
+  if(!APP.results.length){Q('rpt-prev').innerHTML='<p style="color:#5a6a7a;text-align:center;padding:30px">ابتدا محاسبات را اجرا کنید</p>';return;}
+  const t=Q('rt').value, intro=Q('ri').value;
+  const top3=APP.results.slice(0,3);
+  let h=`<h3 style="color:var(--pr-d);margin-bottom:8px;font-size:15px">${t}</h3>
+  <p style="font-size:12.5px;margin-bottom:14px;line-height:1.7;color:#5a6a7a">${intro}</p>
+  <h4 style="margin-bottom:8px;color:var(--pr);font-size:13px">🏆 سه شهرستان برتر (مجموع):</h4>`;
+  top3.forEach((r,i)=>{
+    h+=`<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--brd);font-size:13px">
+      <span>${['🥇','🥈','🥉'][i]} <b>${r.city}</b></span>
+      <span>قهرمانی: <b class="gc">${fN(r.champTotal)}</b> &nbsp; همگانی: <b class="gp">${fN(r.pubTotal)}</b> &nbsp; روستایی: <b class="gr-color">${fN(r.ruralTotal)}</b> &nbsp; مجموع: <b>${fN(r.total)}</b></span></div>`;
+  });
+  Q('rpt-prev').innerHTML=h;
+}
+
+function exportExcel(){
+  if(!APP.results.length){alert('ابتدا محاسبات را اجرا کنید');return;}
+  const wb=XLSX.utils.book_new();
+
+  // شیت رتبه‌بندی نهایی
+  const d1=[['رتبه','شهرستان','تیپ','امتیاز قهرمانی','امتیاز همگانی','امتیاز روستایی','مجموع نهایی (وزن‌دار)','یادداشت']];
+  APP.results.forEach((r,i)=>d1.push([i+1,r.city,'تیپ '+r.tip,r.champTotal,r.pubTotal,r.ruralTotal,r.total,APP.notes[r.city]||'']));
+  const ws1=XLSX.utils.aoa_to_sheet(d1);
+  ws1['!cols']=[{wch:7},{wch:16},{wch:8},{wch:14},{wch:12},{wch:14},{wch:16},{wch:25}];
+  XLSX.utils.book_append_sheet(wb,ws1,'رتبه‌بندی نهایی');
+
+  // شیت قهرمانی
+  const d2=[['شهرستان','تیپ','امتیاز قهرمانی (شامل مبین)']];
+  [...APP.results].sort((a,b)=>b.champTotal-a.champTotal).forEach(r=>d2.push([r.city,'تیپ '+r.tip,r.champTotal]));
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(d2),'رتبه‌بندی قهرمانی');
+
+  // شیت همگانی
+  const d3=[['شهرستان','تیپ','امتیاز همگانی']];
+  [...APP.results].sort((a,b)=>b.pubTotal-a.pubTotal).forEach(r=>d3.push([r.city,'تیپ '+r.tip,r.pubTotal]));
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(d3),'رتبه‌بندی همگانی');
+
+  // شیت روستایی
+  const d4=[['شهرستان','تیپ','امتیاز روستایی']];
+  [...APP.results].sort((a,b)=>b.ruralTotal-a.ruralTotal).forEach(r=>d4.push([r.city,'تیپ '+r.tip,r.ruralTotal]));
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(d4),'رتبه‌بندی روستایی');
+
+  XLSX.writeFile(wb,'ارزیابی_عملکرد_ورزشی_سیستان_بلوچستان_1405.xlsx');
+  addAudit('صدور Excel', APP.user?APP.user.name:'سیستم');
+}
+
+/* ===== خروجی PowerPoint ===== */
+function exportPPT(){
+  if(!APP.results.length){alert('ابتدا محاسبات را اجرا کنید');return;}
+  if(typeof PptxGenJS==='undefined'){alert('کتابخانه PowerPoint بارگذاری نشده. اتصال اینترنت را بررسی کنید.');return;}
+
+  const pres = new PptxGenJS();
+  pres.rtlMode = true;
+  pres.layout  = 'LAYOUT_WIDE'; // 13.33 × 7.5 inch
+
+  // رنگ‌های برند
+  const C_GREEN  = '1a6b5a';
+  const C_GOLD   = 'c9a227';
+  const C_BLUE   = '1e5f8e';
+  const C_DARK   = '104840';
+  const C_WHITE  = 'FFFFFF';
+  const C_LIGHT  = 'f0f4f8';
+  const C_CHAMP  = '1a6b5a';
+  const C_PUB    = '1e5f8e';
+  const C_RURAL  = '8a5a0a';
+
+  const title = (Q('rt')||{value:'گزارش ارزیابی عملکرد ورزشی'}).value;
+  const top3 = APP.results.slice(0,3);
+  const rs = APP.results;
+  const avgC = Math.round(rs.reduce((a,b)=>a+b.champTotal,0)/rs.length);
+  const avgP = Math.round(rs.reduce((a,b)=>a+b.pubTotal,0)/rs.length);
+  const avgR = Math.round(rs.reduce((a,b)=>a+b.ruralTotal,0)/rs.length);
+  const medals = ['🥇','🥈','🥉'];
+
+  // ── اسلاید ۱: عنوان ──
+  const s1 = pres.addSlide();
+  s1.addShape(pres.ShapeType.rect,{x:0,y:0,w:'100%',h:'100%',fill:{color:C_DARK}});
+  s1.addShape(pres.ShapeType.rect,{x:0,y:5.8,w:'100%',h:1.7,fill:{color:C_GOLD}});
+  s1.addText('🏆',{x:0.4,y:0.5,w:1.5,h:1.5,fontSize:48,align:'center'});
+  s1.addText(title,{x:2,y:0.5,w:11,h:1.4,fontSize:24,bold:true,color:C_WHITE,align:'right',fontFace:'Arial'});
+  s1.addText('اداره کل ورزش و جوانان — سیستان و بلوچستان',{x:2,y:2,w:11,h:0.7,fontSize:14,color:'aad4cb',align:'right',fontFace:'Arial'});
+  s1.addText('سال ۱۴۰۵',{x:2,y:2.7,w:11,h:0.6,fontSize:13,color:C_GOLD,align:'right',fontFace:'Arial'});
+  s1.addText('تنظیم‌کننده: امین عزیزی مقدم',{x:0,y:6,w:'100%',h:1.3,fontSize:11,color:C_WHITE,align:'center',fontFace:'Arial'});
+
+  // ── اسلاید ۲: خلاصه KPI ──
+  const s2 = pres.addSlide();
+  s2.addShape(pres.ShapeType.rect,{x:0,y:0,w:'100%',h:1.1,fill:{color:C_GREEN}});
+  s2.addText('📊 خلاصه عملکرد استان',{x:0.3,y:0.15,w:12.7,h:0.8,fontSize:20,bold:true,color:C_WHITE,align:'right',fontFace:'Arial'});
+  const kpiData = [
+    {label:'میانگین قهرمانی',val:avgC,col:C_CHAMP},
+    {label:'میانگین همگانی', val:avgP,col:C_PUB},
+    {label:'میانگین روستایی',val:avgR,col:C_RURAL},
+    {label:'بالاترین مجموع', val:top3[0]?.total||0, col:C_GOLD},
+  ];
+  kpiData.forEach((k,i)=>{
+    const x = 9.8 - i*3.3;
+    s2.addShape(pres.ShapeType.rect,{x,y:1.4,w:3,h:2.2,fill:{color:'f8faf9'},line:{color:k.col,pt:2},rectRadius:0.1});
+    s2.addText(String(k.val),{x,y:1.6,w:3,h:1.1,fontSize:32,bold:true,color:k.col,align:'center',fontFace:'Arial'});
+    s2.addText(k.label,{x,y:2.7,w:3,h:0.7,fontSize:11,color:'5a6a7a',align:'center',fontFace:'Arial'});
+  });
+  s2.addText('برترین شهرستان‌ها (مجموع):',{x:0.3,y:4,w:12.7,h:0.6,fontSize:14,bold:true,color:C_DARK,align:'right',fontFace:'Arial'});
+  top3.forEach((r,i)=>{
+    s2.addShape(pres.ShapeType.rect,{x:0.3+i*4.3,y:4.7,w:4,h:2.2,fill:{color:i===0?'fff8e1':i===1?'f5f5f5':'fdf3e3'},line:{color:i===0?C_GOLD:i===1?'8a9aaa':'b07040',pt:1.5}});
+    s2.addText(medals[i]||'',{x:0.3+i*4.3,y:4.8,w:4,h:0.8,fontSize:26,align:'center'});
+    s2.addText(r.city,{x:0.3+i*4.3,y:5.6,w:4,h:0.6,fontSize:14,bold:true,color:C_DARK,align:'center',fontFace:'Arial'});
+    s2.addText('مجموع: '+r.total,{x:0.3+i*4.3,y:6.2,w:4,h:0.5,fontSize:12,color:'5a6a7a',align:'center',fontFace:'Arial'});
+  });
+
+  // ── اسلاید ۳: رتبه‌بندی قهرمانی ──
+  const s3 = pres.addSlide();
+  s3.addShape(pres.ShapeType.rect,{x:0,y:0,w:'100%',h:1.1,fill:{color:C_CHAMP}});
+  s3.addText('🏋️ رتبه‌بندی گروه قهرمانی ورزشی',{x:0.3,y:0.15,w:12.7,h:0.8,fontSize:18,bold:true,color:C_WHITE,align:'right',fontFace:'Arial'});
+  const champRows = [...rs].sort((a,b)=>b.champTotal-a.champTotal).slice(0,10);
+  const champMax = champRows[0]?.champTotal||1;
+  champRows.forEach((r,i)=>{
+    const y=1.3+i*0.57; const bw=(r.champTotal/champMax)*9;
+    s3.addShape(pres.ShapeType.rect,{x:0.3,y,w:bw,h:0.44,fill:{color:i===0?C_GOLD:i===1?'8a9aaa':i===2?'b07040':C_CHAMP},transparency:i>2?40:0});
+    s3.addText((i+1)+'. '+r.city+' — '+r.champTotal,{x:0.4,y:y+0.03,w:bw>1?bw-0.1:9,h:0.38,fontSize:11,bold:i<3,color:C_WHITE,align:'right',fontFace:'Arial'});
+  });
+
+  // ── اسلاید ۴: رتبه‌بندی همگانی ──
+  const s4 = pres.addSlide();
+  s4.addShape(pres.ShapeType.rect,{x:0,y:0,w:'100%',h:1.1,fill:{color:C_PUB}});
+  s4.addText('🤸 رتبه‌بندی گروه ورزش همگانی',{x:0.3,y:0.15,w:12.7,h:0.8,fontSize:18,bold:true,color:C_WHITE,align:'right',fontFace:'Arial'});
+  const pubRows = [...rs].sort((a,b)=>b.pubTotal-a.pubTotal).slice(0,10);
+  const pubMax = pubRows[0]?.pubTotal||1;
+  pubRows.forEach((r,i)=>{
+    const y=1.3+i*0.57; const bw=(r.pubTotal/pubMax)*9;
+    s4.addShape(pres.ShapeType.rect,{x:0.3,y,w:bw,h:0.44,fill:{color:i===0?C_GOLD:i===1?'8a9aaa':i===2?'b07040':C_PUB},transparency:i>2?40:0});
+    s4.addText((i+1)+'. '+r.city+' — '+r.pubTotal,{x:0.4,y:y+0.03,w:bw>1?bw-0.1:9,h:0.38,fontSize:11,bold:i<3,color:C_WHITE,align:'right',fontFace:'Arial'});
+  });
+
+  // ── اسلاید ۵: رتبه‌بندی روستایی ──
+  const s5 = pres.addSlide();
+  s5.addShape(pres.ShapeType.rect,{x:0,y:0,w:'100%',h:1.1,fill:{color:C_RURAL}});
+  s5.addText('🌾 رتبه‌بندی گروه روستایی/عشایری',{x:0.3,y:0.15,w:12.7,h:0.8,fontSize:18,bold:true,color:C_WHITE,align:'right',fontFace:'Arial'});
+  const ruralRows = [...rs].sort((a,b)=>b.ruralTotal-a.ruralTotal).slice(0,10);
+  const ruralMax = ruralRows[0]?.ruralTotal||1;
+  ruralRows.forEach((r,i)=>{
+    const y=1.3+i*0.57; const bw=(r.ruralTotal/ruralMax)*9;
+    s5.addShape(pres.ShapeType.rect,{x:0.3,y,w:bw,h:0.44,fill:{color:i===0?C_GOLD:i===1?'8a9aaa':i===2?'b07040':C_RURAL},transparency:i>2?40:0});
+    s5.addText((i+1)+'. '+r.city+' — '+r.ruralTotal,{x:0.4,y:y+0.03,w:bw>1?bw-0.1:9,h:0.38,fontSize:11,bold:i<3,color:C_WHITE,align:'right',fontFace:'Arial'});
+  });
+
+  // ── اسلاید ۶: مدال‌ها تیپ ۱ ──
+  const s6 = pres.addSlide();
+  s6.addShape(pres.ShapeType.rect,{x:0,y:0,w:'100%',h:1.1,fill:{color:C_DARK}});
+  s6.addText('🏅 تابلو مدال — تیپ ۱',{x:0.3,y:0.15,w:12.7,h:0.8,fontSize:18,bold:true,color:C_WHITE,align:'right',fontFace:'Arial'});
+  const t1rows = rs.filter(r=>r.tip===1);
+  const groups6=[{key:'champTotal',label:'قهرمانی',col:C_CHAMP},{key:'pubTotal',label:'همگانی',col:C_PUB},{key:'ruralTotal',label:'روستایی',col:C_RURAL}];
+  groups6.forEach((g,gi)=>{
+    const sorted=[...t1rows].sort((a,b)=>b[g.key]-a[g.key]);
+    const gx=0.3+gi*4.3;
+    s6.addShape(pres.ShapeType.rect,{x:gx,y:1.3,w:4,h:0.5,fill:{color:g.col}});
+    s6.addText(g.label,{x:gx,y:1.35,w:4,h:0.4,fontSize:12,bold:true,color:C_WHITE,align:'center',fontFace:'Arial'});
+    sorted.slice(0,3).forEach((r,i)=>{
+      s6.addText(medals[i]+' '+r.city+' ('+r[g.key]+')',{x:gx,y:1.9+i*0.65,w:4,h:0.55,fontSize:12,bold:i===0,color:C_DARK,align:'right',fontFace:'Arial'});
+    });
+  });
+
+  // ── اسلاید ۷: مدال‌ها تیپ ۲ و ۳ ──
+  const s7 = pres.addSlide();
+  s7.addShape(pres.ShapeType.rect,{x:0,y:0,w:'100%',h:1.1,fill:{color:C_DARK}});
+  s7.addText('🏅 تابلو مدال — تیپ ۲ و ۳',{x:0.3,y:0.15,w:12.7,h:0.8,fontSize:18,bold:true,color:C_WHITE,align:'right',fontFace:'Arial'});
+  [2,3].forEach((tip,ti)=>{
+    const trows=rs.filter(r=>r.tip===tip);
+    s7.addText('تیپ '+tip,{x:0.3,y:1.3+ti*3.2,w:12.7,h:0.5,fontSize:13,bold:true,color:C_GREEN,align:'right',fontFace:'Arial'});
+    groups6.forEach((g,gi)=>{
+      const sorted=[...trows].sort((a,b)=>b[g.key]-a[g.key]);
+      const gx=0.3+gi*4.3;
+      s7.addShape(pres.ShapeType.rect,{x:gx,y:1.85+ti*3.2,w:4,h:0.45,fill:{color:g.col}});
+      s7.addText(g.label,{x:gx,y:1.9+ti*3.2,w:4,h:0.35,fontSize:11,bold:true,color:C_WHITE,align:'center',fontFace:'Arial'});
+      sorted.slice(0,3).forEach((r,i)=>{
+        s7.addText((medals[i]||'')+' '+r.city,{x:gx,y:2.35+ti*3.2+i*0.58,w:4,h:0.5,fontSize:11,bold:i===0,color:C_DARK,align:'right',fontFace:'Arial'});
+      });
+    });
+  });
+
+  // ── اسلاید ۸: رتبه‌بندی نهایی جدول ──
+  const s8 = pres.addSlide();
+  s8.addShape(pres.ShapeType.rect,{x:0,y:0,w:'100%',h:1.1,fill:{color:C_GREEN}});
+  s8.addText('🏆 رتبه‌بندی نهایی — مجموع وزن‌دار',{x:0.3,y:0.15,w:12.7,h:0.8,fontSize:18,bold:true,color:C_WHITE,align:'right',fontFace:'Arial'});
+  const tblData = [
+    [{text:'رتبه',options:{bold:true,color:C_WHITE,fill:C_DARK,align:'center'}},
+     {text:'شهرستان',options:{bold:true,color:C_WHITE,fill:C_DARK,align:'right'}},
+     {text:'تیپ',options:{bold:true,color:C_WHITE,fill:C_DARK,align:'center'}},
+     {text:'قهرمانی',options:{bold:true,color:C_WHITE,fill:C_CHAMP,align:'center'}},
+     {text:'همگانی',options:{bold:true,color:C_WHITE,fill:C_PUB,align:'center'}},
+     {text:'روستایی',options:{bold:true,color:C_WHITE,fill:C_RURAL,align:'center'}},
+     {text:'مجموع',options:{bold:true,color:C_WHITE,fill:C_GOLD,align:'center'}}],
+    ...rs.slice(0,14).map((r,i)=>[
+      {text:String(i+1),options:{align:'center',fill:i<3?'fff8e1':'FFFFFF'}},
+      {text:r.city,options:{align:'right',bold:i<3}},
+      {text:'تیپ '+r.tip,options:{align:'center'}},
+      {text:String(r.champTotal),options:{align:'center',color:C_CHAMP}},
+      {text:String(r.pubTotal),options:{align:'center',color:C_PUB}},
+      {text:String(r.ruralTotal),options:{align:'center',color:C_RURAL}},
+      {text:String(r.total),options:{align:'center',bold:true,color:i===0?'c9a227':i===1?'8a9aaa':i===2?'b07040':C_DARK}},
+    ])
+  ];
+  s8.addTable(tblData,{x:0.3,y:1.25,w:12.7,colW:[0.9,2.2,0.9,1.7,1.7,1.7,1.6],fontSize:10,fontFace:'Arial',border:{pt:0.5,color:'dddddd'},rowH:0.37});
+
+  // ── اسلاید ۹: یادداشت‌های کیفی ──
+  const noteCities = CITIES.filter(c=>APP.notes[c]);
+  if(noteCities.length){
+    const s9=pres.addSlide();
+    s9.addShape(pres.ShapeType.rect,{x:0,y:0,w:'100%',h:1.1,fill:{color:C_BLUE}});
+    s9.addText('📝 یادداشت‌های کیفی کارشناسی',{x:0.3,y:0.15,w:12.7,h:0.8,fontSize:18,bold:true,color:C_WHITE,align:'right',fontFace:'Arial'});
+    noteCities.slice(0,6).forEach((c,i)=>{
+      const y=1.3+i*0.95;
+      s9.addShape(pres.ShapeType.rect,{x:0.3,y,w:12.7,h:0.85,fill:{color:i%2===0?'f8faf9':'ffffff'},line:{color:'dddddd',pt:0.5}});
+      s9.addText(c+':',{x:0.4,y:y+0.07,w:1.8,h:0.7,fontSize:11,bold:true,color:C_DARK,align:'right',fontFace:'Arial'});
+      s9.addText(APP.notes[c],{x:2.3,y:y+0.07,w:10.5,h:0.7,fontSize:10.5,color:'444444',align:'right',fontFace:'Arial',wrap:true});
+    });
+  }
+
+  // ── ذخیره ──
+  pres.writeFile({fileName:'ارزیابی_عملکرد_ورزشی_سیستان_بلوچستان_1405.pptx'})
+    .then(()=>{ addAudit('صدور PowerPoint','سیستم'); })
+    .catch(e=>alert('خطا در ساخت PPT: '+e));
+}
+
+function exportPDF(){
+  if(!APP.results.length){alert('ابتدا محاسبات را اجرا کنید');return;}
+  const {jsPDF}=window.jspdf;
+  const doc=new jsPDF({orientation:'p',unit:'mm',format:'a4'});
+  const title=Q('rt').value;
+  doc.setFont('helvetica');
+  doc.setFontSize(14);
+  doc.text(title.length>60?title.slice(0,60)+'...':title, 105,18,{align:'center'});
+  doc.setFontSize(9);
+  doc.text('Sistan & Baluchestan Province — Sports Performance Evaluation 1405', 105,26,{align:'center'});
+  doc.line(15,30,195,30);
+  let y=38;
+  doc.setFontSize(10);
+  doc.text('Final Rankings (Weighted Sum: Champ '+APP.weights.c+'% + Public '+APP.weights.p+'% + Rural '+APP.weights.r+'%)',15,y);
+  y+=8;
+  doc.setFontSize(9);
+  doc.text('Rank  City                   Tip   Champ   Public   Rural   Total',15,y); y+=5;
+  APP.results.forEach((r,i)=>{
+    const line=String(i+1).padEnd(6)+r.city.padEnd(22)+('Tip'+r.tip).padEnd(6)+String(r.champTotal).padEnd(8)+String(r.pubTotal).padEnd(9)+String(r.ruralTotal).padEnd(8)+String(r.total);
+    doc.text(line,15,y); y+=5;
+    if(y>275){doc.addPage();y=20;}
+  });
+  doc.line(15,y+2,195,y+2);
+  doc.setFontSize(8);
+  doc.text('Generated by: Amin Azizi Moghaddam | Directorate of Sports and Youth - Sistan and Baluchestan',105,285,{align:'center'});
+  doc.save('sports_evaluation_1405.pdf');
+  addAudit('صدور PDF', APP.user?APP.user.name:'سیستم');
+}
+
+/* ===== Audit Log ===== */
+function addAudit(action,user){
+  APP.auditLog.unshift({action,user,time:new Date().toLocaleString('fa-IR')});
+  if(APP.auditLog.length>60) APP.auditLog.pop();
+  saveStorage();
+}
+function renderAuditLog(){
+  if(!APP.auditLog.length)return;
+  let h='<table><thead><tr><th>زمان</th><th>کاربر</th><th>عملیات</th></tr></thead><tbody>';
+  APP.auditLog.slice(0,25).forEach(l=>{h+=`<tr><td>${l.time}</td><td>${l.user}</td><td>${l.action}</td></tr>`;});
+  h+='</tbody></table>';
+  Q('audit-tbl').innerHTML=h;
+}
+
+/* ===== حافظه ===== */
+function saveStorage(){
+  try{
+    localStorage.setItem('SEv2_results',JSON.stringify(APP.results));
+    localStorage.setItem('SEv2_weights',JSON.stringify(APP.weights));
+    localStorage.setItem('SEv2_notes',JSON.stringify(APP.notes));
+    localStorage.setItem('SEv2_audit',JSON.stringify(APP.auditLog));
+    localStorage.setItem('SEv2_manual',JSON.stringify(APP.manual));
+    // ذخیره امتیازات شهرستان‌ها
+    localStorage.setItem('SEv2_cityScores',JSON.stringify(APP.cityScores));
+    // داده‌های کوچک
+    if(APP.data.tip) localStorage.setItem('SEv2_tip',JSON.stringify(APP.data.tip.slice(0,50)));
+    if(APP.data.mobin) localStorage.setItem('SEv2_mobin',JSON.stringify(APP.data.mobin.slice(0,50)));
+    if(APP.data.med) localStorage.setItem('SEv2_med',JSON.stringify(APP.data.med.slice(0,50)));
+  }catch(e){console.warn('Storage:',e);}
+}
+function loadStorage(){
+  try{
+    const res=localStorage.getItem('SEv2_results'); if(res) APP.results=JSON.parse(res);
+    const w=localStorage.getItem('SEv2_weights');   if(w)   APP.weights=JSON.parse(w);
+    const n=localStorage.getItem('SEv2_notes');     if(n)   APP.notes=JSON.parse(n);
+    const a=localStorage.getItem('SEv2_audit');     if(a)   APP.auditLog=JSON.parse(a);
+    const m=localStorage.getItem('SEv2_manual');    if(m)   APP.manual=JSON.parse(m);
+    const cs=localStorage.getItem('SEv2_cityScores'); if(cs) APP.cityScores=JSON.parse(cs);
+    const t=localStorage.getItem('SEv2_tip');       if(t)   APP.data.tip=JSON.parse(t);
+    const mo=localStorage.getItem('SEv2_mobin');    if(mo)  APP.data.mobin=JSON.parse(mo);
+    const me=localStorage.getItem('SEv2_med');      if(me)  APP.data.med=JSON.parse(me);
+
+    // اعمال وزن‌ها در UI
+    if(APP.weights){
+      if(Q('wc'))Q('wc').value=APP.weights.c;
+      if(Q('wp'))Q('wp').value=APP.weights.p;
+      if(Q('wr'))Q('wr').value=APP.weights.r;
+      ['c','p','r'].forEach(t=>{const sv=Q('sv-'+t);if(sv)sv.textContent=fN(APP.weights[t]||0);});
+    }
+
+    if(APP.results.length){
+      updateDashboard();
+      renderPreviews();
+      Q('cs').textContent='✅ داده از حافظه بازیابی شد';
+    }
+  }catch(e){console.warn('LoadStorage:',e);}
+}
+
+/* ===== ابزار ===== */
+function fN(n){ return String(Math.round(n*10)/10).replace(/\d/g,d=>'۰۱۲۳۴۵۶۷۸۹'[d]); }
+function Q(id){ return document.getElementById(id); }
+
+/* ===== کیبورد ===== */
+document.getElementById('lp').addEventListener('keyup',e=>{if(e.key==='Enter')doLogin();});
+</script>
+</body>
+</html>

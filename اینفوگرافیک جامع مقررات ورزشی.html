@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اینفوگرافیک جامع مقررات ورزشی</title>
+    <!-- Font Awesome (آیکون‌ها) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- کتابخانه‌های مورد نیاز برای دانلود -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PptxGenJS/3.12.0/pptxgen.bundle.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+        }
+        body {
+            background: linear-gradient(145deg, #f0f4f8 0%, #d9e2ec 100%);
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            max-width: 1400px;
+            width: 100%;
+        }
+        h1 {
+            font-size: 2.5rem;
+            color: #0b2b4a;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 10px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 35px;
+            font-size: 1.1rem;
+            border-bottom: 2px dashed #4a6a8b;
+            padding-bottom: 15px;
+        }
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 40px;
+        }
+        .toolbar button {
+            background: #1a3a5c;
+            border: none;
+            color: #fff;
+            padding: 12px 28px;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 8px 16px rgba(0,20,40,0.2);
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .toolbar button:hover {
+            transform: scale(1.03);
+            background: #0f2b44;
+            box-shadow: 0 12px 24px rgba(0,20,40,0.3);
+        }
+        .toolbar button i {
+            font-size: 1.2rem;
+        }
+        .infographic-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+            gap: 30px;
+        }
+        .card {
+            background: #ffffff;
+            border-radius: 28px;
+            box-shadow: 0 20px 40px -12px rgba(0,0,0,0.25);
+            overflow: hidden;
+            transition: transform 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            height: fit-content;
+        }
+        .card:hover {
+            transform: translateY(-6px);
+        }
+        .card-header {
+            padding: 20px 24px;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .card-header i {
+            font-size: 2.4rem;
+            opacity: 0.9;
+        }
+        .card-header h2 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin: 0;
+        }
+        .card-body {
+            padding: 20px 24px 16px;
+            flex: 1;
+        }
+        .card-body .section {
+            margin-bottom: 18px;
+        }
+        .card-body .section-title {
+            font-weight: 700;
+            color: #1f3a57;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 2px solid #eaeef3;
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+        }
+        .card-body .section-title i {
+            color: #2b4c6e;
+        }
+        .card-body ul {
+            list-style: none;
+            padding-right: 0;
+        }
+        .card-body ul li {
+            padding: 6px 0 6px 0;
+            border-bottom: 1px solid #f0f4f9;
+            font-size: 0.9rem;
+            display: flex;
+            gap: 8px;
+            align-items: baseline;
+        }
+        .card-body ul li i {
+            color: #2b6a9e;
+            width: 20px;
+            font-size: 0.9rem;
+            margin-left: 6px;
+        }
+        .badge {
+            display: inline-block;
+            background: #eef3f9;
+            border-radius: 20px;
+            padding: 3px 14px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #0b2b4a;
+        }
+        .highlight-box {
+            background: #f6f9fe;
+            border-right: 6px solid #1f5a8e;
+            padding: 12px 16px;
+            border-radius: 12px;
+            margin: 12px 0;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        .footer-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 24px 20px;
+            gap: 12px;
+            flex-wrap: wrap;
+            border-top: 1px solid #e2eaf2;
+        }
+        .footer-actions .btn-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .footer-actions button {
+            border: none;
+            background: #e8edf3;
+            color: #1a3a5c;
+            border-radius: 30px;
+            padding: 8px 16px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.15s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .footer-actions button:hover {
+            background: #d0dceb;
+            transform: scale(1.02);
+        }
+        .footer-actions button i {
+            font-size: 0.9rem;
+        }
+        .color-1 { background: linear-gradient(145deg, #1A73E8, #0d47a1); }
+        .color-2 { background: linear-gradient(145deg, #0F9D58, #0b6e3e); }
+        .color-3 { background: linear-gradient(145deg, #E37400, #b85e00); }
+        .color-4 { background: linear-gradient(145deg, #9C27B0, #6a1b9a); }
+        .color-5 { background: linear-gradient(145deg, #00BCD4, #00838f); }
+        .color-6 { background: linear-gradient(145deg, #D32F2F, #b71c1c); }
+
+        @media print {
+            .toolbar, .footer-actions .btn-group { display: none; }
+            .card { break-inside: avoid; box-shadow: none; border: 1px solid #ccc; }
+        }
+        @media (max-width: 600px) {
+            .infographic-grid { grid-template-columns: 1fr; }
+            .card-header h2 { font-size: 1.1rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="mainContainer">
+        <h1><i class="fas fa-scroll" style="color:#1a3a5c;"></i> اینفوگرافیک جامع مقررات ورزشی</h1>
+        <div class="subtitle">بر اساس ۶ سند بالادستی وزارت ورزش و جوانان</div>
+
+        <!-- نوار ابزار کلی -->
+        <div class="toolbar" id="globalToolbar">
+            <button onclick="downloadAllPNG()"><i class="fas fa-images"></i> دانلود همه تصاویر</button>
+            <button onclick="exportAllWord()"><i class="fas fa-file-word"></i> خروجی Word</button>
+            <button onclick="exportAllPPT()"><i class="fas fa-file-powerpoint"></i> خروجی PowerPoint</button>
+            <button onclick="window.print()"><i class="fas fa-print"></i> چاپ / PDF</button>
+        </div>
+
+        <!-- شبکه اینفوگرافیک‌ها -->
+        <div class="infographic-grid" id="infographicGrid">
+            <!-- 1. مربیان -->
+            <div class="card" id="infographic-1">
+                <div class="card-header color-1">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                    <h2>کمیسیون مربیان</h2>
+                </div>
+                <div class="card-body">
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-tasks"></i> وظایف کلیدی</div>
+                        <ul>
+                            <li><i class="fas fa-check-circle"></i> انتخاب نمایندگان مربیان در مجمع</li>
+                            <li><i class="fas fa-check-circle"></i> جمع‌بندی نظرات مربیان کشور</li>
+                            <li><i class="fas fa-check-circle"></i> برگزاری حداقل ۲ جلسه سالانه</li>
+                        </ul>
+                    </div>
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-users"></i> ترکیب (۹ نفر)</div>
+                        <ul>
+                            <li><i class="fas fa-user-tie"></i> <strong>۵ اصلی</strong> (حداقل ۱ بانو) + ۴ علی‌بدل</li>
+                            <li><i class="fas fa-calendar-alt"></i> دوره ۴ ساله | رئیس: ۱ ساله (تجدیدپذیر)</li>
+                        </ul>
+                    </div>
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-star"></i> شرایط ویژه داوطلب</div>
+                        <ul>
+                            <li><i class="fas fa-id-card"></i> کارت مربیگری معتبر</li>
+                            <li><i class="fas fa-medal"></i> مقام ۱ تا ۶ المپیک/جهانی در ۸ سال اخیر</li>
+                            <li><i class="fas fa-trophy"></i> یا سرمربی تیم ملی / استعدادیاب سطح یک</li>
+                        </ul>
+                    </div>
+                    <div class="highlight-box">
+                        <i class="fas fa-clock" style="margin-left:10px;"></i> فرآیند: فراخوان ۷۵ روز قبل ← ثبت‌نام ۶ روزه ← رأی‌گیری ۸ ساعته
+                    </div>
+                </div>
+                <div class="footer-actions">
+                    <span class="badge">ماده ۱ تا ۱۰</span>
+                    <div class="btn-group">
+                        <button onclick="downloadSinglePNG('infographic-1','مربیان')"><i class="fas fa-image"></i> PNG</button>
+                        <button onclick="exportSingleWord('infographic-1','کمیسیون مربیان')"><i class="fas fa-file-word"></i> Word</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. داوران -->
+            <div class="card" id="infographic-2">
+                <div class="card-header color-2">
+                    <i class="fas fa-whistle"></i>
+                    <h2>کمیسیون داوران</h2>
+                </div>
+                <div class="card-body">
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-tasks"></i> وظایف کلیدی</div>
+                        <ul>
+                            <li><i class="fas fa-check-circle"></i> انتخاب نمایندگان داوران در مجمع</li>
+                            <li><i class="fas fa-check-circle"></i> جمع‌بندی نظرات داوری کشور</li>
+                            <li><i class="fas fa-check-circle"></i> بررسی عملکرد داوران</li>
+                        </ul>
+                    </div>
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-users"></i> ترکیب (۹ نفر)</div>
+                        <ul>
+                            <li><i class="fas fa-user-tie"></i> <strong>۵ اصلی</strong> (حداقل ۱ بانو) + ۴ علی‌بدل</li>
+                            <li><i class="fas fa-calendar-alt"></i> دوره ۴ ساله | رئیس: ۱ ساله</li>
+                        </ul>
+                    </div>
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-star"></i> شرایط ویژه داوطلب</div>
+                        <ul>
+                            <li><i class="fas fa-id-card"></i> کارت داوری بین‌المللی</li>
+                            <li><i class="fas fa-futbol"></i> یا مربی درجه یک ملی با سابقه قضاوت در لیگ برتر (۳ سال اخیر)</li>
+                        </ul>
+                    </div>
+                    <div class="highlight-box">
+                        <i class="fas fa-gavel" style="margin-left:10px;"></i> رأی‌دهندگان: مدرسان بین‌المللی + داوران درجه یک و دو ملی
+                    </div>
+                </div>
+                <div class="footer-actions">
+                    <span class="badge">ماده ۱ تا ۱۰</span>
+                    <div class="btn-group">
+                        <button onclick="downloadSinglePNG('infographic-2','داوران')"><i class="fas fa-image"></i> PNG</button>
+                        <button onclick="exportSingleWord('infographic-2','کمیسیون داوران')"><i class="fas fa-file-word"></i> Word</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. شورای ساماندهی رزمی -->
+            <div class="card" id="infographic-3">
+                <div class="card-header color-3">
+                    <i class="fas fa-fist-raised"></i>
+                    <h2>شورای ساماندهی رزمی</h2>
+                </div>
+                <div class="card-body">
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-bullseye"></i> هدف</div>
+                        <ul>
+                            <li><i class="fas fa-check-circle"></i> صدور، ارتقا، تنزل یا انحلال سبک‌های رزمی و رشته‌های نوین</li>
+                        </ul>
+                    </div>
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-user-cog"></i> اعضا</div>
+                        <ul>
+                            <li><i class="fas fa-user-tie"></i> معاون قهرمانی (رئیس)، مدیران کل حراست، حقوقی، بانوان، همگانی، مشترک</li>
+                            <li><i class="fas fa-flag"></i> نمایندگان فدراسیون‌های کاراته، تکواندو، ووشو، رزمی، جودو، کونگ‌فو</li>
+                        </ul>
+                    </div>
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-route"></i> فرآیند ۶ مرحله‌ای</div>
+                        <ul>
+                            <li><i class="fas fa-1"></i> درخواست از طریق فدراسیون</li>
+                            <li><i class="fas fa-2"></i> بررسی کمیته کارشناسی</li>
+                            <li><i class="fas fa-3"></i> استعلام از فدراسیون مربوطه</li>
+                            <li><i class="fas fa-4"></i> اعلام پذیرش با صورتجلسه فنی</li>
+                            <li><i class="fas fa-5"></i> بررسی ثانویه کارشناسی</li>
+                            <li><i class="fas fa-6"></i> صدور گواهینامه</li>
+                        </ul>
+                    </div>
+                    <div class="highlight-box">
+                        <i class="fas fa-exclamation-triangle" style="margin-left:10px;"></i> مجوز به نام سبک صادر می‌شود، نه شخص.
+                    </div>
+                </div>
+                <div class="footer-actions">
+                    <span class="badge">ماده ۱ تا ۱۵</span>
+                    <div class="btn-group">
+                        <button onclick="downloadSinglePNG('infographic-3','ساماندهی')"><i class="fas fa-image"></i> PNG</button>
+                        <button onclick="exportSingleWord('infographic-3','شورای ساماندهی')"><i class="fas fa-file-word"></i> Word</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. هیأت‌های استان و شهرستان -->
+            <div class="card" id="infographic-4">
+                <div class="card-header color-4">
+                    <i class="fas fa-building"></i>
+                    <h2>هیأت‌های ورزشی استان</h2>
+                </div>
+                <div class="card-body">
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-sitemap"></i> ارکان</div>
+                        <ul>
+                            <li><i class="fas fa-users"></i> مجمع عمومی (بالاترین رکن)</li>
+                            <li><i class="fas fa-user-tie"></i> هیأت رئیسه: رئیس، نایب، دبیر، خزانه‌دار، ۳ عضو</li>
+                            <li><i class="fas fa-search"></i> بازرس قانونی</li>
+                        </ul>
+                    </div>
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-user-check"></i> شرایط رئیس استان</div>
+                        <ul>
+                            <li><i class="fas fa-graduation-cap"></i> مدرک کارشناسی، سن ۲۸–۶۵ سال</li>
+                            <li><i class="fas fa-briefcase"></i> ۴ سال سابقه مدیریت</li>
+                            <li><i class="fas fa-redo-alt"></i> حداکثر ۳ دوره (۱۲ سال)</li>
+                        </ul>
+                    </div>
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-city"></i> رئیس شهرستان</div>
+                        <ul>
+                            <li><i class="fas fa-graduation-cap"></i> فوق‌دیپلم، سن ۲۸–۶۵ سال</li>
+                            <li><i class="fas fa-medal"></i> سابقه مدال‌آوری یا مربیگری تیم‌های استانی</li>
+                        </ul>
+                    </div>
+                    <div class="highlight-box">
+                        <i class="fas fa-vote-yea" style="margin-left:10px;"></i> رسمیت مجمع با ۲/۳ اعضا، اکثریت مطلق آرا
+                    </div>
+                </div>
+                <div class="footer-actions">
+                    <span class="badge">ماده ۱ تا ۳۳</span>
+                    <div class="btn-group">
+                        <button onclick="downloadSinglePNG('infographic-4','هیات')"><i class="fas fa-image"></i> PNG</button>
+                        <button onclick="exportSingleWord('infographic-4','هیأت‌های استان')"><i class="fas fa-file-word"></i> Word</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. نامزدهای هیأت رئیسه فدراسیون -->
+            <div class="card" id="infographic-5">
+                <div class="card-header color-5">
+                    <i class="fas fa-vote-yea"></i>
+                    <h2>ثبت‌نام نامزدهای فدراسیون</h2>
+                </div>
+                <div class="card-body">
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-list-ul"></i> سوابق مدیریتی قابل قبول</div>
+                        <ul>
+                            <li><i class="fas fa-check"></i> عضو هیأت رئیسه فدراسیون</li>
+                            <li><i class="fas fa-check"></i> عضو هیأت اجرایی کمیته ملی المپیک</li>
+                            <li><i class="fas fa-check"></i> مدیرکل وزارت ورزش / رئیس هیأت استان</li>
+                            <li><i class="fas fa-check"></i> فرمانده ورزشی نیروهای مسلح (رتبه ۱۶+)</li>
+                        </ul>
+                    </div>
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-hourglass-half"></i> معادل‌سازی سابقه</div>
+                        <ul>
+                            <li><i class="fas fa-medal"></i> مدال‌آوران المپیک/آسیایی = ۵ سال سابقه مدیریتی</li>
+                            <li><i class="fas fa-chess-king"></i> سرمربی تیم ملی = ۵ سال سابقه</li>
+                        </ul>
+                    </div>
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-calendar-check"></i> زمان‌بندی</div>
+                        <ul>
+                            <li><i class="fas fa-bullhorn"></i> فراخوان ۱۲۰ روز قبل</li>
+                            <li><i class="fas fa-pen"></i> ثبت‌نام ۱۰ روز کاری</li>
+                            <li><i class="fas fa-search"></i> بررسی کمیسیون ۵ روز</li>
+                            <li><i class="fas fa-gavel"></i> اعتراض به شورا ۵ روز</li>
+                        </ul>
+                    </div>
+                    <div class="highlight-box">
+                        <i class="fas fa-gavel" style="margin-left:10px;"></i> رأی‌گیری: اکثریت مطلق ← دور دوم بین ۲ نفر برتر ← قرعه‌کشی در صورت تساوی
+                    </div>
+                </div>
+                <div class="footer-actions">
+                    <span class="badge">ماده ۱ تا ۱۹</span>
+                    <div class="btn-group">
+                        <button onclick="downloadSinglePNG('infographic-5','نامزدها')"><i class="fas fa-image"></i> PNG</button>
+                        <button onclick="exportSingleWord('infographic-5','ثبت‌نام فدراسیون')"><i class="fas fa-file-word"></i> Word</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 6. شورای برون‌مرزی -->
+            <div class="card" id="infographic-6">
+                <div class="card-header color-6">
+                    <i class="fas fa-globe-asia"></i>
+                    <h2>شورای برون‌مرزی</h2>
+                </div>
+                <div class="card-body">
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-flag-checkered"></i> هدف</div>
+                        <ul>
+                            <li><i class="fas fa-check-circle"></i> نظارت بر اعزام به خارج و میزبانی رویدادهای بین‌المللی</li>
+                            <li><i class="fas fa-check-circle"></i> صرفه‌جویی مالی، حفظ شئون فرهنگی</li>
+                        </ul>
+                    </div>
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-user-cog"></i> اعضا</div>
+                        <ul>
+                            <li><i class="fas fa-user-tie"></i> وزیر (رئیس)، معاون قهرمانی (نایب)</li>
+                            <li><i class="fas fa-flag"></i> دبیران کمیته المپیک و پارالمپیک</li>
+                            <li><i class="fas fa-globe"></i> نماینده وزارت خارجه</li>
+                            <li><i class="fas fa-users"></i> ۳ رئیس فدراسیون (۲ المپیکی)</li>
+                            <li><i class="fas fa-shield-alt"></i> مدیران کل حراست، حقوقی، روابط‌عمومی</li>
+                        </ul>
+                    </div>
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-clock"></i> قوانین کلیدی</div>
+                        <ul>
+                            <li><i class="fas fa-calendar-plus"></i> درخواست حداقل ۱۵ روز قبل</li>
+                            <li><i class="fas fa-file-signature"></i> گزارش مکتوب حداکثر ۱۰ روز پس از بازگشت</li>
+                            <li><i class="fas fa-ban"></i> عدم گزارش = عدم طرح درخواست‌های بعدی</li>
+                        </ul>
+                    </div>
+                    <div class="highlight-box">
+                        <i class="fas fa-balance-scale" style="margin-left:10px;"></i> تخلفات قابل ارجاع به کمیته انضباطی و کمیسیون عالی اخلاق
+                    </div>
+                </div>
+                <div class="footer-actions">
+                    <span class="badge">ماده ۱ تا ۱۶</span>
+                    <div class="btn-group">
+                        <button onclick="downloadSinglePNG('infographic-6','برونمرزی')"><i class="fas fa-image"></i> PNG</button>
+                        <button onclick="exportSingleWord('infographic-6','شورای برونمرزی')"><i class="fas fa-file-word"></i> Word</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ---- توابع کمکی ----
+
+        // دریافت محتوای یک کارت به همراه هدر و فوتر
+        function getCardContent(cardId) {
+            const card = document.getElementById(cardId);
+            return card.cloneNode(true);
+        }
+
+        // ---- دانلود تک PNG (هر اینفوگرافیک) ----
+        function downloadSinglePNG(cardId, name) {
+            const card = document.getElementById(cardId);
+            html2canvas(card, {
+                scale: 1.8,
+                backgroundColor: '#ffffff',
+                allowTaint: false,
+                useCORS: true,
+                logging: false
+            }).then(canvas => {
+                canvas.toBlob(function(blob) {
+                    saveAs(blob, `اینفوگرافیک_${name}.png`);
+                });
+            }).catch(err => alert('خطا در ساخت تصویر: ' + err));
+        }
+
+        // ---- دانلود همه PNG به صورت جداگانه (زیپ نمی‌شود، به ترتیب دانلود می‌شود) ----
+        function downloadAllPNG() {
+            const ids = ['infographic-1','infographic-2','infographic-3','infographic-4','infographic-5','infographic-6'];
+            const names = ['مربیان','داوران','ساماندهی','هیات_استان','نامزدها','برونمرزی'];
+            ids.forEach((id, idx) => {
+                setTimeout(() => {
+                    downloadSinglePNG(id, names[idx]);
+                }, idx * 600);
+            });
+        }
+
+        // ---- خروجی Word (تک کارت) ----
+        function exportSingleWord(cardId, title) {
+            const card = document.getElementById(cardId);
+            // ساخت کپی و حذف دکمه‌ها
+            const clone = card.cloneNode(true);
+            const btns = clone.querySelectorAll('.footer-actions .btn-group');
+            btns.forEach(b => b.remove());
+
+            const style = `
+                <style>
+                    body { font-family: 'Segoe UI', Tahoma, sans-serif; direction: rtl; padding:20px; background:#fff; }
+                    .card { max-width:700px; margin:auto; border:1px solid #ccc; border-radius:20px; overflow:hidden; }
+                    .card-header { background:#1a3a5c; color:#fff; padding:16px 24px; }
+                    .card-body { padding:16px 24px; }
+                    .section { margin-bottom:16px; }
+                    .section-title { font-weight:bold; border-bottom:2px solid #eaeef3; padding-bottom:4px; margin-bottom:8px; }
+                    ul { list-style:none; padding-right:0; }
+                    li { padding:4px 0; }
+                    .highlight-box { background:#f0f6fd; padding:12px; border-right:6px solid #1f5a8e; border-radius:8px; }
+                    .badge { background:#eef3f9; padding:3px 14px; border-radius:20px; }
+                    .footer-actions { padding:12px 24px; border-top:1px solid #ddd; display:flex; justify-content:space-between; }
+                </style>
+            `;
+
+            const htmlContent = `
+                <!DOCTYPE html>
+                <html>
+                <head><meta charset="UTF-8"><title>${title}</title>${style}</head>
+                <body>${clone.outerHTML}</body>
+                </html>
+            `;
+
+            const blob = new Blob([htmlContent], { type: 'application/msword;charset=utf-8' });
+            saveAs(blob, `اینفوگرافیک_${title}.doc`);
+        }
+
+        // ---- خروجی Word کامل (همه کارت‌ها) ----
+        function exportAllWord() {
+            const grid = document.getElementById('infographicGrid');
+            const cloneGrid = grid.cloneNode(true);
+            // حذف تمام دکمه‌های دانلود
+            const allBtns = cloneGrid.querySelectorAll('.footer-actions .btn-group');
+            allBtns.forEach(b => b.remove());
+
+            const style = `
+                <style>
+                    body { font-family: 'Segoe UI', Tahoma, sans-serif; direction: rtl; padding:20px; background:#fff; }
+                    .infographic-grid { display:flex; flex-direction:column; gap:30px; }
+                    .card { border:1px solid #ccc; border-radius:20px; overflow:hidden; page-break-inside:avoid; }
+                    .card-header { color:#fff; padding:16px 24px; }
+                    .card-body { padding:16px 24px; }
+                    .section { margin-bottom:16px; }
+                    .section-title { font-weight:bold; border-bottom:2px solid #eaeef3; padding-bottom:4px; margin-bottom:8px; }
+                    ul { list-style:none; padding-right:0; }
+                    li { padding:4px 0; }
+                    .highlight-box { background:#f0f6fd; padding:12px; border-right:6px solid #1f5a8e; border-radius:8px; }
+                    .badge { background:#eef3f9; padding:3px 14px; border-radius:20px; }
+                    .footer-actions { padding:12px 24px; border-top:1px solid #ddd; display:flex; justify-content:space-between; }
+                    .color-1 { background:#1A73E8; } .color-2 { background:#0F9D58; } .color-3 { background:#E37400; }
+                    .color-4 { background:#9C27B0; } .color-5 { background:#00BCD4; } .color-6 { background:#D32F2F; }
+                </style>
+            `;
+
+            const htmlContent = `
+                <!DOCTYPE html>
+                <html>
+                <head><meta charset="UTF-8"><title>همه اینفوگرافیک‌ها</title>${style}</head>
+                <body>${cloneGrid.outerHTML}</body>
+                </html>
+            `;
+
+            const blob = new Blob([htmlContent], { type: 'application/msword;charset=utf-8' });
+            saveAs(blob, `اینفوگرافیک_کامل.doc`);
+        }
+
+        // ---- خروجی PowerPoint (با PptxGenJS) ----
+        function exportAllPPT() {
+            let pptx = new PptxGenJS();
+            pptx.defineLayout({ name: 'WIDE', width: 13.33, height: 7.5 });
+            pptx.layout = 'WIDE';
+
+            const cards = document.querySelectorAll('.card');
+            let slideIndex = 0;
+
+            cards.forEach((card, idx) => {
+                // برای هر کارت یک اسلاید با دو ستون (متن ساده)
+                const slide = pptx.addSlide();
+                slide.background = { color: 'F5F7FA' };
+
+                // عنوان اسلاید
+                const header = card.querySelector('.card-header h2')?.innerText || 'عنوان';
+                slide.addText(header, {
+                    x: 0.5, y: 0.3, w: 12.3, h: 1.0,
+                    fontSize: 28, color: '1A3A5C', bold: true,
+                    align: 'center'
+                });
+
+                // استخراج بخش‌ها
+                const sections = card.querySelectorAll('.card-body .section');
+                let yPos = 1.6;
+                sections.forEach((sec, i) => {
+                    const title = sec.querySelector('.section-title')?.innerText?.trim() || '';
+                    const items = sec.querySelectorAll('ul li');
+                    let textLines = [];
+                    items.forEach(li => {
+                        let txt = li.innerText.trim();
+                        if (txt) textLines.push('• ' + txt);
+                    });
+                    if (title) textLines.unshift(`[ ${title} ]`);
+                    if (textLines.length === 0) return;
+
+                    const content = textLines.join('\n');
+                    slide.addText(content, {
+                        x: 0.7, y: yPos, w: 11.9, h: 1.2,
+                        fontSize: 13,
+                        color: '2C3E50',
+                        valign: 'top',
+                        lineSpacing: 18
+                    });
+                    yPos += 1.3;
+                    if (yPos > 6.0) { 
+                        // اگر فضا تمام شد، ادامه در اسلاید بعدی (ساده‌سازی)
+                    }
+                });
+
+                // باکس هایلایت
+                const highlight = card.querySelector('.highlight-box');
+                if (highlight) {
+                    let hText = highlight.innerText.trim();
+                    if (hText) {
+                        slide.addText('🔹 ' + hText, {
+                            x: 0.7, y: yPos, w: 11.9, h: 0.8,
+                            fontSize: 14, color: 'C62828',
+                            fill: { color: 'FFF3E0' },
+                            border: { type: 'solid', color: 'FF9800', pt: 1 },
+                            valign: 'middle'
+                        });
+                        yPos += 0.9;
+                    }
+                }
+
+                // شماره صفحه
+                slide.addText(`صفحه ${idx+1} از ${cards.length}`, {
+                    x: 0.5, y: 6.8, w: 12.3, h: 0.4,
+                    fontSize: 10, color: '9E9E9E', align: 'center'
+                });
+            });
+
+            pptx.writeFile({ fileName: 'اینفوگرافیک_ورزشی.pptx' })
+                .then(() => console.log('PPTX ذخیره شد'))
+                .catch(err => alert('خطا در ساخت PPTX: ' + err));
+        }
+    </script>
+
+</body>
+</html>
