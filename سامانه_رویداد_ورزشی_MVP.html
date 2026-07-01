@@ -1,0 +1,2147 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>سامانه مدیریت رویدادهای ورزشی — سیستان و بلوچستان</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+  --ocean: #1A5276;
+  --ocean-light: #2E86C1;
+  --ocean-dark: #0E2F44;
+  --sunset: #E8830A;
+  --sunset-light: #F5A623;
+  --palm: #1E8449;
+  --palm-light: #27AE60;
+  --sand: #FDF6E3;
+  --sand-dark: #FAF0CA;
+  --white: #FFFFFF;
+  --gray-50: #F8F9FA;
+  --gray-100: #EEF2F7;
+  --gray-200: #D5DDE8;
+  --gray-400: #8FA5BE;
+  --gray-600: #4A6580;
+  --gray-800: #1C2B3A;
+  --danger: #C0392B;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --shadow: 0 4px 20px rgba(26,82,118,0.12);
+  --shadow-lg: 0 8px 40px rgba(26,82,118,0.18);
+  --transition: 0.25s ease;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Vazirmatn', 'B Nazanin', Tahoma, sans-serif;
+  background: var(--gray-50);
+  color: var(--gray-800);
+  min-height: 100vh;
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+/* ===== HEADER ===== */
+.app-header {
+  background: linear-gradient(135deg, var(--ocean-dark) 0%, var(--ocean) 60%, var(--ocean-light) 100%);
+  color: white;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 20px rgba(0,0,0,0.3);
+}
+
+.header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.15);
+}
+
+.header-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-icon {
+  width: 42px;
+  height: 42px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.logo-text h1 {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.logo-text p {
+  font-size: 11px;
+  opacity: 0.7;
+}
+
+.header-social {
+  display: flex;
+  gap: 8px;
+}
+
+.social-btn {
+  width: 32px;
+  height: 32px;
+  background: rgba(255,255,255,0.15);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  transition: var(--transition);
+  text-decoration: none;
+}
+
+.social-btn:hover { background: rgba(255,255,255,0.3); }
+
+.header-nav {
+  display: flex;
+  gap: 4px;
+  padding: 8px 16px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.nav-btn {
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.8);
+  font-family: inherit;
+  font-size: 13px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: var(--transition);
+}
+
+.nav-btn:hover, .nav-btn.active {
+  background: rgba(255,255,255,0.2);
+  color: white;
+}
+
+/* ===== SEARCH BAR ===== */
+.search-bar {
+  background: white;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--gray-200);
+}
+
+.search-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon {
+  position: absolute;
+  right: 14px;
+  color: var(--gray-400);
+  font-size: 16px;
+  pointer-events: none;
+}
+
+.search-input {
+  width: 100%;
+  padding: 10px 42px 10px 14px;
+  border: 2px solid var(--gray-200);
+  border-radius: 25px;
+  font-family: inherit;
+  font-size: 14px;
+  outline: none;
+  transition: var(--transition);
+  background: var(--gray-50);
+  color: var(--gray-800);
+}
+
+.search-input:focus {
+  border-color: var(--ocean-light);
+  background: white;
+}
+
+.filter-chips {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: 2px;
+}
+
+.chip {
+  background: var(--gray-100);
+  border: 1.5px solid var(--gray-200);
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 12px;
+  color: var(--gray-600);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: var(--transition);
+  font-family: inherit;
+}
+
+.chip:hover, .chip.active {
+  background: var(--ocean);
+  border-color: var(--ocean);
+  color: white;
+}
+
+/* ===== MAIN ===== */
+.main { padding: 16px; max-width: 900px; margin: 0 auto; }
+
+/* ===== SECTION TITLE ===== */
+.section-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--ocean-dark);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.section-title::after {
+  content: '';
+  flex: 1;
+  height: 2px;
+  background: linear-gradient(90deg, var(--ocean-light), transparent);
+  border-radius: 2px;
+}
+
+/* ===== POSTER SLIDER ===== */
+.slider-wrap {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius);
+  margin-bottom: 20px;
+  box-shadow: var(--shadow-lg);
+}
+
+.slider-track {
+  display: flex;
+  transition: transform 0.5s cubic-bezier(.4,0,.2,1);
+}
+
+.slide {
+  min-width: 100%;
+  position: relative;
+  cursor: pointer;
+}
+
+.slide-poster {
+  width: 100%;
+  height: 240px;
+  object-fit: cover;
+  display: block;
+}
+
+.slide-canvas {
+  width: 100%;
+  height: 240px;
+  display: block;
+}
+
+.slide-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(transparent, rgba(14,47,68,0.95));
+  padding: 30px 18px 16px;
+  color: white;
+}
+
+.slide-badge {
+  display: inline-block;
+  background: var(--sunset);
+  color: white;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 12px;
+  margin-bottom: 6px;
+}
+
+.slide-title { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+.slide-meta {
+  display: flex;
+  gap: 14px;
+  font-size: 12px;
+  opacity: 0.9;
+  flex-wrap: wrap;
+}
+
+.slide-capacity {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  background: rgba(0,0,0,0.65);
+  backdrop-filter: blur(6px);
+  color: white;
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.capacity-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--palm-light);
+  animation: pulse 1.5s infinite;
+}
+
+.capacity-dot.full { background: var(--danger); animation: none; }
+
+@keyframes pulse {
+  0%,100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.slider-dots {
+  position: absolute;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+}
+
+.dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.5);
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: var(--transition);
+}
+
+.dot.active { background: white; width: 18px; border-radius: 4px; }
+
+.slider-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255,255,255,0.2);
+  backdrop-filter: blur(6px);
+  border: none;
+  color: white;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  transition: var(--transition);
+}
+
+.slider-arrow:hover { background: rgba(255,255,255,0.35); }
+.slider-arrow.prev { right: 10px; }
+.slider-arrow.next { left: 10px; }
+
+/* ===== EVENT CARDS ===== */
+.events-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+@media(min-width: 600px) { .events-grid { grid-template-columns: 1fr 1fr; } }
+@media(min-width: 860px) { .events-grid { grid-template-columns: 1fr 1fr 1fr; } }
+
+.event-card {
+  background: white;
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  transition: transform var(--transition), box-shadow var(--transition);
+  border: 1.5px solid var(--gray-100);
+}
+
+.event-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-lg);
+}
+
+.card-img-wrap { position: relative; height: 140px; overflow: hidden; }
+
+.card-canvas {
+  width: 100%;
+  height: 140px;
+  display: block;
+}
+
+.card-type-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 10px;
+  color: white;
+}
+
+.badge-competition { background: var(--ocean); }
+.badge-conference { background: var(--palm); }
+.badge-festival { background: var(--sunset); }
+
+.card-body { padding: 12px 14px 14px; }
+.card-title { font-size: 14px; font-weight: 700; color: var(--ocean-dark); margin-bottom: 8px; line-height: 1.4; }
+.card-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--gray-600);
+  margin-bottom: 4px;
+}
+
+.card-row span { font-size: 13px; }
+
+.card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--gray-100);
+}
+
+.capacity-bar-wrap { flex: 1; margin-left: 10px; }
+.capacity-label { font-size: 11px; color: var(--gray-600); margin-bottom: 3px; }
+.capacity-bar {
+  height: 5px;
+  background: var(--gray-200);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.capacity-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.8s ease;
+}
+
+.fill-low { background: var(--palm-light); }
+.fill-medium { background: var(--sunset); }
+.fill-high { background: var(--danger); }
+
+.btn-register {
+  background: linear-gradient(135deg, var(--ocean), var(--ocean-light));
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+  transition: var(--transition);
+}
+
+.btn-register:hover { opacity: 0.9; transform: scale(1.02); }
+
+.btn-waitlist {
+  background: linear-gradient(135deg, var(--gray-600), var(--gray-400));
+}
+
+/* ===== MODAL OVERLAY ===== */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(14,47,68,0.7);
+  backdrop-filter: blur(4px);
+  z-index: 200;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 0;
+}
+
+.modal-overlay.open { display: flex; }
+
+.modal {
+  background: white;
+  width: 100%;
+  max-width: 600px;
+  max-height: 92vh;
+  border-radius: var(--radius) var(--radius) 0 0;
+  overflow-y: auto;
+  animation: slideUp 0.35s cubic-bezier(.4,0,.2,1);
+  position: relative;
+}
+
+@media(min-width: 640px) {
+  .modal-overlay { align-items: center; padding: 20px; }
+  .modal { border-radius: var(--radius); }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(60px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.modal-handle {
+  width: 40px;
+  height: 4px;
+  background: var(--gray-200);
+  border-radius: 2px;
+  margin: 12px auto 0;
+}
+
+@media(min-width: 640px) { .modal-handle { display: none; } }
+
+.modal-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--gray-100);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  background: white;
+  z-index: 1;
+}
+
+.modal-title { font-size: 16px; font-weight: 700; color: var(--ocean-dark); }
+
+.modal-close {
+  width: 32px; height: 32px;
+  background: var(--gray-100);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+}
+
+.modal-close:hover { background: var(--gray-200); }
+
+.modal-body { padding: 20px; }
+
+/* ===== STEPS ===== */
+.steps-bar {
+  display: flex;
+  align-items: center;
+  margin-bottom: 24px;
+  position: relative;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+  position: relative;
+}
+
+.step-circle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--gray-200);
+  color: var(--gray-600);
+  font-weight: 700;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+  z-index: 1;
+}
+
+.step.active .step-circle { background: var(--ocean); color: white; }
+.step.done .step-circle { background: var(--palm); color: white; }
+
+.step-label {
+  font-size: 11px;
+  color: var(--gray-400);
+  white-space: nowrap;
+}
+
+.step.active .step-label { color: var(--ocean); font-weight: 600; }
+.step.done .step-label { color: var(--palm); }
+
+.steps-bar::before {
+  content: '';
+  position: absolute;
+  top: 15px;
+  right: 16%;
+  left: 16%;
+  height: 2px;
+  background: var(--gray-200);
+}
+
+/* ===== EVENT DETAIL PAGE ===== */
+.event-detail-img {
+  width: 100%;
+  height: 180px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 16px;
+  display: block;
+  object-fit: cover;
+}
+
+.event-detail-canvas {
+  width: 100%;
+  height: 180px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 16px;
+  display: block;
+}
+
+.event-detail-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--ocean-dark);
+  margin-bottom: 12px;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.info-item {
+  background: var(--gray-50);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  border: 1px solid var(--gray-100);
+}
+
+.info-label {
+  font-size: 11px;
+  color: var(--gray-400);
+  margin-bottom: 2px;
+}
+
+.info-value {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ocean-dark);
+}
+
+.event-desc {
+  font-size: 13px;
+  line-height: 1.8;
+  color: var(--gray-600);
+  margin-bottom: 16px;
+  padding: 12px;
+  background: var(--sand);
+  border-radius: var(--radius-sm);
+  border-right: 3px solid var(--sunset);
+}
+
+.terms-box {
+  background: var(--gray-50);
+  border: 1.5px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  margin-bottom: 16px;
+  font-size: 13px;
+  line-height: 1.8;
+  color: var(--gray-600);
+  max-height: 140px;
+  overflow-y: auto;
+}
+
+.terms-check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--gray-800);
+}
+
+.terms-check input[type=checkbox] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--ocean);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.share-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.share-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  transition: var(--transition);
+}
+
+.share-whatsapp { background: #25D366; color: white; }
+.share-eitaa { background: #F04B23; color: white; }
+.share-soroush { background: #0066CC; color: white; }
+.share-bale { background: #FFD700; color: #333; }
+
+/* ===== FORM ===== */
+.form-group { margin-bottom: 16px; }
+.form-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ocean-dark);
+  margin-bottom: 6px;
+}
+
+.form-label .required { color: var(--danger); margin-right: 2px; }
+
+.form-control {
+  width: 100%;
+  padding: 10px 14px;
+  border: 2px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: 14px;
+  outline: none;
+  transition: var(--transition);
+  background: white;
+  color: var(--gray-800);
+  direction: rtl;
+}
+
+.form-control:focus { border-color: var(--ocean-light); background: var(--gray-50); }
+.form-control.error { border-color: var(--danger); }
+.form-control:disabled { background: var(--gray-100); color: var(--gray-400); }
+
+.form-error {
+  font-size: 12px;
+  color: var(--danger);
+  margin-top: 4px;
+  display: none;
+}
+
+.form-error.show { display: block; }
+
+.form-hint {
+  font-size: 11px;
+  color: var(--gray-400);
+  margin-top: 4px;
+}
+
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+.gender-btns { display: flex; gap: 10px; }
+
+.gender-btn {
+  flex: 1;
+  padding: 9px;
+  border: 2px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  background: white;
+  font-family: inherit;
+  font-size: 14px;
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-weight: 500;
+}
+
+.gender-btn.selected {
+  border-color: var(--ocean);
+  background: rgba(26,82,118,0.08);
+  color: var(--ocean);
+}
+
+.age-category-display {
+  background: var(--sand);
+  border: 1.5px solid var(--sunset-light);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--sunset);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* OTP */
+.otp-wrap { display: flex; gap: 8px; align-items: center; }
+.otp-wrap .form-control { flex: 1; }
+
+.btn-send-otp {
+  background: var(--ocean);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  font-family: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  white-space: nowrap;
+  font-weight: 600;
+  transition: var(--transition);
+}
+
+.btn-send-otp:disabled { background: var(--gray-400); cursor: not-allowed; }
+
+.otp-code-display {
+  background: #e8f5e9;
+  border: 2px dashed var(--palm);
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+  margin-top: 10px;
+  font-size: 13px;
+  color: var(--palm);
+  display: none;
+  text-align: center;
+}
+
+.otp-code-display .code {
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: 8px;
+  display: block;
+  margin-top: 4px;
+}
+
+/* ===== BUTTONS ===== */
+.btn {
+  width: 100%;
+  padding: 13px;
+  border-radius: 30px;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--ocean) 0%, var(--ocean-light) 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(26,82,118,0.3);
+}
+
+.btn-primary:hover { opacity: 0.92; transform: translateY(-1px); }
+.btn-primary:disabled { background: var(--gray-300); box-shadow: none; cursor: not-allowed; transform: none; opacity: 1; }
+
+.btn-secondary {
+  background: var(--gray-100);
+  color: var(--gray-600);
+}
+
+.btn-success {
+  background: linear-gradient(135deg, var(--palm) 0%, var(--palm-light) 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(30,132,73,0.3);
+}
+
+.btn-row { display: flex; gap: 10px; }
+.btn-row .btn { flex: 1; }
+
+/* ===== SUCCESS ===== */
+.success-view { text-align: center; padding: 20px 0; }
+.success-icon {
+  font-size: 64px;
+  margin-bottom: 14px;
+  animation: bounceIn 0.5s;
+}
+
+@keyframes bounceIn {
+  0% { transform: scale(0); }
+  60% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+.success-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--palm);
+  margin-bottom: 8px;
+}
+
+.success-desc {
+  font-size: 14px;
+  color: var(--gray-600);
+  margin-bottom: 20px;
+  line-height: 1.8;
+}
+
+.reg-code-box {
+  background: var(--sand);
+  border: 2px dashed var(--sunset);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.reg-code-label { font-size: 12px; color: var(--gray-400); margin-bottom: 4px; }
+.reg-code { font-size: 22px; font-weight: 800; color: var(--sunset); letter-spacing: 4px; }
+
+/* ===== PDF PREVIEW ===== */
+.pdf-card {
+  background: white;
+  border: 2px solid var(--gray-200);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 16px;
+  position: relative;
+  font-size: 13px;
+}
+
+.pdf-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid var(--ocean);
+  padding-bottom: 10px;
+  margin-bottom: 12px;
+}
+
+.pdf-org { font-size: 12px; color: var(--ocean-dark); font-weight: 700; }
+.pdf-title { font-size: 16px; font-weight: 800; color: var(--ocean); text-align: center; }
+
+.pdf-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.pdf-info-item { }
+.pdf-info-label { font-size: 10px; color: var(--gray-400); }
+.pdf-info-value { font-size: 13px; font-weight: 600; color: var(--gray-800); }
+
+.pdf-qr-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px dashed var(--gray-200);
+  padding-top: 12px;
+}
+
+.pdf-signature { font-size: 11px; color: var(--gray-400); }
+.pdf-sign-line { width: 100px; border-bottom: 1px solid var(--gray-400); margin-top: 20px; }
+
+/* ===== PROFILE PAGE ===== */
+.profile-search { margin-bottom: 20px; }
+
+.profile-card {
+  background: white;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.profile-card-header {
+  background: linear-gradient(135deg, var(--ocean-dark), var(--ocean));
+  color: white;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.profile-avatar {
+  width: 56px;
+  height: 56px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+}
+
+.profile-name { font-size: 18px; font-weight: 700; }
+.profile-national-id { font-size: 12px; opacity: 0.75; margin-top: 2px; }
+
+.stat-chips {
+  display: flex;
+  gap: 8px;
+  padding: 14px 20px;
+  background: var(--gray-50);
+  border-bottom: 1px solid var(--gray-100);
+  flex-wrap: wrap;
+}
+
+.stat-chip {
+  background: white;
+  border: 1.5px solid var(--gray-200);
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.stat-chip .num { font-weight: 700; color: var(--ocean); font-size: 14px; }
+
+.history-list { padding: 14px 20px; }
+.history-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--gray-100);
+}
+
+.history-item:last-child { border-bottom: none; }
+.history-icon { font-size: 22px; flex-shrink: 0; }
+.history-info { flex: 1; }
+.history-title { font-size: 13px; font-weight: 600; color: var(--gray-800); }
+.history-date { font-size: 11px; color: var(--gray-400); margin-top: 2px; }
+.history-rank {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 12px;
+}
+
+.rank-gold { background: #FEF9C3; color: #A16207; }
+.rank-silver { background: #F1F5F9; color: #475569; }
+.rank-bronze { background: #FEF3C7; color: #92400E; }
+
+/* ===== ABOUT / CONTACT ===== */
+.static-page { padding: 4px 0; }
+.static-page h2 { font-size: 18px; font-weight: 700; color: var(--ocean-dark); margin-bottom: 12px; }
+.static-page p { font-size: 14px; line-height: 1.9; color: var(--gray-600); margin-bottom: 12px; }
+.contact-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--gray-50);
+  border-radius: var(--radius-sm);
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+
+.contact-icon { font-size: 20px; }
+
+/* ===== FOOTER ===== */
+.app-footer {
+  background: var(--ocean-dark);
+  color: rgba(255,255,255,0.7);
+  padding: 16px 20px;
+  text-align: center;
+  margin-top: 30px;
+  font-size: 12px;
+  line-height: 1.8;
+}
+
+.footer-designer { font-weight: 700; color: var(--sunset-light); font-size: 13px; }
+.footer-qr {
+  display: inline-block;
+  background: white;
+  padding: 4px;
+  border-radius: 6px;
+  margin: 8px auto;
+}
+
+/* ===== ADMIN PANEL ===== */
+.admin-section { margin-bottom: 24px; }
+.admin-section h3 { font-size: 15px; font-weight: 700; color: var(--ocean-dark); margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid var(--gray-100); }
+
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--gray-100);
+}
+
+.toggle-info h4 { font-size: 14px; font-weight: 600; color: var(--gray-800); }
+.toggle-info p { font-size: 12px; color: var(--gray-400); margin-top: 2px; }
+
+.toggle {
+  position: relative;
+  width: 48px;
+  height: 26px;
+  flex-shrink: 0;
+}
+
+.toggle input { opacity: 0; width: 0; height: 0; }
+
+.toggle-slider {
+  position: absolute;
+  inset: 0;
+  background: var(--gray-200);
+  border-radius: 13px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.toggle-slider::before {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background: white;
+  border-radius: 50%;
+  top: 3px;
+  right: 3px;
+  transition: var(--transition);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+}
+
+.toggle input:checked + .toggle-slider { background: var(--ocean); }
+.toggle input:checked + .toggle-slider::before { transform: translateX(-22px); }
+
+/* ===== PAGE VISIBILITY ===== */
+.page { display: none; }
+.page.active { display: block; }
+
+/* ===== TOAST ===== */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: var(--ocean-dark);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 30px;
+  font-size: 14px;
+  font-weight: 600;
+  z-index: 999;
+  transition: transform 0.35s cubic-bezier(.4,0,.2,1);
+  white-space: nowrap;
+  max-width: 90vw;
+  text-align: center;
+}
+
+.toast.show { transform: translateX(-50%) translateY(0); }
+.toast.success { background: var(--palm); }
+.toast.error { background: var(--danger); }
+
+/* ===== EMPTY STATE ===== */
+.empty-state { text-align: center; padding: 40px 20px; color: var(--gray-400); }
+.empty-state .icon { font-size: 48px; margin-bottom: 12px; }
+.empty-state p { font-size: 14px; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="app-header">
+  <div class="header-top">
+    <div class="header-logo">
+      <div class="logo-icon">🏆</div>
+      <div class="logo-text">
+        <h1>سامانه رویدادهای ورزشی</h1>
+        <p>اداره کل ورزش و جوانان سیستان و بلوچستان</p>
+      </div>
+    </div>
+    <div class="header-social">
+      <a class="social-btn" title="سروش">📲</a>
+      <a class="social-btn" title="تلگرام">✈️</a>
+      <a class="social-btn" title="اینستاگرام">📷</a>
+    </div>
+  </div>
+  <nav class="header-nav">
+    <button class="nav-btn active" onclick="showPage('home')">🏠 خانه</button>
+    <button class="nav-btn" onclick="showPage('profile')">👤 پروفایل هوشمند</button>
+    <button class="nav-btn" onclick="showPage('about')">ℹ️ درباره ما</button>
+    <button class="nav-btn" onclick="showPage('contact')">📞 تماس با ما</button>
+    <button class="nav-btn" onclick="showPage('admin')">⚙️ پنل ادمین</button>
+  </nav>
+</header>
+
+<!-- SEARCH -->
+<div class="search-bar">
+  <div class="search-input-wrap">
+    <span class="search-icon">🔍</span>
+    <input class="search-input" id="searchInput" type="text" placeholder="جستجو بر اساس نام رویداد، شهر یا هیئت..." oninput="filterEvents()">
+  </div>
+  <div class="filter-chips" id="filterChips">
+    <button class="chip active" onclick="filterByType('all',this)">همه رویدادها</button>
+    <button class="chip" onclick="filterByType('مسابقه',this)">🏅 مسابقات</button>
+    <button class="chip" onclick="filterByType('همایش',this)">🎓 همایش‌ها</button>
+    <button class="chip" onclick="filterByType('جشنواره',this)">🎉 جشنواره‌ها</button>
+    <button class="chip" onclick="filterByCity('زاهدان',this)">📍 زاهدان</button>
+    <button class="chip" onclick="filterByCity('چابهار',this)">📍 چابهار</button>
+    <button class="chip" onclick="filterByCity('زابل',this)">📍 زابل</button>
+    <button class="chip" onclick="filterByCity('ایرانشهر',this)">📍 ایرانشهر</button>
+  </div>
+</div>
+
+<!-- HOME PAGE -->
+<div class="page active" id="page-home">
+  <main class="main">
+
+    <!-- SLIDER -->
+    <div class="slider-wrap" id="mainSlider">
+      <div class="slider-track" id="sliderTrack"></div>
+      <div class="slider-dots" id="sliderDots"></div>
+      <button class="slider-arrow prev" onclick="prevSlide()">›</button>
+      <button class="slider-arrow next" onclick="nextSlide()">‹</button>
+    </div>
+
+    <!-- EVENTS GRID -->
+    <div class="section-title">رویدادهای پیش رو</div>
+    <div class="events-grid" id="eventsGrid"></div>
+
+  </main>
+</div>
+
+<!-- PROFILE PAGE -->
+<div class="page" id="page-profile">
+  <main class="main">
+    <div class="section-title">پروفایل هوشمند ورزشکار</div>
+    <div class="profile-search">
+      <div class="search-input-wrap">
+        <span class="search-icon">🔍</span>
+        <input class="search-input" type="text" id="profileSearchInput" placeholder="کد ملی ۱۰ رقمی خود را وارد کنید..." maxlength="10" oninput="searchProfile()">
+      </div>
+    </div>
+    <div id="profileResult">
+      <div class="empty-state">
+        <div class="icon">🏃</div>
+        <p>کد ملی خود را وارد کنید تا سوابق ورزشی شما نمایش داده شود</p>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- ABOUT PAGE -->
+<div class="page" id="page-about">
+  <main class="main">
+    <div class="static-page" id="aboutContent">
+      <h2>درباره سامانه رویدادهای ورزشی</h2>
+      <p>این سامانه با هدف سهولت در ثبت‌نام و مدیریت رویدادهای ورزشی استان سیستان و بلوچستان طراحی و پیاده‌سازی شده است. با استفاده از این بستر، تمام مسابقات، همایش‌ها و جشنواره‌های ورزشی در سطح ۲۶ شهر استان به صورت یکپارچه مدیریت می‌شوند.</p>
+      <p>این سامانه محصول اداره کل ورزش و جوانان استان سیستان و بلوچستان بوده و در راستای دیجیتال‌سازی خدمات ورزشی استان طراحی گردیده است.</p>
+      <p style="font-weight:600;color:var(--ocean-dark);">طراحی و پیاده‌سازی: امین عزیزی مقدم — ۱۴۰۴</p>
+    </div>
+  </main>
+</div>
+
+<!-- CONTACT PAGE -->
+<div class="page" id="page-contact">
+  <main class="main">
+    <div class="static-page" id="contactContent">
+      <h2>تماس با ما</h2>
+      <div class="contact-item"><span class="contact-icon">🏢</span><span>اداره کل ورزش و جوانان — زاهدان، بلوار آزادی</span></div>
+      <div class="contact-item"><span class="contact-icon">📞</span><span>۰۵۴-۳۳۴۱۲۰۰۰ — پشتیبانی فنی سامانه</span></div>
+      <div class="contact-item"><span class="contact-icon">📧</span><span>sport.sb@msy.gov.ir</span></div>
+      <div class="contact-item"><span class="contact-icon">🕐</span><span>ساعات پاسخگویی: شنبه تا چهارشنبه ۸ الی ۱۴</span></div>
+    </div>
+  </main>
+</div>
+
+<!-- ADMIN PAGE -->
+<div class="page" id="page-admin">
+  <main class="main">
+    <div class="section-title">⚙️ پنل تنظیمات پیشرفته</div>
+
+    <div class="admin-section">
+      <h3>🔌 ماژول‌های سیستم</h3>
+      <div class="toggle-row">
+        <div class="toggle-info">
+          <h4>استعلام ثبت احوال</h4>
+          <p>غیرفعال: اعتبارسنجی الگوریتمی کد ملی | فعال: تماس با API ثبت احوال</p>
+        </div>
+        <label class="toggle"><input type="checkbox" id="toggle-civil"><span class="toggle-slider"></span></label>
+      </div>
+      <div class="toggle-row">
+        <div class="toggle-info">
+          <h4>درگاه پیامکی (SMS)</h4>
+          <p>غیرفعال: نمایش کد OTP در صفحه | فعال: ارسال پیامک واقعی</p>
+        </div>
+        <label class="toggle"><input type="checkbox" id="toggle-sms"><span class="toggle-slider"></span></label>
+      </div>
+      <div class="toggle-row">
+        <div class="toggle-info">
+          <h4>چت‌بات هوش مصنوعی</h4>
+          <p>غیرفعال: FAQ ایستا | فعال: اتصال به مدل زبانی</p>
+        </div>
+        <label class="toggle"><input type="checkbox" id="toggle-ai"><span class="toggle-slider"></span></label>
+      </div>
+      <div class="toggle-row">
+        <div class="toggle-info">
+          <h4>درگاه پرداخت آنلاین</h4>
+          <p>غیرفعال: ثبت‌نام رایگان | فعال: درگاه پرداخت فعال می‌شود</p>
+        </div>
+        <label class="toggle"><input type="checkbox" id="toggle-payment"><span class="toggle-slider"></span></label>
+      </div>
+    </div>
+
+    <div class="admin-section">
+      <h3>➕ افزودن رویداد جدید</h3>
+      <div class="form-group">
+        <label class="form-label">عنوان رویداد <span class="required">*</span></label>
+        <input class="form-control" id="admin-event-title" type="text" placeholder="مثال: مسابقات استانی کشتی جوانان">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">نوع رویداد</label>
+          <select class="form-control" id="admin-event-type">
+            <option>مسابقه</option>
+            <option>همایش</option>
+            <option>جشنواره</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">شهر</label>
+          <select class="form-control" id="admin-event-city"></select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">هیئت ورزشی</label>
+          <select class="form-control" id="admin-event-board" onchange="updateAdminSports()"></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">رشته ورزشی</label>
+          <select class="form-control" id="admin-event-sport"></select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">تاریخ برگزاری</label>
+          <input class="form-control" id="admin-event-date" type="text" placeholder="مثال: ۱۴۰۴/۰۵/۱۵">
+        </div>
+        <div class="form-group">
+          <label class="form-label">ظرفیت کل</label>
+          <input class="form-control" id="admin-event-capacity" type="number" placeholder="۱۰۰" min="1">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">مکان برگزاری</label>
+        <input class="form-control" id="admin-event-location" type="text" placeholder="آدرس کامل محل برگزاری">
+      </div>
+      <div class="form-group">
+        <label class="form-label">توضیحات</label>
+        <textarea class="form-control" id="admin-event-desc" rows="3" placeholder="شرایط شرکت، قوانین و اطلاعات بیشتر..."></textarea>
+      </div>
+      <button class="btn btn-primary" onclick="addEvent()">✅ ثبت رویداد جدید</button>
+    </div>
+
+    <div class="admin-section">
+      <h3>📋 لیست ثبت‌نامی‌ها</h3>
+      <div id="adminRegList"></div>
+    </div>
+  </main>
+</div>
+
+<!-- FOOTER -->
+<footer class="app-footer">
+  <div class="footer-designer">طراحی و پیاده‌سازی: امین عزیزی مقدم</div>
+  <div>اداره کل ورزش و جوانان استان سیستان و بلوچستان | ۱۴۰۴</div>
+  <div style="margin-top:4px;font-size:11px;">دسته‌بندی: اتوماسیون اداری / برنامه‌ریزی رویداد</div>
+</footer>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalOut(event)">
+  <div class="modal" id="mainModal">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <span class="modal-title" id="modalTitle">جزئیات رویداد</span>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<script>
+// ===== DATA =====
+const CITIES = ['زاهدان','زابل','ایرانشهر','چابهار','خاش','سراوان','نیکشهر','کنارک','دلگان','سرباز','بمپور','هامون','میرجاوه','زهک','هیرمند','قصرقند','مهرستان','فنوج','سوران','راسک','جالق','اسپکه','گلمورتی','ریگان','بنت','نوک'];
+
+const BOARDS = {
+  'فوتبال': ['فوتبال یازده نفره','فوتسال','فوتبال ساحلی','فوتبال پایه'],
+  'کشتی': ['کشتی آزاد','کشتی فرنگی','کشتی پهلوانی'],
+  'والیبال': ['والیبال سالنی','والیبال ساحلی'],
+  'تکواندو': ['پومسه','کیوروگی'],
+  'کاراته': ['کاتا','کومیته'],
+  'دو و میدانی': ['دو','پرش','پرتاب','ماراتن'],
+  'شنا': ['شنای استخری','شنای آب‌های آزاد'],
+  'بسکتبال': ['بسکتبال ۵ نفره','بسکتبال ۳ نفره'],
+  'هندبال': ['هندبال سالنی','هندبال ساحلی'],
+  'بدمینتون': ['بدمینتون انفرادی','بدمینتون دونفره'],
+  'وزنه‌برداری': ['المپیک','پاورلیفتینگ'],
+  'شطرنج': ['شطرنج کلاسیک','شطرنج سریع'],
+  'دوچرخه‌سواری': ['جاده','کوهستان'],
+  'ژیمناستیک': ['آرتیستیک','ریتمیک'],
+};
+
+const AGE_CATS = [
+  {name:'نونهالان', emoji:'👶', min:0, max:11},
+  {name:'نوجوانان', emoji:'🧒', min:12, max:14},
+  {name:'جوانان', emoji:'👦', min:15, max:17},
+  {name:'بزرگسالان', emoji:'👨', min:18, max:40},
+  {name:'پیشکسوتان', emoji:'👴', min:41, max:200},
+];
+
+const EVENT_COLORS = {
+  'مسابقه': ['#1A5276','#2E86C1','#1B4F72'],
+  'همایش': ['#1E8449','#27AE60','#186A3B'],
+  'جشنواره': ['#E8830A','#F5A623','#CA6F1E'],
+};
+
+const SAMPLE_EVENTS = [
+  {id:1, title:'مسابقات استانی کشتی جوانان', type:'مسابقه', city:'زاهدان', board:'کشتی', sport:'کشتی آزاد', date:'۱۴۰۴/۰۵/۱۵', time:'۰۸:۳۰', location:'سالن ورزشی شهید فهمیده زاهدان', capacity:120, registered:87, desc:'مسابقات رسمی استانی در رده سنی جوانان، ویژه ورزشکاران زیر ۱۸ سال. حضور با کارت ورزشکاری الزامی است.'},
+  {id:2, title:'همایش روسای هیئت‌های ورزشی', type:'همایش', city:'زاهدان', board:'فوتبال', sport:'فوتبال یازده نفره', date:'۱۴۰۴/۰۵/۲۰', time:'۱۰:۰۰', location:'سالن اجلاس فرمانداری زاهدان', capacity:80, registered:80, desc:'همایش سالانه روسای هیئت‌های ورزشی استان جهت بررسی عملکرد و برنامه‌ریزی فصل ورزشی جدید.'},
+  {id:3, title:'جشنواره ورزش‌های بومی چابهار', type:'جشنواره', city:'چابهار', board:'دو و میدانی', sport:'دو', date:'۱۴۰۴/۰۶/۰۱', time:'۱۶:۰۰', location:'ساحل دریای عمان — چابهار', capacity:300, registered:145, desc:'جشنواره بزرگ ورزش‌های بومی و محلی در کنار دریای عمان. برای تمام سنین آزاد است.'},
+  {id:4, title:'مسابقات فوتسال لیگ استانی', type:'مسابقه', city:'زابل', board:'فوتبال', sport:'فوتسال', date:'۱۴۰۴/۰۶/۱۰', time:'۱۷:۰۰', location:'سالن ورزشی امام علی زابل', capacity:16, registered:12, desc:'مرحله نهایی لیگ فوتسال استانی با حضور ۱۶ تیم برتر. بلیت تماشاگر به صورت رایگان است.'},
+  {id:5, title:'مسابقات شنا قهرمانی استان', type:'مسابقه', city:'ایرانشهر', board:'شنا', sport:'شنای استخری', date:'۱۴۰۴/۰۶/۲۰', time:'۰۹:۰۰', location:'استخر المپیک ایرانشهر', capacity:60, registered:28, desc:'مسابقات قهرمانی شنای استانی در مسافت‌های ۵۰، ۱۰۰ و ۲۰۰ متر آزاد و پشت.'},
+  {id:6, title:'همایش سلامت و ورزش', type:'همایش', city:'خاش', board:'کشتی', sport:'کشتی پهلوانی', date:'۱۴۰۴/۰۷/۰۵', time:'۱۱:۰۰', location:'تالار شهرداری خاش', capacity:200, registered:67, desc:'همایش علمی سلامت و ورزش با حضور پزشکان ورزشی و اساتید دانشگاه.'},
+];
+
+// STORAGE
+function saveToStorage(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch(e){} }
+function loadFromStorage(key, def) { try { const v=localStorage.getItem(key); return v?JSON.parse(v):def; } catch(e){ return def; } }
+
+let events = loadFromStorage('events', SAMPLE_EVENTS);
+let registrations = loadFromStorage('registrations', []);
+let activeFilter = {type:'all', city:''};
+let currentEvent = null;
+let currentStep = 1;
+let sliderIdx = 0;
+let sliderTimer = null;
+
+// ===== POSTER CANVAS =====
+function drawPoster(canvas, event, width, height) {
+  if (!canvas) return;
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext('2d');
+  const colors = EVENT_COLORS[event.type] || EVENT_COLORS['مسابقه'];
+  const grad = ctx.createLinearGradient(0, 0, width, height);
+  grad.addColorStop(0, colors[0]);
+  grad.addColorStop(0.6, colors[1]);
+  grad.addColorStop(1, colors[2]);
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, width, height);
+
+  // Pattern
+  ctx.save();
+  ctx.globalAlpha = 0.08;
+  for(let i=0; i<8; i++){
+    ctx.beginPath();
+    ctx.arc(width*0.8, height*0.3, 30+i*25, 0, Math.PI*2);
+    ctx.strokeStyle='#fff';
+    ctx.lineWidth=2;
+    ctx.stroke();
+  }
+  ctx.restore();
+
+  // Sport icon
+  const icons = {'کشتی':'🤼','فوتبال':'⚽','والیبال':'🏐','شنا':'🏊','دو و میدانی':'🏃','تکواندو':'🥋','کاراته':'🥊','بسکتبال':'🏀','هندبال':'🤾','شطرنج':'♟️','دوچرخه‌سواری':'🚴','وزنه‌برداری':'🏋️','ژیمناستیک':'🤸','بدمینتون':'🏸'};
+  const icon = icons[event.board] || '🏆';
+
+  ctx.font = `${Math.round(height*0.25)}px serif`;
+  ctx.textAlign = 'center';
+  ctx.fillStyle = 'rgba(255,255,255,0.15)';
+  ctx.fillText(icon, width * 0.5, height * 0.55);
+
+  // Bottom gradient
+  const btmGrad = ctx.createLinearGradient(0, height*0.4, 0, height);
+  btmGrad.addColorStop(0, 'transparent');
+  btmGrad.addColorStop(1, 'rgba(0,0,0,0.7)');
+  ctx.fillStyle = btmGrad;
+  ctx.fillRect(0, 0, width, height);
+}
+
+// ===== RENDER SLIDER =====
+function renderSlider() {
+  const track = document.getElementById('sliderTrack');
+  const dots = document.getElementById('sliderDots');
+  const featured = events.slice(0,4);
+  track.innerHTML = '';
+  dots.innerHTML = '';
+
+  featured.forEach((ev, i) => {
+    const pct = Math.round(ev.registered/ev.capacity*100);
+    const full = ev.registered >= ev.capacity;
+    const slide = document.createElement('div');
+    slide.className = 'slide';
+    slide.onclick = () => openEventModal(ev);
+    slide.innerHTML = `
+      <canvas class="slide-canvas" id="slide-canvas-${i}"></canvas>
+      <div class="slide-capacity">
+        <div class="capacity-dot ${full?'full':''}"></div>
+        ${full ? 'ظرفیت تکمیل' : `${ev.capacity - ev.registered} جای خالی`}
+      </div>
+      <div class="slide-overlay">
+        <span class="slide-badge">${ev.type}</span>
+        <div class="slide-title">${ev.title}</div>
+        <div class="slide-meta">
+          <span>📅 ${ev.date}</span>
+          <span>📍 ${ev.city}</span>
+          <span>🏅 ${ev.board}</span>
+        </div>
+      </div>`;
+    track.appendChild(slide);
+
+    const dot = document.createElement('button');
+    dot.className = 'dot' + (i===0?' active':'');
+    dot.onclick = (e) => { e.stopPropagation(); goToSlide(i); };
+    dots.appendChild(dot);
+  });
+
+  requestAnimationFrame(() => {
+    featured.forEach((ev, i) => {
+      const c = document.getElementById(`slide-canvas-${i}`);
+      if(c) drawPoster(c, ev, c.parentElement.offsetWidth || 360, 240);
+    });
+  });
+
+  startSliderTimer();
+}
+
+function goToSlide(idx) {
+  sliderIdx = idx;
+  document.getElementById('sliderTrack').style.transform = `translateX(${idx * 100}%)`;
+  document.querySelectorAll('.dot').forEach((d,i) => d.className='dot'+(i===idx?' active':''));
+}
+
+function nextSlide() {
+  const count = events.slice(0,4).length;
+  goToSlide((sliderIdx+1)%count);
+}
+
+function prevSlide() {
+  const count = events.slice(0,4).length;
+  goToSlide((sliderIdx-1+count)%count);
+}
+
+function startSliderTimer() {
+  clearInterval(sliderTimer);
+  sliderTimer = setInterval(nextSlide, 4000);
+}
+
+// ===== RENDER CARDS =====
+function renderEvents(list) {
+  const grid = document.getElementById('eventsGrid');
+  if(!list.length) {
+    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="icon">🔍</div><p>رویدادی یافت نشد</p></div>`;
+    return;
+  }
+  grid.innerHTML = list.map(ev => {
+    const pct = Math.round(ev.registered/ev.capacity*100);
+    const full = ev.registered >= ev.capacity;
+    const fillClass = pct>=90?'fill-high':pct>=60?'fill-medium':'fill-low';
+    const badgeClass = ev.type==='مسابقه'?'badge-competition':ev.type==='همایش'?'badge-conference':'badge-festival';
+    return `<div class="event-card" onclick="openEventModal(${ev.id})">
+      <div class="card-img-wrap">
+        <canvas class="card-canvas" id="card-canvas-${ev.id}"></canvas>
+        <span class="card-type-badge ${badgeClass}">${ev.type}</span>
+      </div>
+      <div class="card-body">
+        <div class="card-title">${ev.title}</div>
+        <div class="card-row"><span>📅</span>${ev.date} — ${ev.time}</div>
+        <div class="card-row"><span>📍</span>${ev.city}</div>
+        <div class="card-row"><span>🏅</span>${ev.board} — ${ev.sport}</div>
+        <div class="card-footer">
+          <div class="capacity-bar-wrap">
+            <div class="capacity-label">${ev.registered} از ${ev.capacity} نفر</div>
+            <div class="capacity-bar"><div class="capacity-fill ${fillClass}" style="width:${pct}%"></div></div>
+          </div>
+          <button class="btn-register ${full?'btn-waitlist':''}" onclick="event.stopPropagation();openEventModal(${ev.id})">${full?'لیست انتظار':'ثبت‌نام'}</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  requestAnimationFrame(() => {
+    list.forEach(ev => {
+      const c = document.getElementById(`card-canvas-${ev.id}`);
+      if(c) drawPoster(c, ev, c.parentElement.offsetWidth||300, 140);
+    });
+  });
+}
+
+// ===== FILTER =====
+let filterType = 'all', filterCity = '';
+
+function filterByType(type, el) {
+  filterType = type;
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  if(el) el.classList.add('active');
+  filterCity = '';
+  applyFilter();
+}
+
+function filterByCity(city, el) {
+  filterCity = filterCity === city ? '' : city;
+  filterType = 'all';
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  if(filterCity && el) el.classList.add('active');
+  applyFilter();
+}
+
+function filterEvents() {
+  applyFilter();
+}
+
+function applyFilter() {
+  const q = (document.getElementById('searchInput').value||'').trim().toLowerCase();
+  let list = events.filter(ev => {
+    const matchType = filterType==='all' || ev.type===filterType;
+    const matchCity = !filterCity || ev.city===filterCity;
+    const matchQ = !q || ev.title.includes(q) || ev.city.includes(q) || ev.board.includes(q) || ev.sport.includes(q);
+    return matchType && matchCity && matchQ;
+  });
+  renderEvents(list);
+}
+
+// ===== EVENT MODAL =====
+function getEventById(id) { return events.find(e=>e.id==id); }
+
+function openEventModal(evOrId) {
+  currentEvent = typeof evOrId === 'object' ? evOrId : getEventById(evOrId);
+  if(!currentEvent) return;
+  currentStep = 1;
+  document.getElementById('modalTitle').textContent = 'جزئیات رویداد';
+  showStep1();
+  openModal();
+}
+
+function showStep1() {
+  const ev = currentEvent;
+  const full = ev.registered >= ev.capacity;
+  document.getElementById('modalTitle').textContent = ev.title;
+  document.getElementById('modalBody').innerHTML = `
+    <canvas class="event-detail-canvas" id="modal-canvas"></canvas>
+    <div class="event-detail-title">${ev.title}</div>
+    <div class="info-grid">
+      <div class="info-item"><div class="info-label">تاریخ و ساعت</div><div class="info-value">📅 ${ev.date} — ${ev.time}</div></div>
+      <div class="info-item"><div class="info-label">شهر و مکان</div><div class="info-value">📍 ${ev.city}</div></div>
+      <div class="info-item"><div class="info-label">هیئت ورزشی</div><div class="info-value">🏅 ${ev.board}</div></div>
+      <div class="info-item"><div class="info-label">رشته</div><div class="info-value">⚡ ${ev.sport}</div></div>
+      <div class="info-item"><div class="info-label">ظرفیت کل</div><div class="info-value">${ev.capacity} نفر</div></div>
+      <div class="info-item"><div class="info-label">ظرفیت باقی‌مانده</div><div class="info-value" style="color:${full?'var(--danger)':'var(--palm)'}">${full ? '🔴 تکمیل' : `🟢 ${ev.capacity-ev.registered} نفر`}</div></div>
+    </div>
+    <p class="info-item" style="margin-bottom:12px"><div class="info-label">آدرس</div><div class="info-value">🏢 ${ev.location}</div></p>
+    <div class="event-desc">${ev.desc}</div>
+    <div class="share-row">
+      <span style="font-size:12px;color:var(--gray-400);align-self:center">اشتراک‌گذاری:</span>
+      <button class="share-btn share-whatsapp" onclick="shareEvent('واتساپ')">📱 واتساپ</button>
+      <button class="share-btn share-eitaa" onclick="shareEvent('ایتا')">💬 ایتا</button>
+      <button class="share-btn share-soroush" onclick="shareEvent('سروش')">📡 سروش</button>
+      <button class="share-btn share-bale" onclick="shareEvent('بله')">✅ بله</button>
+    </div>
+    <div class="terms-box">
+      <strong>قوانین و مقررات رویداد</strong><br><br>
+      ۱. ارائه کارت ورزشکاری یا مدرک شناسایی معتبر در روز برگزاری الزامی است.<br>
+      ۲. شرکت‌کننده باید واجد شرایط سنی و جسمانی مندرج در شیوه‌نامه رویداد باشد.<br>
+      ۳. رعایت پوشش ورزشی مناسب و آیین‌نامه انضباطی اداره کل الزامی است.<br>
+      ۴. غیبت غیرموجه موجب محرومیت در دوره‌های بعدی خواهد شد.<br>
+      ۵. اداره کل ورزش حق لغو یا تغییر تاریخ رویداد را در شرایط اضطراری محفوظ می‌دارد.
+    </div>
+    <label class="terms-check">
+      <input type="checkbox" id="termsChk" onchange="document.getElementById('btnNextStep').disabled=!this.checked">
+      قوانین و مقررات رویداد را مطالعه کرده و می‌پذیرم
+    </label>
+    <button class="btn btn-primary" id="btnNextStep" disabled onclick="showStep2()">${full ? '➕ ثبت در لیست انتظار' : '← مرحله بعد: ثبت‌نام'}</button>`;
+
+  requestAnimationFrame(() => {
+    const c = document.getElementById('modal-canvas');
+    if(c) drawPoster(c, ev, c.parentElement.offsetWidth||520, 180);
+  });
+}
+
+function showStep2() {
+  document.getElementById('modalTitle').textContent = 'ثبت‌نام';
+  const boardOptions = Object.keys(BOARDS).map(b=>`<option${b===currentEvent.board?' selected':''}>${b}</option>`).join('');
+  document.getElementById('modalBody').innerHTML = `
+    <div class="steps-bar">
+      <div class="step done"><div class="step-circle">✓</div><div class="step-label">جزئیات</div></div>
+      <div class="step active"><div class="step-circle">۲</div><div class="step-label">ثبت‌نام</div></div>
+      <div class="step"><div class="step-circle">۳</div><div class="step-label">تاییدیه</div></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">نام <span class="required">*</span></label>
+        <input class="form-control" id="f-fname" type="text" placeholder="نام">
+        <div class="form-error" id="e-fname">نام را وارد کنید</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">نام خانوادگی <span class="required">*</span></label>
+        <input class="form-control" id="f-lname" type="text" placeholder="نام خانوادگی">
+        <div class="form-error" id="e-lname">نام خانوادگی را وارد کنید</div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">کد ملی <span class="required">*</span></label>
+      <input class="form-control" id="f-nid" type="text" maxlength="10" placeholder="۱۰ رقم" oninput="this.value=this.value.replace(/\D/g,'');checkNID()">
+      <div class="form-error" id="e-nid">کد ملی معتبر نیست</div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">تاریخ تولد (شمسی) <span class="required">*</span></label>
+      <input class="form-control" id="f-dob" type="text" placeholder="مثال: ۱۳۸۵/۰۳/۱۵" oninput="calcAge()">
+      <div class="form-error" id="e-dob">تاریخ تولد را به درستی وارد کنید</div>
+    </div>
+    <div class="form-group" id="ageCatWrap" style="display:none">
+      <label class="form-label">رده سنی (محاسبه خودکار)</label>
+      <div class="age-category-display" id="ageCatDisplay">—</div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">آدرس کامل <span class="required">*</span></label>
+      <input class="form-control" id="f-addr" type="text" placeholder="شهر، خیابان، کوچه...">
+      <div class="form-error" id="e-addr">آدرس را وارد کنید</div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">شماره همراه <span class="required">*</span></label>
+      <div class="otp-wrap">
+        <input class="form-control" id="f-phone" type="tel" maxlength="11" placeholder="۰۹۱۲۳۴۵۶۷۸۹" oninput="this.value=this.value.replace(/\D/g,'')">
+        <button class="btn-send-otp" onclick="sendOTP()">ارسال کد</button>
+      </div>
+      <div class="otp-code-display" id="otpDisplay">
+        کد تایید شما (نمایش موقت):<span class="code" id="otpCode"></span>
+      </div>
+    </div>
+    <div class="form-group" id="otpVerifyWrap" style="display:none">
+      <label class="form-label">کد تایید</label>
+      <input class="form-control" id="f-otp" type="text" maxlength="6" placeholder="کد ۶ رقمی">
+      <div class="form-error" id="e-otp">کد تایید اشتباه است</div>
+    </div>
+    <hr style="border:none;border-top:1px solid var(--gray-100);margin:14px 0">
+    <div class="form-group">
+      <label class="form-label">جنسیت</label>
+      <div class="gender-btns">
+        <button class="gender-btn" id="gb-male" onclick="selectGender('male')">👨 آقا</button>
+        <button class="gender-btn" id="gb-female" onclick="selectGender('female')">👩 خانم</button>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">نقش</label>
+      <select class="form-control" id="f-role">
+        <option value="">انتخاب کنید</option>
+        <option>ورزشکار</option><option>مربی</option><option>سرمربی</option>
+        <option>داور</option><option>دست‌اندرکار</option><option>کادر پزشکی</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">هیئت ورزشی</label>
+        <select class="form-control" id="f-board" onchange="updateSports()">${boardOptions}</select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">رشته ورزشی</label>
+        <select class="form-control" id="f-sport"></select>
+      </div>
+    </div>
+    <div class="btn-row" style="margin-top:8px">
+      <button class="btn btn-secondary" onclick="showStep1()">← بازگشت</button>
+      <button class="btn btn-primary" onclick="submitForm()">ثبت‌نام نهایی ✓</button>
+    </div>`;
+  updateSports();
+}
+
+let selectedGender = '';
+let generatedOTP = '';
+let verifiedPhone = false;
+
+function selectGender(g) {
+  selectedGender = g;
+  document.getElementById('gb-male').className='gender-btn'+(g==='male'?' selected':'');
+  document.getElementById('gb-female').className='gender-btn'+(g==='female'?' selected':'');
+}
+
+function updateSports() {
+  const board = document.getElementById('f-board')?.value;
+  const sportSel = document.getElementById('f-sport');
+  if(!sportSel) return;
+  const sports = BOARDS[board] || [];
+  sportSel.innerHTML = sports.map(s=>`<option>${s}</option>`).join('');
+}
+
+function calcAge() {
+  const val = document.getElementById('f-dob')?.value || '';
+  const parts = val.replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d)).split('/');
+  if(parts.length !== 3) { document.getElementById('ageCatWrap').style.display='none'; return; }
+  const year = parseInt(parts[0]);
+  const nowYear = 1403;
+  const age = nowYear - year;
+  if(isNaN(age)||age<0||age>120) { document.getElementById('ageCatWrap').style.display='none'; return; }
+  const cat = AGE_CATS.find(c => age>=c.min && age<=c.max);
+  if(cat) {
+    document.getElementById('ageCatDisplay').innerHTML = `${cat.emoji} ${cat.name} (${age} سال)`;
+    document.getElementById('ageCatWrap').style.display='block';
+    document.getElementById('e-dob').classList.remove('show');
+    document.getElementById('f-dob').classList.remove('error');
+  }
+}
+
+function checkNID() {
+  const nid = document.getElementById('f-nid')?.value || '';
+  if(nid.length !== 10) return;
+  const valid = validateNID(nid);
+  document.getElementById('f-nid').classList.toggle('error', !valid);
+  document.getElementById('e-nid').classList.toggle('show', !valid);
+}
+
+function validateNID(n) {
+  if(n.length!==10||/^(.)\1{9}$/.test(n)) return false;
+  let s=0;
+  for(let i=0;i<9;i++) s+=parseInt(n[i])*(10-i);
+  const r=s%11;
+  return r<2 ? r===parseInt(n[9]) : (11-r)===parseInt(n[9]);
+}
+
+function sendOTP() {
+  const phone = document.getElementById('f-phone')?.value || '';
+  if(phone.length<10 || !phone.startsWith('09')) { showToast('شماره همراه معتبر وارد کنید','error'); return; }
+  generatedOTP = String(Math.floor(100000+Math.random()*900000));
+  document.getElementById('otpCode').textContent = generatedOTP;
+  document.getElementById('otpDisplay').style.display='block';
+  document.getElementById('otpVerifyWrap').style.display='block';
+  showToast('کد تایید نمایش داده شد (حالت آزمایشی)','success');
+}
+
+function submitForm() {
+  let ok = true;
+  const fname = document.getElementById('f-fname')?.value.trim()||'';
+  const lname = document.getElementById('f-lname')?.value.trim()||'';
+  const nid = document.getElementById('f-nid')?.value.trim()||'';
+  const dob = document.getElementById('f-dob')?.value.trim()||'';
+  const addr = document.getElementById('f-addr')?.value.trim()||'';
+  const phone = document.getElementById('f-phone')?.value.trim()||'';
+  const otp = document.getElementById('f-otp')?.value.trim()||'';
+
+  if(!fname){document.getElementById('e-fname').classList.add('show');document.getElementById('f-fname').classList.add('error');ok=false;}
+  else{document.getElementById('e-fname').classList.remove('show');document.getElementById('f-fname').classList.remove('error');}
+  if(!lname){document.getElementById('e-lname').classList.add('show');document.getElementById('f-lname').classList.add('error');ok=false;}
+  else{document.getElementById('e-lname').classList.remove('show');document.getElementById('f-lname').classList.remove('error');}
+  if(!validateNID(nid)){document.getElementById('e-nid').classList.add('show');document.getElementById('f-nid').classList.add('error');ok=false;}
+  else{document.getElementById('e-nid').classList.remove('show');document.getElementById('f-nid').classList.remove('error');}
+  if(!dob){document.getElementById('e-dob').classList.add('show');document.getElementById('f-dob').classList.add('error');ok=false;}
+  else{document.getElementById('e-dob').classList.remove('show');document.getElementById('f-dob').classList.remove('error');}
+  if(!addr){document.getElementById('e-addr').classList.add('show');document.getElementById('f-addr').classList.add('error');ok=false;}
+  else{document.getElementById('e-addr').classList.remove('show');document.getElementById('f-addr').classList.remove('error');}
+
+  if(generatedOTP && otp !== generatedOTP){document.getElementById('e-otp').classList.add('show');ok=false;}
+  else if(document.getElementById('e-otp')){document.getElementById('e-otp').classList.remove('show');}
+
+  if(!ok){ showToast('لطفاً خطاهای فرم را برطرف کنید','error'); return; }
+
+  // Check duplicate
+  const dup = registrations.find(r=>r.eventId===currentEvent.id && r.nid===nid);
+  if(dup){ showToast('شما قبلاً در این رویداد ثبت‌نام کرده‌اید','error'); return; }
+
+  const ev = currentEvent;
+  const full = ev.registered >= ev.capacity;
+  const regCode = 'SB-'+ev.id+'-'+Date.now().toString(36).toUpperCase().slice(-6);
+  const catEl = document.getElementById('ageCatDisplay');
+  const ageCategory = catEl ? catEl.textContent.trim() : '';
+  const role = document.getElementById('f-role')?.value||'';
+  const board = document.getElementById('f-board')?.value||ev.board;
+  const sport = document.getElementById('f-sport')?.value||ev.sport;
+  const gender = selectedGender==='male'?'آقا':selectedGender==='female'?'خانم':'';
+
+  const reg = {
+    id: regCode, eventId: ev.id, eventTitle: ev.title,
+    fname, lname, nid, dob, addr, phone, ageCategory, role, board, sport, gender,
+    date: new Date().toLocaleDateString('fa-IR'),
+    isWaitlist: full
+  };
+
+  registrations.push(reg);
+  saveToStorage('registrations', registrations);
+
+  if(!full) {
+    ev.registered++;
+    saveToStorage('events', events);
+  }
+
+  showStep3(reg, full);
+}
+
+function showStep3(reg, isWaitlist) {
+  document.getElementById('modalTitle').textContent = isWaitlist ? 'ثبت در لیست انتظار' : 'تاییدیه ثبت‌نام';
+  document.getElementById('modalBody').innerHTML = `
+    <div class="steps-bar">
+      <div class="step done"><div class="step-circle">✓</div><div class="step-label">جزئیات</div></div>
+      <div class="step done"><div class="step-circle">✓</div><div class="step-label">ثبت‌نام</div></div>
+      <div class="step active"><div class="step-circle">۳</div><div class="step-label">تاییدیه</div></div>
+    </div>
+    <div class="success-view">
+      <div class="success-icon">${isWaitlist?'⏳':'🎉'}</div>
+      <div class="success-title">${isWaitlist?'در لیست انتظار ثبت شدید':'ثبت‌نام با موفقیت انجام شد!'}</div>
+      <div class="success-desc">${isWaitlist?`${reg.fname} ${reg.lname} عزیز، در لیست انتظار قرار گرفتید و با آزاد شدن ظرفیت به شما اطلاع داده می‌شود.`:`${reg.fname} ${reg.lname} عزیز، ثبت‌نام شما در رویداد <strong>${currentEvent.title}</strong> با موفقیت ثبت شد.`}</div>
+      <div class="reg-code-box">
+        <div class="reg-code-label">کد ثبت‌نام یکتا</div>
+        <div class="reg-code">${reg.id}</div>
+      </div>
+    </div>
+    <div class="pdf-card">
+      <div class="pdf-header">
+        <div class="pdf-org">اداره کل ورزش و جوانان<br>سیستان و بلوچستان</div>
+        <div class="pdf-title">تاییدیه ثبت‌نام<br><small style="font-size:12px;font-weight:400">${currentEvent.title}</small></div>
+        <div style="font-size:28px">🏆</div>
+      </div>
+      <div class="pdf-info-grid">
+        <div class="pdf-info-item"><div class="pdf-info-label">نام و نام خانوادگی</div><div class="pdf-info-value">${reg.fname} ${reg.lname}</div></div>
+        <div class="pdf-info-item"><div class="pdf-info-label">کد ملی</div><div class="pdf-info-value">${reg.nid}</div></div>
+        <div class="pdf-info-item"><div class="pdf-info-label">رده سنی</div><div class="pdf-info-value">${reg.ageCategory||'—'}</div></div>
+        <div class="pdf-info-item"><div class="pdf-info-label">نقش</div><div class="pdf-info-value">${reg.role||'—'}</div></div>
+        <div class="pdf-info-item"><div class="pdf-info-label">هیئت</div><div class="pdf-info-value">${reg.board}</div></div>
+        <div class="pdf-info-item"><div class="pdf-info-label">رشته</div><div class="pdf-info-value">${reg.sport}</div></div>
+        <div class="pdf-info-item"><div class="pdf-info-label">تاریخ ثبت‌نام</div><div class="pdf-info-value">${reg.date}</div></div>
+        <div class="pdf-info-item"><div class="pdf-info-label">شهر</div><div class="pdf-info-value">${currentEvent.city}</div></div>
+      </div>
+      <div class="pdf-qr-row">
+        <div class="pdf-signature">
+          <div>امضاء مسئول ثبت‌نام:</div>
+          <div class="pdf-sign-line"></div>
+        </div>
+        <div style="text-align:center">
+          <canvas id="qrCanvas" width="80" height="80"></canvas>
+          <div style="font-size:10px;color:var(--gray-400);margin-top:4px">${reg.id}</div>
+        </div>
+      </div>
+      <div style="text-align:center;font-size:10px;color:var(--gray-400);margin-top:10px;padding-top:8px;border-top:1px dashed var(--gray-200)">طراحی و پیاده‌سازی: امین عزیزی مقدم — اداره کل ورزش و جوانان سیستان و بلوچستان</div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="closeModal()">بستن</button>
+      <button class="btn btn-success" onclick="printCard()">🖨️ چاپ / ذخیره PDF</button>
+    </div>`;
+
+  drawSimpleQR(reg.id);
+}
+
+function drawSimpleQR(text) {
+  const c = document.getElementById('qrCanvas');
+  if(!c) return;
+  const ctx = c.getContext('2d');
+  ctx.fillStyle='white'; ctx.fillRect(0,0,80,80);
+  const size=6; const cells=12;
+  for(let i=0;i<cells;i++){
+    for(let j=0;j<cells;j++){
+      const hash=(text.charCodeAt(i%text.length)*31+j*17+i*13)%7;
+      if(hash<4||(i<3&&j<3)||(i<3&&j>8)||(i>8&&j<3)){
+        ctx.fillStyle='#1A5276';
+        ctx.fillRect(j*size+4, i*size+4, size-1, size-1);
+      }
+    }
+  }
+  ctx.strokeStyle='#1A5276'; ctx.lineWidth=2;
+  ctx.strokeRect(4,4,72,72);
+}
+
+function printCard() {
+  window.print();
+}
+
+function shareEvent(platform) {
+  showToast(`اشتراک‌گذاری در ${platform} انجام شد`, 'success');
+}
+
+// ===== PROFILE =====
+function searchProfile() {
+  const nid = document.getElementById('profileSearchInput')?.value.trim()||'';
+  if(nid.length < 10) { document.getElementById('profileResult').innerHTML='<div class="empty-state"><div class="icon">🏃</div><p>کد ملی ۱۰ رقمی خود را وارد کنید</p></div>'; return; }
+  const userRegs = registrations.filter(r=>r.nid===nid);
+  if(!userRegs.length){ document.getElementById('profileResult').innerHTML='<div class="empty-state"><div class="icon">🔍</div><p>سابقه‌ای برای این کد ملی یافت نشد</p></div>'; return; }
+  const first = userRegs[0];
+  const total = userRegs.length;
+  const competitions = userRegs.filter(r=>{ const e=getEventById(r.eventId); return e&&e.type==='مسابقه'; }).length;
+  document.getElementById('profileResult').innerHTML=`
+    <div class="profile-card">
+      <div class="profile-card-header">
+        <div class="profile-avatar">👤</div>
+        <div>
+          <div class="profile-name">${first.fname} ${first.lname}</div>
+          <div class="profile-national-id">کد ملی: ${nid}</div>
+          <div class="profile-national-id">${first.ageCategory||''} — ${first.gender||''}</div>
+        </div>
+      </div>
+      <div class="stat-chips">
+        <div class="stat-chip"><span class="num">${total}</span>رویداد</div>
+        <div class="stat-chip"><span class="num">${competitions}</span>مسابقه</div>
+        <div class="stat-chip"><span class="num">${total-competitions}</span>همایش/جشنواره</div>
+      </div>
+      <div class="history-list">
+        ${userRegs.map(r=>{
+          const ev = getEventById(r.eventId)||{};
+          return `<div class="history-item">
+            <div class="history-icon">${ev.type==='مسابقه'?'🏅':ev.type==='همایش'?'🎓':'🎉'}</div>
+            <div class="history-info">
+              <div class="history-title">${r.eventTitle}</div>
+              <div class="history-date">📅 ${r.date} | 📍 ${ev.city||''} | ${r.board} — ${r.sport}</div>
+            </div>
+            <span class="history-rank rank-gold">کد: ${r.id}</span>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+}
+
+// ===== ADMIN =====
+function loadAdmin() {
+  // City dropdown
+  const citySelect = document.getElementById('admin-event-city');
+  if(citySelect) { citySelect.innerHTML = CITIES.map(c=>`<option>${c}</option>`).join(''); }
+  const boardSelect = document.getElementById('admin-event-board');
+  if(boardSelect) { boardSelect.innerHTML = Object.keys(BOARDS).map(b=>`<option>${b}</option>`).join(''); updateAdminSports(); }
+  renderAdminRegs();
+}
+
+function updateAdminSports() {
+  const board = document.getElementById('admin-event-board')?.value;
+  const sportSel = document.getElementById('admin-event-sport');
+  if(!sportSel) return;
+  sportSel.innerHTML = (BOARDS[board]||[]).map(s=>`<option>${s}</option>`).join('');
+}
+
+function addEvent() {
+  const title = document.getElementById('admin-event-title')?.value.trim();
+  if(!title){ showToast('عنوان رویداد را وارد کنید','error'); return; }
+  const capacity = parseInt(document.getElementById('admin-event-capacity')?.value)||50;
+  const newEv = {
+    id: Date.now(),
+    title,
+    type: document.getElementById('admin-event-type')?.value||'مسابقه',
+    city: document.getElementById('admin-event-city')?.value||CITIES[0],
+    board: document.getElementById('admin-event-board')?.value||'فوتبال',
+    sport: document.getElementById('admin-event-sport')?.value||'',
+    date: document.getElementById('admin-event-date')?.value||'۱۴۰۴/—',
+    time: '۰۸:۰۰',
+    location: document.getElementById('admin-event-location')?.value||'',
+    capacity,
+    registered: 0,
+    desc: document.getElementById('admin-event-desc')?.value||'اطلاعات بیشتر به زودی...'
+  };
+  events.unshift(newEv);
+  saveToStorage('events', events);
+  renderSlider();
+  applyFilter();
+  renderAdminRegs();
+  showToast('رویداد جدید با موفقیت اضافه شد ✅','success');
+  document.getElementById('admin-event-title').value='';
+  document.getElementById('admin-event-desc').value='';
+}
+
+function renderAdminRegs() {
+  const el = document.getElementById('adminRegList');
+  if(!el) return;
+  if(!registrations.length){ el.innerHTML='<div class="empty-state"><div class="icon">📋</div><p>هنوز ثبت‌نامی انجام نشده</p></div>'; return; }
+  el.innerHTML=`<table style="width:100%;border-collapse:collapse;font-size:13px">
+    <tr style="background:var(--ocean);color:white">
+      <th style="padding:8px;text-align:right">نام</th>
+      <th style="padding:8px;text-align:right">رویداد</th>
+      <th style="padding:8px;text-align:right">کد</th>
+      <th style="padding:8px;text-align:right">تاریخ</th>
+    </tr>
+    ${registrations.slice().reverse().map((r,i)=>`<tr style="background:${i%2?'var(--gray-50)':'white'}">
+      <td style="padding:8px">${r.fname} ${r.lname}</td>
+      <td style="padding:8px">${r.eventTitle}</td>
+      <td style="padding:8px;font-family:monospace;font-size:11px">${r.id}</td>
+      <td style="padding:8px">${r.date}</td>
+    </tr>`).join('')}
+  </table>`;
+}
+
+// ===== NAVIGATION =====
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  event.target.classList.add('active');
+  if(name==='admin') loadAdmin();
+  window.scrollTo(0,0);
+}
+
+// ===== MODAL =====
+function openModal() {
+  document.getElementById('modalOverlay').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('open');
+  document.body.style.overflow='';
+}
+
+function closeModalOut(e) {
+  if(e.target === document.getElementById('modalOverlay')) closeModal();
+}
+
+// ===== TOAST =====
+function showToast(msg, type='') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (type?' '+type:'');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(()=>t.className='toast', 3000);
+}
+
+// ===== INIT =====
+window.addEventListener('DOMContentLoaded', () => {
+  renderSlider();
+  renderEvents(events);
+});
+
+window.addEventListener('resize', () => {
+  const featured = events.slice(0,4);
+  featured.forEach((ev, i) => {
+    const c = document.getElementById(`slide-canvas-${i}`);
+    if(c) drawPoster(c, ev, c.parentElement?.offsetWidth||360, 240);
+  });
+  events.forEach(ev => {
+    const c = document.getElementById(`card-canvas-${ev.id}`);
+    if(c) drawPoster(c, ev, c.parentElement?.offsetWidth||300, 140);
+  });
+});
+</script>
+</body>
+</html>

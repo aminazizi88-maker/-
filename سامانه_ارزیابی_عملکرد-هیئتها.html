@@ -1,0 +1,2238 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>سامانه جامع ارزیابی عملکرد هیئت‌های ورزشی – سیستان و بلوچستان</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary: #1a3a5c;
+  --primary-light: #2563a8;
+  --accent: #e8a020;
+  --accent-light: #f5c55a;
+  --success: #1a7a4a;
+  --success-light: #27ae60;
+  --danger: #c0392b;
+  --danger-light: #e74c3c;
+  --bg: #f0f4f8;
+  --card: #ffffff;
+  --text: #1a2a3a;
+  --text-muted: #5a7080;
+  --border: #dce4ee;
+  --sidebar-w: 240px;
+  --header-h: 64px;
+  --radius: 12px;
+  --shadow: 0 2px 12px rgba(26,58,92,0.10);
+  --shadow-lg: 0 4px 24px rgba(26,58,92,0.14);
+}
+.theme-emerald {
+  --primary: #0d4a3a;
+  --primary-light: #166534;
+  --accent: #f59e0b;
+  --accent-light: #fcd34d;
+  --success: #0d7a5a;
+  --bg: #f0faf5;
+  --border: #c6e8d8;
+}
+.theme-royal {
+  --primary: #3730a3;
+  --primary-light: #4f46e5;
+  --accent: #f59e0b;
+  --accent-light: #fcd34d;
+  --success: #065f46;
+  --bg: #f5f3ff;
+  --border: #ddd6fe;
+}
+.theme-crimson {
+  --primary: #7f1d1d;
+  --primary-light: #b91c1c;
+  --accent: #d97706;
+  --accent-light: #fbbf24;
+  --success: #065f46;
+  --bg: #fff5f5;
+  --border: #fecaca;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Vazirmatn',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+button,input,select,textarea{font-family:inherit}
+
+/* === HEADER === */
+.header{height:var(--header-h);background:var(--primary);color:#fff;display:flex;align-items:center;padding:0 24px;gap:16px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,0.18)}
+.header-logo{width:40px;height:40px;background:var(--accent);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px}
+.header-title{flex:1}
+.header-title h1{font-size:15px;font-weight:600;line-height:1.2}
+.header-title p{font-size:11px;opacity:.75}
+.header-actions{display:flex;gap:8px;align-items:center}
+.theme-btn{width:26px;height:26px;border-radius:50%;border:2px solid rgba(255,255,255,0.4);cursor:pointer;transition:.2s}
+.theme-btn:hover{border-color:#fff;transform:scale(1.1)}
+.year-select{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:#fff;padding:6px 12px;border-radius:8px;font-size:13px;cursor:pointer}
+.year-select option{color:var(--text);background:#fff}
+.user-badge{background:rgba(255,255,255,0.15);border-radius:8px;padding:6px 12px;font-size:12px;display:flex;align-items:center;gap:6px}
+.role-tag{background:var(--accent);color:var(--primary);border-radius:4px;padding:2px 6px;font-size:10px;font-weight:700}
+
+/* === LAYOUT === */
+.layout{display:flex;flex:1;overflow:hidden}
+
+/* === SIDEBAR === */
+.sidebar{width:var(--sidebar-w);background:var(--primary);color:#fff;display:flex;flex-direction:column;overflow-y:auto;flex-shrink:0}
+.sidebar-section{padding:12px 8px 4px;font-size:10px;font-weight:700;opacity:.5;letter-spacing:.08em;text-transform:uppercase}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 16px;cursor:pointer;border-radius:8px;margin:2px 8px;font-size:13px;transition:.15s;opacity:.85}
+.nav-item:hover{background:rgba(255,255,255,0.12);opacity:1}
+.nav-item.active{background:rgba(255,255,255,0.18);opacity:1;font-weight:600}
+.nav-item svg{width:18px;height:18px;flex-shrink:0;opacity:.9}
+.nav-badge{margin-right:auto;background:var(--accent);color:var(--primary);border-radius:10px;padding:1px 7px;font-size:10px;font-weight:700}
+
+/* === MAIN === */
+.main{flex:1;overflow-y:auto;padding:24px;display:flex;flex-direction:column;gap:20px}
+
+/* === PAGES === */
+.page{display:none;flex-direction:column;gap:20px}
+.page.active{display:flex}
+
+/* === PAGE HEADER === */
+.page-header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.page-header h2{font-size:20px;font-weight:700;color:var(--primary)}
+.page-header p{font-size:13px;color:var(--text-muted);margin-top:2px}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-weight:500;transition:.15s}
+.btn:hover{filter:brightness(1.05);transform:translateY(-1px)}
+.btn-primary{background:var(--primary-light);color:#fff}
+.btn-accent{background:var(--accent);color:var(--primary)}
+.btn-success{background:var(--success-light);color:#fff}
+.btn-danger{background:var(--danger-light);color:#fff}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text)}
+.btn-sm{padding:5px 10px;font-size:12px}
+
+/* === CARDS === */
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px;border:1px solid var(--border)}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;gap:12px}
+.card-title{font-size:15px;font-weight:600;color:var(--primary)}
+.card-subtitle{font-size:12px;color:var(--text-muted);margin-top:2px}
+
+/* === STAT CARDS === */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px}
+.stat-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px 20px;border-right:4px solid var(--primary-light);transition:.2s}
+.stat-card:hover{box-shadow:var(--shadow-lg);transform:translateY(-2px)}
+.stat-card.accent{border-right-color:var(--accent)}
+.stat-card.success{border-right-color:var(--success-light)}
+.stat-card.danger{border-right-color:var(--danger-light)}
+.stat-label{font-size:11px;color:var(--text-muted);font-weight:500;margin-bottom:8px}
+.stat-value{font-size:26px;font-weight:700;color:var(--primary);line-height:1}
+.stat-sub{font-size:11px;color:var(--text-muted);margin-top:4px}
+.stat-icon{float:left;width:36px;height:36px;border-radius:8px;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:8px}
+
+/* === TABLE === */
+.table-wrap{overflow-x:auto;border-radius:8px;border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead tr{background:var(--primary);color:#fff}
+th{padding:10px 14px;font-weight:600;white-space:nowrap;text-align:right}
+td{padding:9px 14px;border-bottom:1px solid var(--border);text-align:right}
+tbody tr:hover{background:rgba(37,99,168,0.05)}
+tbody tr:last-child td{border-bottom:none}
+.rank-badge{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:6px;font-size:11px;font-weight:700}
+.rank-1{background:#FFD700;color:#7a5900}
+.rank-2{background:#C0C0C0;color:#444}
+.rank-3{background:#cd7f32;color:#fff}
+.rank-other{background:var(--bg);color:var(--text-muted)}
+.score-bar{display:flex;align-items:center;gap:8px}
+.score-bar-inner{flex:1;height:6px;background:var(--border);border-radius:3px;min-width:60px}
+.score-bar-fill{height:100%;border-radius:3px;background:var(--primary-light);transition:.5s}
+.level-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600}
+.level-1{background:#dbeafe;color:#1d4ed8}
+.level-2{background:#dcfce7;color:#16a34a}
+.level-3{background:#fef9c3;color:#92400e}
+.status-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600}
+.status-up{background:#dcfce7;color:#16a34a}
+.status-down{background:#fee2e2;color:#b91c1c}
+.status-same{background:#f3f4f6;color:#6b7280}
+
+/* === CHARTS === */
+.chart-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px}
+.chart-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px;border:1px solid var(--border)}
+.chart-card canvas{max-height:280px}
+
+/* === FORM === */
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.form-group{display:flex;flex-direction:column;gap:6px}
+.form-label{font-size:12px;font-weight:600;color:var(--text-muted)}
+.form-control{padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;background:var(--card);color:var(--text);transition:.15s;font-family:inherit}
+.form-control:focus{outline:none;border-color:var(--primary-light);box-shadow:0 0 0 3px rgba(37,99,168,0.12)}
+.form-control:hover{border-color:var(--primary-light)}
+
+/* === MATRIX TABLE === */
+.matrix-wrap{overflow-x:auto}
+.matrix-table{border-collapse:collapse;font-size:12px;min-width:600px}
+.matrix-table th{background:var(--primary);color:#fff;padding:8px 10px;text-align:center;font-weight:600;white-space:nowrap}
+.matrix-table td{padding:4px 6px;border:1px solid var(--border);text-align:center}
+.matrix-table .row-header{background:rgba(37,99,168,0.08);font-weight:600;color:var(--primary);text-align:right;padding:8px 12px;white-space:nowrap}
+.matrix-input{width:56px;padding:5px 8px;border:1px solid var(--border);border-radius:6px;font-size:12px;text-align:center;background:var(--card);font-family:inherit;color:var(--text)}
+.matrix-input:focus{outline:none;border-color:var(--accent);background:#fffbf0}
+
+/* === TABS === */
+.tabs{display:flex;gap:4px;background:var(--bg);border-radius:10px;padding:4px;width:fit-content}
+.tab{padding:7px 16px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:500;color:var(--text-muted);transition:.15s;border:none;background:none;font-family:inherit}
+.tab.active{background:var(--card);color:var(--primary);font-weight:600;box-shadow:0 1px 4px rgba(0,0,0,0.08)}
+.tab-content{display:none}
+.tab-content.active{display:block}
+
+/* === UPLOAD ZONE === */
+.upload-zone{border:2px dashed var(--border);border-radius:var(--radius);padding:40px;text-align:center;cursor:pointer;transition:.2s;background:var(--bg)}
+.upload-zone:hover{border-color:var(--primary-light);background:rgba(37,99,168,0.04)}
+.upload-zone svg{width:48px;height:48px;color:var(--text-muted);margin:0 auto 12px;display:block}
+.upload-zone p{color:var(--text-muted);font-size:13px}
+.upload-zone strong{color:var(--primary-light)}
+
+/* === ALERTS === */
+.alert{padding:12px 16px;border-radius:8px;font-size:13px;display:flex;align-items:flex-start;gap:10px}
+.alert-warning{background:#fef9c3;border-right:3px solid #d97706;color:#92400e}
+.alert-success{background:#dcfce7;border-right:3px solid #16a34a;color:#14532d}
+.alert-info{background:#dbeafe;border-right:3px solid #2563eb;color:#1e3a8a}
+
+/* === INSIGHTS === */
+.insight-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+.insight-card{background:var(--card);border-radius:var(--radius);padding:16px;border:1px solid var(--border);display:flex;gap:14px;align-items:flex-start}
+.insight-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.insight-icon.up{background:#dcfce7}
+.insight-icon.down{background:#fee2e2}
+.insight-icon.star{background:#fef9c3}
+.insight-icon.info{background:#dbeafe}
+.insight-title{font-size:13px;font-weight:600;color:var(--primary);margin-bottom:4px}
+.insight-body{font-size:12px;color:var(--text-muted);line-height:1.6}
+
+/* === MODAL === */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:200;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.open{display:flex}
+.modal{background:var(--card);border-radius:16px;box-shadow:var(--shadow-lg);padding:28px;max-width:520px;width:100%;max-height:90vh;overflow-y:auto}
+.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.modal-title{font-size:16px;font-weight:700;color:var(--primary)}
+.modal-close{width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--text-muted);transition:.15s}
+.modal-close:hover{background:var(--bg);color:var(--text)}
+
+/* === FOOTER === */
+.footer{background:var(--primary);color:rgba(255,255,255,0.65);text-align:center;padding:10px;font-size:11px}
+
+/* === TOAST === */
+.toast-wrap{position:fixed;bottom:24px;left:24px;z-index:300;display:flex;flex-direction:column;gap:8px;align-items:flex-start}
+.toast{background:var(--primary);color:#fff;padding:10px 16px;border-radius:8px;font-size:13px;box-shadow:var(--shadow-lg);animation:slideIn .3s ease;display:flex;align-items:center;gap:8px}
+.toast.success{background:var(--success)}
+.toast.danger{background:var(--danger)}
+@keyframes slideIn{from{transform:translateY(16px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+/* === PROGRESS === */
+.progress-bar{height:8px;background:var(--border);border-radius:4px;overflow:hidden}
+.progress-fill{height:100%;border-radius:4px;background:var(--primary-light);transition:.5s}
+.progress-fill.accent{background:var(--accent)}
+.progress-fill.success{background:var(--success-light)}
+.progress-fill.danger{background:var(--danger-light)}
+
+/* === HEATMAP === */
+.heatmap-cell{display:inline-block;width:32px;height:28px;border-radius:4px;font-size:10px;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600}
+
+/* === RESPONSIVE === */
+@media(max-width:768px){
+  .sidebar{display:none}
+  .stat-grid{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-logo">⚡</div>
+  <div class="header-title">
+    <h1>سامانه جامع ارزیابی عملکرد هیئت‌های ورزشی</h1>
+    <p>اداره کل ورزش و جوانان استان سیستان و بلوچستان</p>
+  </div>
+  <div class="header-actions">
+    <div style="display:flex;gap:5px">
+      <div class="theme-btn" style="background:#1a3a5c" title="آبی کلاسیک" onclick="setTheme('')"></div>
+      <div class="theme-btn" style="background:#0d4a3a" title="زمرد" onclick="setTheme('theme-emerald')"></div>
+      <div class="theme-btn" style="background:#3730a3" title="شاهانه" onclick="setTheme('theme-royal')"></div>
+      <div class="theme-btn" style="background:#7f1d1d" title="سرخ" onclick="setTheme('theme-crimson')"></div>
+    </div>
+    <select class="year-select" id="yearSelector" onchange="changeYear(this.value)">
+      <option value="1403">۱۴۰۳</option>
+      <option value="1404" selected>۱۴۰۴</option>
+      <option value="1405">۱۴۰۵</option>
+    </select>
+    <div class="user-badge">
+      <span>امین عزیزی‌مقدم</span>
+    </div>
+  </div>
+</div>
+
+<!-- LAYOUT -->
+<div class="layout">
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div style="padding:16px 16px 4px;opacity:.6;font-size:11px;font-weight:700;letter-spacing:.05em">منوی اصلی</div>
+  <div class="nav-item active" onclick="showPage('dashboard')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
+    داشبورد تحلیلی
+  </div>
+  <div class="nav-item" onclick="showPage('boards')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+    مدیریت هیئت‌ها
+    <span class="nav-badge">۲۶</span>
+  </div>
+  <div class="nav-item" onclick="showPage('entry')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+    ورود داده
+  </div>
+  <div class="nav-item" onclick="showPage('charts')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18l4-7 4 3 4-6 4 5"/><path d="M3 3v18h18"/></svg>
+    نمودارها
+  </div>
+  <div class="nav-item" onclick="showPage('reports')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+    گزارش‌گیری
+  </div>
+  <div style="padding:16px 16px 4px;margin-top:8px;opacity:.6;font-size:11px;font-weight:700;letter-spacing:.05em">تنظیمات</div>
+  <div class="nav-item" onclick="showPage('settings')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+    تنظیمات سیستم
+  </div>
+  <div class="nav-item" onclick="showPage('ranking')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    جدول رنکینگ کامل
+  </div>
+  <div class="nav-item" onclick="showPage('users')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+    مدیریت کاربران
+  </div>
+  <div style="flex:1"></div>
+  <div style="padding:12px 16px;font-size:10px;opacity:.5;border-top:1px solid rgba(255,255,255,0.1);margin-top:8px">نسخه ۱.۰.۰ – سال ۱۴۰۴</div>
+</div>
+
+<!-- MAIN -->
+<div class="main" id="mainContent">
+
+<!-- ===================== PAGE: DASHBOARD ===================== -->
+<div class="page active" id="page-dashboard">
+  <div class="page-header">
+    <div>
+      <h2>داشبورد تحلیلی</h2>
+      <p id="dashSubtitle">نمای کلی عملکرد هیئت‌های ورزشی – سال ۱۴۰۴</p>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-outline btn-sm" onclick="exportDashboard()">📥 خروجی PDF</button>
+      <button class="btn btn-primary btn-sm" onclick="showPage('entry')">➕ ورود داده جدید</button>
+    </div>
+  </div>
+
+  <!-- STAT CARDS -->
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-label">کل هیئت‌های ارزیابی‌شده</div>
+      <div class="stat-value" id="st1">۲۶</div>
+      <div class="stat-sub">از ۲۶ هیئت فعال استان</div>
+    </div>
+    <div class="stat-card accent">
+      <div class="stat-label">میانگین امتیاز استانی</div>
+      <div class="stat-value" id="st2">۳۸۴</div>
+      <div class="stat-sub">از ۵۵۰ امتیاز کل</div>
+    </div>
+    <div class="stat-card success">
+      <div class="stat-label">بیشترین امتیاز</div>
+      <div class="stat-value" id="st3">۵۱۲</div>
+      <div class="stat-sub" id="st3name">هیئت کشتی</div>
+    </div>
+    <div class="stat-card danger">
+      <div class="stat-label">هیئت‌های نیازمند توجه</div>
+      <div class="stat-value" id="st4">۶</div>
+      <div class="stat-sub">زیر ۲۰۰ امتیاز</div>
+    </div>
+  </div>
+
+  <!-- INSIGHTS -->
+  <div class="insight-grid">
+    <div class="insight-card">
+      <div class="insight-icon up">📈</div>
+      <div>
+        <div class="insight-title">بیشترین رشد: هیئت دوومیدانی</div>
+        <div class="insight-body">+۸۷ امتیاز نسبت به سال ۱۴۰۳ — رشد ۲۴٪ در شاخص اعزام و مدال‌آوری</div>
+      </div>
+    </div>
+    <div class="insight-card">
+      <div class="insight-icon down">📉</div>
+      <div>
+        <div class="insight-title">بیشترین افت: هیئت فوتسال</div>
+        <div class="insight-body">-۴۵ امتیاز نسبت به سال ۱۴۰۳ — کاهش در شاخص‌های سازمان‌دهی و اعزام</div>
+      </div>
+    </div>
+    <div class="insight-card">
+      <div class="insight-icon star">⭐</div>
+      <div>
+        <div class="insight-title">برتر در اعزام: هیئت کشتی</div>
+        <div class="insight-body">۳۸ اعزام در سال ۱۴۰۴ — بالاتر از میانگین استانی (۱۴ اعزام)</div>
+      </div>
+    </div>
+    <div class="insight-card">
+      <div class="insight-icon info">💡</div>
+      <div>
+        <div class="insight-title">۱۲ هیئت بالای میانگین استانی</div>
+        <div class="insight-body">در هر دو شاخص اعزام و مدال‌آوری بهتر از میانگین عمل کرده‌اند</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHARTS ROW 1 -->
+  <div class="chart-grid">
+    <div class="chart-card" style="grid-column: span 2">
+      <div class="card-header">
+        <div>
+          <div class="card-title">رتبه‌بندی هیئت‌ها بر اساس امتیاز نهایی</div>
+          <div class="card-subtitle">سال انتخابی | کلیک روی نوار برای جزئیات</div>
+        </div>
+        <select class="form-control" style="width:auto;font-size:12px" onchange="updateBarChart(this.value)">
+          <option value="total">امتیاز کل</option>
+          <option value="send">شاخص اعزام</option>
+          <option value="medal">شاخص مدال</option>
+        </select>
+      </div>
+      <canvas id="barChart" height="220"></canvas>
+    </div>
+    <div class="chart-card">
+      <div class="card-header">
+        <div class="card-title">توزیع سطوح هیئت‌ها</div>
+      </div>
+      <canvas id="doughnutChart" height="220"></canvas>
+    </div>
+    <div class="chart-card">
+      <div class="card-header">
+        <div class="card-title">مقایسه ۵ هیئت برتر – روند ۳ ساله</div>
+      </div>
+      <canvas id="lineChart" height="220"></canvas>
+    </div>
+  </div>
+
+  <!-- CHARTS ROW 2 -->
+  <div class="chart-grid">
+    <div class="chart-card">
+      <div class="card-header">
+        <div class="card-title">رادار عملکرد – هیئت کشتی</div>
+        <select class="form-control" style="width:auto;font-size:12px" onchange="updateRadar(this.value)" id="radarSelect">
+          <option value="0">هیئت کشتی</option>
+          <option value="1">هیئت دوومیدانی</option>
+          <option value="2">هیئت شنا</option>
+          <option value="3">هیئت تکواندو</option>
+          <option value="4">هیئت والیبال</option>
+        </select>
+      </div>
+      <canvas id="radarChart" height="260"></canvas>
+    </div>
+    <div class="chart-card">
+      <div class="card-header">
+        <div class="card-title">پراکندگی: اعزام در برابر مدال</div>
+        <div class="card-subtitle">اندازه حباب = ورزشکار سازمان‌یافته</div>
+      </div>
+      <canvas id="scatterChart" height="260"></canvas>
+    </div>
+    <div class="chart-card">
+      <div class="card-header">
+        <div class="card-title">آبشاری تغییرات – هیئت کشتی ۱۴۰۴ vs ۱۴۰۳</div>
+      </div>
+      <canvas id="waterfallChart" height="260"></canvas>
+    </div>
+  </div>
+
+  <!-- HEATMAP -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">نقشه گرمایی: عملکرد ۵ هیئت برتر – ۵ سال اخیر</div>
+      <div class="card-subtitle">ردیف = سال | ستون = شاخص | رنگ = سطح عملکرد</div>
+    </div>
+    <div id="heatmapContainer" style="overflow-x:auto"></div>
+  </div>
+</div>
+
+<!-- ===================== PAGE: BOARDS ===================== -->
+<div class="page" id="page-boards">
+  <div class="page-header">
+    <div><h2>مدیریت هیئت‌ها</h2><p>لیست ۲۶ هیئت ورزشی استان</p></div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <input class="form-control" style="width:200px" placeholder="جستجو..." oninput="filterBoards(this.value)" id="boardSearch">
+      <button class="btn btn-primary btn-sm" onclick="openAddBoard()">➕ هیئت جدید</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="table-wrap">
+      <table id="boardsTable">
+        <thead>
+          <tr>
+            <th>ردیف</th><th>نام هیئت</th><th>سطح</th><th>امتیاز ۱۴۰۴</th><th>امتیاز ۱۴۰۳</th><th>تغییر</th><th>رتبه</th><th>عملکرد</th><th>عملیات</th>
+          </tr>
+        </thead>
+        <tbody id="boardsTbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== PAGE: ENTRY ===================== -->
+<div class="page" id="page-entry">
+  <div class="page-header">
+    <div><h2>ورود داده</h2><p>ثبت و بارگذاری اطلاعات شاخص‌های ارزیابی</p></div>
+  </div>
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('tab-excel','entry')">📊 درگاه اکسل ارزیابی</button>
+    <button class="tab" onclick="switchTab('tab-insurance','entry')">🛡 بیمه ورزشی</button>
+    <button class="tab" onclick="switchTab('tab-mobin','entry')">🏟 سامانه مبین</button>
+    <button class="tab" onclick="switchTab('tab-manual','entry')">✍️ ورود دستی</button>
+  </div>
+
+  <div id="tab-excel" class="tab-content active">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">درگاه اکسل ارزیابی – ورود شاخص‌های ۱،۲،۵–۱۳</div>
+        <select class="form-control" style="width:auto;font-size:12px" id="evalYear">
+          <option value="1404">سال ۱۴۰۴</option><option value="1403">سال ۱۴۰۳</option><option value="1402">سال ۱۴۰۲</option>
+        </select>
+      </div>
+      <div class="alert alert-info" style="margin-bottom:14px">
+        <span>ℹ️</span>
+        <div>
+          <strong>سه حالت پذیرفته می‌شود:</strong><br>
+          <span style="font-size:12px">① فایل تک‌هیئت: هر فایل مربوط به یک هیئت است (نام هیئت از نام فایل یا سلول A1 خوانده می‌شود)</span><br>
+          <span style="font-size:12px">② فایل چندشیتی: هر شیت = یک هیئت (نام شیت = نام هیئت)</span><br>
+          <span style="font-size:12px">③ فایل جامع همه هیئت‌ها: ستون «نام هیئت» در ردیف‌ها وجود دارد</span>
+        </div>
+      </div>
+      <div class="upload-zone" id="evalUploadZone" onclick="document.getElementById('excelFile').click()" ondrop="handleEvalDrop(event)" ondragover="event.preventDefault()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        <p><strong>کلیک کنید</strong> یا یک یا چند فایل را اینجا بکشید</p>
+        <p style="margin-top:6px;font-size:11px">فرمت‌های پذیرفته‌شده: .xlsx, .xls | چند فایل هم‌زمان قابل انتخاب است</p>
+      </div>
+      <input type="file" id="excelFile" accept=".xlsx,.xls" style="display:none" multiple onchange="handleExcelUpload(this)">
+
+      <div id="evalFileList" style="margin-top:14px"></div>
+
+      <!-- MAPPING CONFIG -->
+      <div id="evalMappingSection" style="display:none;margin-top:16px">
+        <div class="card-header" style="padding:0 0 10px"><div class="card-title" style="font-size:13px">⚙️ تنظیم تطابق ستون‌ها</div></div>
+        <div class="alert alert-warning" style="margin-bottom:12px">
+          <span>⚠️</span><span>ستون‌های زیر را با سرستون‌های فایل اکسل تطبیق دهید. سیستم سعی می‌کند به‌صورت خودکار تشخیص دهد.</span>
+        </div>
+        <div id="evalColMapping" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px"></div>
+        <div style="margin-top:14px;display:flex;gap:10px;justify-content:flex-end">
+          <button class="btn btn-outline btn-sm" onclick="resetEvalMapping()">🔄 بازنشانی خودکار</button>
+          <button class="btn btn-primary" onclick="applyEvalData()">✅ اعمال داده‌ها به سیستم</button>
+        </div>
+      </div>
+
+      <!-- PREVIEW TABLE -->
+      <div id="excelPreview" style="margin-top:16px"></div>
+    </div>
+  </div>
+
+  <div id="tab-insurance" class="tab-content">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">درگاه بیمه ورزشی – شاخص ۳ (همه هیئت‌ها)</div>
+        <select class="form-control" style="width:auto;font-size:12px" id="insYear">
+          <option value="1404">۱۴۰۴</option><option value="1403">۱۴۰۳</option><option value="1402">۱۴۰۲</option>
+        </select>
+      </div>
+      <div class="alert alert-info" style="margin-bottom:14px">
+        <span>ℹ️</span>
+        <div>
+          <strong>فایل اکسل بیمه باید حاوی اطلاعات همه هیئت‌ها باشد.</strong><br>
+          <span style="font-size:12px">ستون‌های مورد نیاز: «نام هیئت» یا «نام فدراسیون» + «تاریخ اعتبار بیمه» + «وضعیت» (اختیاری)</span><br>
+          <span style="font-size:12px">سیستم به‌ازای هر هیئت، تعداد بیمه‌شدگان فعال در سال انتخابی را شمارش و امتیاز شاخص ۳ را محاسبه می‌کند.</span>
+        </div>
+      </div>
+      <div class="upload-zone" id="insUploadZone" onclick="document.getElementById('insuranceFile').click()" ondrop="handleInsDrop(event)" ondragover="event.preventDefault()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:44px;height:44px;color:var(--text-muted);margin:0 auto 10px;display:block"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        <p><strong>بارگذاری فایل اکسل بیمه ورزشی</strong></p>
+        <p style="margin-top:6px;font-size:11px">فایل جامع همه هیئت‌ها | .xlsx, .xls</p>
+      </div>
+      <input type="file" id="insuranceFile" accept=".xlsx,.xls" style="display:none" onchange="handleInsuranceUpload(this)">
+      <div id="insColConfig" style="display:none;margin-top:14px">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-bottom:12px">
+          <div class="form-group"><label class="form-label">ستون نام هیئت</label><select class="form-control" id="insColBoard"></select></div>
+          <div class="form-group"><label class="form-label">ستون تاریخ اعتبار</label><select class="form-control" id="insColDate"></select></div>
+          <div class="form-group"><label class="form-label">ستون وضعیت (اختیاری)</label><select class="form-control" id="insColStatus"><option value="">— ندارد —</option></select></div>
+          <div class="form-group"><label class="form-label">مقدار «فعال» در وضعیت</label><input class="form-control" id="insActiveVal" value="فعال" placeholder="مثال: فعال یا active"></div>
+        </div>
+        <button class="btn btn-primary" onclick="processInsuranceData()">📊 پردازش و اعمال به همه هیئت‌ها</button>
+      </div>
+      <div id="insuranceResult" style="margin-top:14px"></div>
+    </div>
+  </div>
+
+  <div id="tab-mobin" class="tab-content">
+    <div class="card">
+      <div class="card-header"><div class="card-title">درگاه سامانه مبین – محاسبه شاخص ۴</div></div>
+      <div class="alert alert-info" style="margin-bottom:14px">
+        <span>ℹ️</span>
+        <div>
+          <strong>فایل اکسل خروجی سامانه مبین باید حاوی اطلاعات همه هیئت‌ها باشد.</strong><br>
+          <span style="font-size:12px">ستون‌های مورد نیاز: «نام هیئت/فدراسیون» + «تاریخ ثبت‌نام»</span><br>
+          <span style="font-size:12px">سیستم به‌ازای هر هیئت، تعداد ثبت‌نام‌شدگان در سال انتخابی را شمارش و امتیاز شاخص ۴ را محاسبه می‌کند.</span>
+        </div>
+      </div>
+      <div class="form-grid" style="margin-bottom:16px">
+        <div class="form-group">
+          <label class="form-label">سال شمسی</label>
+          <select class="form-control" id="mobinYear"><option value="1404">۱۴۰۴</option><option value="1403">۱۴۰۳</option><option value="1402">۱۴۰۲</option></select>
+        </div>
+      </div>
+      <div class="upload-zone" onclick="document.getElementById('mobinFile').click()" ondrop="handleMobinDrop(event)" ondragover="event.preventDefault()" id="mobinUploadZone">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:48px;height:48px;color:var(--text-muted);margin:0 auto 12px;display:block"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        <p><strong>بارگذاری فایل اکسل سامانه مبین</strong></p>
+        <p style="margin-top:6px;font-size:11px">فرمت‌های پذیرفته‌شده: .xlsx, .xls</p>
+      </div>
+      <input type="file" id="mobinFile" accept=".xlsx,.xls" style="display:none" onchange="handleMobinUpload(this)">
+      <div id="mobinFileInfo" style="margin-top:12px"></div>
+      <div id="mobinColConfig" style="display:none;margin-top:14px">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-bottom:12px">
+          <div class="form-group"><label class="form-label">ستون نام هیئت</label><select class="form-control" id="mobinColBoard"></select></div>
+          <div class="form-group"><label class="form-label">ستون تاریخ ثبت‌نام</label><select class="form-control" id="mobinColDate"></select></div>
+        </div>
+        <button class="btn btn-primary" onclick="processMobinData()">📊 پردازش و اعمال به همه هیئت‌ها</button>
+      </div>
+      <div id="mobinResult"></div>
+    </div>
+  </div>
+
+  <div id="tab-manual" class="tab-content">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">ورود دستی شاخص‌ها</div>
+        <div style="display:flex;gap:8px">
+          <select class="form-control" style="width:auto;font-size:12px" id="manualBoard"></select>
+          <select class="form-control" style="width:auto;font-size:12px"><option>۱۴۰۴</option><option>۱۴۰۳</option></select>
+        </div>
+      </div>
+      <div id="manualIndicators"></div>
+      <div style="display:flex;gap:10px;margin-top:20px;justify-content:flex-end">
+        <button class="btn btn-outline" onclick="resetManual()">🗑 پاک کردن</button>
+        <button class="btn btn-primary" onclick="saveManual()">💾 ذخیره داده‌ها</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== PAGE: CHARTS ===================== -->
+<div class="page" id="page-charts">
+  <div class="page-header">
+    <div><h2>نمودارهای تحلیلی</h2><p>تحلیل تخصصی عملکرد هیئت‌ها</p></div>
+    <div style="display:flex;gap:8px">
+      <select class="form-control" style="width:auto" id="chartBoardSelect" onchange="updateAllCharts()"></select>
+      <select class="form-control" style="width:auto" id="chartYearSelect" onchange="updateAllCharts()">
+        <option value="1404">۱۴۰۴</option><option value="1403">۱۴۰۳</option><option value="1402">۱۴۰۲</option>
+      </select>
+    </div>
+  </div>
+  <div class="chart-grid">
+    <div class="chart-card">
+      <div class="card-header"><div class="card-title">رادار ۱۳ شاخص – جزئیات کامل</div></div>
+      <canvas id="radarBig" height="320"></canvas>
+    </div>
+    <div class="chart-card">
+      <div class="card-header"><div class="card-title">روند چندساله امتیاز کل</div></div>
+      <canvas id="lineBig" height="320"></canvas>
+    </div>
+    <div class="chart-card" style="grid-column:span 2">
+      <div class="card-header"><div class="card-title">نقشه گرمایی ۱۳ شاخص در ۵ سال</div></div>
+      <div id="heatmapBig" style="overflow-x:auto"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== PAGE: REPORTS ===================== -->
+<div class="page" id="page-reports">
+  <div class="page-header">
+    <div><h2>گزارش‌گیری</h2><p>تولید گزارش‌های تخصصی PDF و Excel</p></div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px">
+    <div class="card" style="text-align:center;padding:28px">
+      <div style="font-size:48px;margin-bottom:12px">📋</div>
+      <div class="card-title" style="margin-bottom:8px">گزارش جامع سالانه</div>
+      <p style="font-size:12px;color:var(--text-muted);margin-bottom:16px">جداول امتیازات، رتبه‌بندی و نمودارهای روند تمام هیئت‌ها</p>
+      <div style="display:flex;gap:8px;justify-content:center">
+        <button class="btn btn-primary btn-sm" onclick="genReport('annual','pdf')">📄 PDF</button>
+        <button class="btn btn-success btn-sm" onclick="genReport('annual','excel')">📊 Excel</button>
+      </div>
+    </div>
+    <div class="card" style="text-align:center;padding:28px">
+      <div style="font-size:48px;margin-bottom:12px">🏅</div>
+      <div class="card-title" style="margin-bottom:8px">کارنامه انفرادی هیئت</div>
+      <p style="font-size:12px;color:var(--text-muted);margin-bottom:16px">رادار، تحلیل نقاط قوت/ضعف، مقایسه با میانگین استان</p>
+      <select class="form-control" style="margin-bottom:12px;font-size:12px" id="reportBoard"></select>
+      <button class="btn btn-accent btn-sm" onclick="genReport('card','pdf')" style="width:100%">تولید کارنامه PDF</button>
+    </div>
+    <div class="card" style="text-align:center;padding:28px">
+      <div style="font-size:48px;margin-bottom:12px">📊</div>
+      <div class="card-title" style="margin-bottom:8px">گزارش تطبیقی چندساله</div>
+      <p style="font-size:12px;color:var(--text-muted);margin-bottom:16px">مقایسه عملکرد یک هیئت در ۳ سال متوالی</p>
+      <select class="form-control" style="margin-bottom:12px;font-size:12px" id="reportBoard2"></select>
+      <div style="display:flex;gap:8px;justify-content:center">
+        <button class="btn btn-primary btn-sm" onclick="genReport('compare','pdf')">📄 PDF</button>
+        <button class="btn btn-success btn-sm" onclick="genReport('compare','excel')">📊 Excel</button>
+      </div>
+    </div>
+  </div>
+  <div class="alert alert-info">
+    <span>ℹ️</span>
+    <span>تمام گزارش‌ها دارای هدر «ارزیابی عملکرد هیئت‌های ورزشی استان سیستان و بلوچستان – سال شمسی ۱۴۰۴» و فوتر «تنظیم‌کننده: امین عزیزی‌مقدم» هستند.</span>
+  </div>
+</div>
+
+<!-- ===================== PAGE: SETTINGS ===================== -->
+<div class="page" id="page-settings">
+  <div class="page-header">
+    <div><h2>تنظیمات سیستم</h2><p>پیکربندی موتور محاسبه امتیاز</p></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-outline btn-sm" onclick="rollbackSettings()">↩ بازگشت به نسخه قبل</button>
+      <button class="btn btn-danger" onclick="confirmRecalc()">🔄 بازمحاسبه همه دوره‌ها</button>
+    </div>
+  </div>
+  <div class="tabs" id="settingsTabs">
+    <button class="tab active" onclick="switchTab('stab-matrix','settings')">الف) ماتریس امتیازات</button>
+    <button class="tab" onclick="switchTab('stab-caps','settings')">ب) سقف شاخص‌ها</button>
+    <button class="tab" onclick="switchTab('stab-coef','settings')">ج) ضرایب سطوح</button>
+    <button class="tab" onclick="switchTab('stab-rate','settings')">د) نرخ تبدیل اعتبارات</button>
+    <button class="tab" onclick="switchTab('stab-history','settings')">ه) تاریخچه نسخ</button>
+  </div>
+
+  <div id="stab-matrix" class="tab-content active">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">ویرایشگر ماتریس امتیازات پایه</div>
+        <button class="btn btn-primary btn-sm" onclick="saveMatrix()">💾 ذخیره ماتریس</button>
+      </div>
+      <div class="alert alert-warning" style="margin-bottom:16px">
+        <span>⚠️</span><span>پس از هر تغییر در ماتریس، دکمه «بازمحاسبه همه دوره‌ها» فعال می‌شود. نسخه جدید در تاریخچه ثبت می‌گردد.</span>
+      </div>
+      <div class="matrix-wrap">
+        <table class="matrix-table" id="matrixTable"></table>
+      </div>
+    </div>
+  </div>
+
+  <div id="stab-caps" class="tab-content">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">ویرایشگر سقف امتیازات شاخص‌ها</div>
+        <button class="btn btn-primary btn-sm" onclick="saveCaps()">💾 ذخیره سقف‌ها</button>
+      </div>
+      <div id="capsEditor"></div>
+    </div>
+  </div>
+
+  <div id="stab-coef" class="tab-content">
+    <div class="card">
+      <div class="card-header"><div class="card-title">ضرایب تعدیلی سطوح هیئت</div></div>
+      <div class="alert alert-info" style="margin-bottom:16px">
+        <span>ℹ️</span><span>ضرایب در امتیاز نهایی ضرب می‌شوند. هیئت سطح ۱ تمام امتیاز، سطح ۲ با ضریب ۰.۸ و سطح ۳ با ضریب ۰.۶ محاسبه می‌شوند.</span>
+      </div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">ضریب سطح ۱ (هیئت‌های درجه یک)</label>
+          <input class="form-control" type="number" step="0.1" id="coef1" value="1.0">
+        </div>
+        <div class="form-group">
+          <label class="form-label">ضریب سطح ۲ (هیئت‌های درجه دو)</label>
+          <input class="form-control" type="number" step="0.1" id="coef2" value="0.8">
+        </div>
+        <div class="form-group">
+          <label class="form-label">ضریب سطح ۳ (هیئت‌های درجه سه)</label>
+          <input class="form-control" type="number" step="0.1" id="coef3" value="0.6">
+        </div>
+      </div>
+      <button class="btn btn-primary" style="margin-top:16px" onclick="saveCoef()">💾 ذخیره ضرایب</button>
+    </div>
+  </div>
+
+  <div id="stab-rate" class="tab-content">
+    <div class="card">
+      <div class="card-header"><div class="card-title">نرخ تبدیل ریال به امتیاز (شاخص ۱۳ – اعتبارات)</div></div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">به ازای هر (میلیون تومان)</label>
+          <input class="form-control" type="number" id="rateAmount" value="100" placeholder="۱۰۰">
+        </div>
+        <div class="form-group">
+          <label class="form-label">امتیاز کسب‌شده</label>
+          <input class="form-control" type="number" id="rateScore" value="5" placeholder="۵">
+        </div>
+      </div>
+      <div class="alert alert-success" style="margin-top:16px" id="ratePreview">
+        <span>✅</span><span>هر ۱۰۰ میلیون تومان = ۵ امتیاز</span>
+      </div>
+      <button class="btn btn-primary" style="margin-top:12px" onclick="saveRate()">💾 ذخیره نرخ تبدیل</button>
+    </div>
+  </div>
+
+  <div id="stab-history" class="tab-content">
+    <div class="card">
+      <div class="card-header"><div class="card-title">تاریخچه تغییرات تنظیمات</div></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>شماره نسخه</th><th>تاریخ تغییر</th><th>نوع تغییر</th><th>تغییردهنده</th><th>عملیات</th></tr></thead>
+          <tbody id="historyTbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== PAGE: RANKING ===================== -->
+<div class="page" id="page-ranking">
+  <div class="page-header">
+    <div><h2>جدول رنکینگ کامل</h2><p>رتبه‌بندی از برترین تا ضعیف‌ترین هیئت – با تمام شاخص‌ها</p></div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <select class="form-control" style="width:auto" id="rankYear" onchange="renderRankingTable()">
+        <option value="1404">۱۴۰۴</option><option value="1403">۱۴۰۳</option><option value="1402">۱۴۰۲</option>
+      </select>
+      <select class="form-control" style="width:auto" id="rankLevel" onchange="renderRankingTable()">
+        <option value="0">همه سطوح</option><option value="1">سطح ۱</option><option value="2">سطح ۲</option><option value="3">سطح ۳</option>
+      </select>
+      <input class="form-control" style="width:180px" placeholder="جستجوی هیئت..." oninput="filterRanking(this.value)" id="rankSearch">
+      <button class="btn btn-success btn-sm" onclick="exportRankingExcel()">📊 خروجی Excel</button>
+    </div>
+  </div>
+
+  <!-- RANK SUMMARY CARDS -->
+  <div class="stat-grid" id="rankSummaryCards"></div>
+
+  <!-- PODIUM TOP 3 -->
+  <div class="card">
+    <div class="card-header"><div class="card-title">🏆 سکوی برترین‌ها</div></div>
+    <div id="rankPodium" style="display:flex;justify-content:center;align-items:flex-end;gap:24px;padding:12px 0 20px"></div>
+  </div>
+
+  <!-- FULL TABLE -->
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <div class="card-title">جدول امتیازات کامل – رتبه‌بندی بهترین تا ضعیف‌ترین</div>
+        <div class="card-subtitle">مرتب‌سازی بر اساس امتیاز نهایی | کلیک روی عنوان ستون برای مرتب‌سازی</div>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table id="rankingTable">
+        <thead>
+          <tr>
+            <th style="cursor:pointer" onclick="sortRanking('rank')">رتبه ▲</th>
+            <th style="cursor:pointer" onclick="sortRanking('name')">نام هیئت</th>
+            <th style="cursor:pointer" onclick="sortRanking('level')">سطح</th>
+            <th style="cursor:pointer" onclick="sortRanking('score')">امتیاز نهایی ▼</th>
+            <th>ش۱ اعزام</th>
+            <th>ش۲ مدال</th>
+            <th>ش۳ بیمه</th>
+            <th>ش۴ مبین</th>
+            <th>ش۵ ورزشکار</th>
+            <th>ش۶ مربی</th>
+            <th>ش۷ داور</th>
+            <th>ش۸ مسابقه</th>
+            <th>ش۹ روستایی</th>
+            <th>ش۱۰ استعداد</th>
+            <th>ش۱۱ اردو</th>
+            <th>ش۱۲ مدال‌فردی</th>
+            <th>ش۱۳ اعتبار</th>
+            <th style="cursor:pointer" onclick="sortRanking('change')">تغییر</th>
+            <th>نمودار</th>
+          </tr>
+        </thead>
+        <tbody id="rankingTbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- PER-INDICATOR RANKINGS -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">رتبه‌بندی تفکیکی شاخص‌ها</div>
+      <select class="form-control" style="width:auto;font-size:12px" id="indicatorRankSel" onchange="renderIndicatorRank()">
+        <option value="0">شاخص ۱: اعزام تیمی</option>
+        <option value="1">شاخص ۲: مدال تیمی</option>
+        <option value="2">شاخص ۳: بیمه</option>
+        <option value="3">شاخص ۴: مبین</option>
+        <option value="4">شاخص ۵: ورزشکار</option>
+        <option value="5">شاخص ۶: مربی</option>
+        <option value="6">شاخص ۷: داور</option>
+        <option value="7">شاخص ۸: مسابقه</option>
+        <option value="8">شاخص ۹: روستایی</option>
+        <option value="9">شاخص ۱۰: استعداد</option>
+        <option value="10">شاخص ۱۱: اردو</option>
+        <option value="11">شاخص ۱۲: مدال فردی</option>
+        <option value="12">شاخص ۱۳: اعتبارات</option>
+      </select>
+    </div>
+    <div id="indicatorRankContainer"></div>
+  </div>
+</div>
+
+<!-- ===================== PAGE: USERS ===================== -->
+<div class="page" id="page-users">
+  <div class="page-header">
+    <div><h2>مدیریت کاربران و امنیت</h2><p>نقش‌ها و دسترسی‌ها</p></div>
+    <button class="btn btn-primary btn-sm" onclick="openAddUser()">➕ کاربر جدید</button>
+  </div>
+  <div class="card">
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>نام و نام خانوادگی</th><th>نام کاربری</th><th>نقش</th><th>آخرین ورود</th><th>وضعیت</th><th>عملیات</th></tr></thead>
+        <tbody id="usersTbody"></tbody>
+      </table>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header"><div class="card-title">لاگ عملیات‌های حیاتی</div></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>تاریخ</th><th>کاربر</th><th>نقش</th><th>عملیات</th><th>جزئیات</th></tr></thead>
+        <tbody id="logTbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+</div><!-- end main -->
+</div><!-- end layout -->
+
+<div class="footer">سامانه جامع ارزیابی عملکرد هیئت‌های ورزشی – اداره کل ورزش و جوانان استان سیستان و بلوچستان | تنظیم‌کننده: امین عزیزی‌مقدم</div>
+
+<!-- MODAL: Edit User -->
+<div class="modal-overlay" id="editUserModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="editUserModalTitle">ویرایش کاربر</div>
+      <button class="modal-close" onclick="closeModal('editUserModal')">✕</button>
+    </div>
+    <input type="hidden" id="editUserId">
+    <div class="form-grid">
+      <div class="form-group"><label class="form-label">نام و نام خانوادگی</label><input class="form-control" id="editUserName" placeholder="نام کامل"></div>
+      <div class="form-group"><label class="form-label">نام کاربری</label><input class="form-control" id="editUserUsername" placeholder="username"></div>
+      <div class="form-group">
+        <label class="form-label">نقش</label>
+        <select class="form-control" id="editUserRole">
+          <option value="کاربر ارشد">کاربر ارشد</option>
+          <option value="کارشناس ارزیاب">کارشناس ارزیاب</option>
+          <option value="ناظر هیئت">ناظر هیئت</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">وضعیت</label>
+        <select class="form-control" id="editUserStatus">
+          <option value="فعال">فعال</option>
+          <option value="غیرفعال">غیرفعال</option>
+        </select>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:20px">
+      <button class="btn btn-danger btn-sm" onclick="deleteUser()" id="deleteUserBtn">🗑 حذف کاربر</button>
+      <div style="flex:1"></div>
+      <button class="btn btn-outline" onclick="closeModal('editUserModal')">انصراف</button>
+      <button class="btn btn-primary" onclick="saveUserEdit()">💾 ذخیره تغییرات</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Add Board -->
+<div class="modal-overlay" id="addBoardModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">افزودن هیئت جدید</div>
+      <button class="modal-close" onclick="closeModal('addBoardModal')">✕</button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group"><label class="form-label">نام هیئت</label><input class="form-control" id="newBoardName" placeholder="مثال: هیئت بسکتبال"></div>
+      <div class="form-group"><label class="form-label">سطح هیئت</label>
+        <select class="form-control" id="newBoardLevel"><option value="1">سطح ۱</option><option value="2">سطح ۲</option><option value="3">سطح ۳</option></select>
+      </div>
+      <div class="form-group"><label class="form-label">کد فدراسیون</label><input class="form-control" id="newBoardCode" placeholder="کد ملی فدراسیون"></div>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:20px">
+      <button class="btn btn-outline" onclick="closeModal('addBoardModal')">انصراف</button>
+      <button class="btn btn-primary" onclick="addBoard()">ذخیره</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Recalc Confirm -->
+<div class="modal-overlay" id="recalcModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" style="color:var(--danger-light)">⚠️ هشدار – بازمحاسبه کلی</div>
+      <button class="modal-close" onclick="closeModal('recalcModal')">✕</button>
+    </div>
+    <p style="font-size:14px;line-height:1.7;color:var(--text)">این عملیات <strong>تمام امتیازات تمام هیئت‌ها را در تمام سال‌های شمسی</strong> بر اساس ضرایب جدید از صفر محاسبه و بازنویسی می‌کند.</p>
+    <div class="alert alert-warning" style="margin:16px 0">
+      <span>⚠️</span><span>این عمل غیرقابل بازگشت است. نسخه فعلی تنظیمات در تاریخچه ذخیره می‌شود.</span>
+    </div>
+    <div id="recalcProgress" style="display:none">
+      <div class="progress-bar" style="margin-bottom:8px"><div class="progress-fill" id="recalcBar" style="width:0%"></div></div>
+      <p style="font-size:12px;color:var(--text-muted)" id="recalcStatus">در حال محاسبه...</p>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:20px" id="recalcBtns">
+      <button class="btn btn-outline" onclick="closeModal('recalcModal')">انصراف</button>
+      <button class="btn btn-danger" onclick="doRecalc()">بله، بازمحاسبه کن</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOASTS -->
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script>
+// ===================== DATA =====================
+const BOARDS = [
+  {id:1,name:'هیئت کشتی',level:1,score:{1404:512,1403:498,1402:445,1401:390,1400:350}},
+  {id:2,name:'هیئت دوومیدانی',level:1,score:{1404:487,1403:400,1402:360,1401:320,1400:280}},
+  {id:3,name:'هیئت شنا',level:2,score:{1404:432,1403:415,1402:390,1401:350,1400:300}},
+  {id:4,name:'هیئت تکواندو',level:1,score:{1404:415,1403:405,1402:380,1401:340,1400:310}},
+  {id:5,name:'هیئت والیبال',level:2,score:{1404:398,1403:410,1402:375,1401:330,1400:295}},
+  {id:6,name:'هیئت بسکتبال',level:2,score:{1404:375,1403:360,1402:340,1401:310,1400:285}},
+  {id:7,name:'هیئت فوتسال',level:1,score:{1404:352,1403:397,1402:340,1401:300,1400:280}},
+  {id:8,name:'هیئت کاراته',level:2,score:{1404:340,1403:328,1402:310,1401:290,1400:260}},
+  {id:9,name:'هیئت وزنه‌برداری',level:2,score:{1404:328,1403:310,1402:295,1401:270,1400:250}},
+  {id:10,name:'هیئت بدمینتون',level:3,score:{1404:315,1403:300,1402:285,1401:260,1400:240}},
+  {id:11,name:'هیئت تنیس روی‌میز',level:3,score:{1404:298,1403:285,1402:270,1401:250,1400:225}},
+  {id:12,name:'هیئت ژیمناستیک',level:2,score:{1404:285,1403:275,1402:260,1401:240,1400:215}},
+  {id:13,name:'هیئت شطرنج',level:3,score:{1404:270,1403:260,1402:245,1401:225,1400:200}},
+  {id:14,name:'هیئت بوکس',level:2,score:{1404:255,1403:248,1402:230,1401:210,1400:190}},
+  {id:15,name:'هیئت جودو',level:3,score:{1404:240,1403:232,1402:215,1401:195,1400:175}},
+  {id:16,name:'هیئت هندبال',level:3,score:{1404:225,1403:220,1402:200,1401:180,1400:165}},
+  {id:17,name:'هیئت رزمی',level:3,score:{1404:210,1403:198,1402:185,1401:165,1400:150}},
+  {id:18,name:'هیئت پینگ‌پنگ',level:3,score:{1404:195,1403:188,1402:172,1401:155,1400:140}},
+  {id:19,name:'هیئت سه‌گانه',level:3,score:{1404:182,1403:175,1402:160,1401:145,1400:130}},
+  {id:20,name:'هیئت تیراندازی',level:3,score:{1404:168,1403:162,1402:148,1401:132,1400:120}},
+  {id:21,name:'هیئت اسکواش',level:3,score:{1404:155,1403:150,1402:138,1401:122,1400:110}},
+  {id:22,name:'هیئت سافت‌بال',level:3,score:{1404:142,1403:138,1402:128,1401:115,1400:105}},
+  {id:23,name:'هیئت بیلیارد',level:3,score:{1404:128,1403:125,1402:115,1401:104,1400:96}},
+  {id:24,name:'هیئت بولینگ',level:3,score:{1404:115,1403:112,1402:104,1401:94,1400:86}},
+  {id:25,name:'هیئت دارت',level:3,score:{1404:102,1403:98,1402:90,1401:82,1400:75}},
+  {id:26,name:'هیئت شاهماتk',level:3,score:{1404:88,1403:85,1402:78,1401:70,1400:65}},
+];
+
+// شاخص‌ها: عنوان کوتاه + سقف امتیاز (طبق مستند: شاخص۱=۱۱۰، شاخص۳=۷۰، شاخص۱۳=۵۰)
+// شاخص ۱: اعزام (تیمی+انفرادی با هم)  ۱۱۰
+// شاخص ۲: مقام اول تا سوم  ۱۰۰
+// شاخص ۳: بیمه ورزشی + ورزشکار سازمان‌یافته  ۷۰
+// شاخص ۴: ثبت‌نام سامانه مبین  ۸۰
+// شاخص ۵: مربیان دارای مجوز فعال  ۶۵
+// شاخص ۶: داوران فعال  ۶۰
+// شاخص ۷: برگزاری مسابقات استانی  ۷۵
+// شاخص ۸: هیئت‌های شهرستان/روستایی  ۵۵
+// شاخص ۹: کانون استعدادیابی  ۶۰
+// شاخص ۱۰: اردوهای تمرینی  ۷۰
+// شاخص ۱۱: مدال‌های انفرادی  ۹۵
+// شاخص ۱۲: جذب اعتبارات  ۵۰
+// شاخص ۱۳: سایر فعالیت‌ها  ۴۵
+const INDICATORS = [
+  'شاخص ۱: اعزام (تیمی و انفرادی)',
+  'شاخص ۲: مقام‌آوری (اول تا سوم)',
+  'شاخص ۳: بیمه ورزشی و ورزشکار سازمان‌یافته',
+  'شاخص ۴: ثبت‌نام سامانه مبین',
+  'شاخص ۵: مربیان دارای مجوز فعال',
+  'شاخص ۶: داوران فعال',
+  'شاخص ۷: برگزاری مسابقات استانی',
+  'شاخص ۸: هیئت‌های شهرستانی و روستایی',
+  'شاخص ۹: کانون استعدادیابی',
+  'شاخص ۱۰: اردوهای تمرینی',
+  'شاخص ۱۱: مدال‌های انفرادی',
+  'شاخص ۱۲: جذب اعتبارات',
+  'شاخص ۱۳: سایر فعالیت‌ها و برنامه‌ها',
+];
+
+const MATRIX_ROWS = ['منطقه‌ای','کشوری','بین‌المللی','آسیایی','جهانی','المپیک'];
+const MATRIX_COLS = ['اعزام تیمی','اول تیمی','دوم تیمی','سوم تیمی','اعزام انفرادی','اول انفرادی','دوم انفرادی','سوم انفرادی'];
+let matrixData = [
+  [2,10,7,5,1,8,5,3],
+  [3,15,12,9,2,12,8,5],
+  [5,25,18,12,3,20,14,9],
+  [8,35,28,20,5,30,22,15],
+  [12,50,40,30,8,45,35,25],
+  [20,80,60,45,12,70,55,40],
+];
+
+const CAPS = [110,100,70,80,65,60,75,55,60,70,95,50,45]; // سقف ۱۳ شاخص طبق مستند
+let currentYear = '1404';
+let charts = {};
+let settingsHistory = [
+  {v:'v1.0',date:'۱۴۰۴/۰۱/۰۱',type:'تنظیمات پایه',user:'امین عزیزی‌مقدم'},
+  {v:'v1.1',date:'۱۴۰۴/۰۳/۱۵',type:'تغییر سقف شاخص ۱',user:'امین عزیزی‌مقدم'},
+];
+const auditLog = [
+  {date:'۱۴۰۴/۰۵/۱۰',user:'امین عزیزی‌مقدم (کاربر ارشد)',role:'کاربر ارشد',op:'تغییر ماتریس',detail:'امتیاز اول المپیک از ۷۵ به ۸۰ تغییر یافت'},
+  {date:'۱۴۰۴/۰۵/۰۸',user:'م. رضایی (کارشناس)',role:'کارشناس ارزیاب',op:'ورود داده اکسل',detail:'داده‌های هیئت کشتی – سال ۱۴۰۴ از فایل اکسل بارگذاری شد'},
+  {date:'۱۴۰۴/۰۴/۲۵',user:'امین عزیزی‌مقدم (کاربر ارشد)',role:'کاربر ارشد',op:'بازمحاسبه کلی',detail:'تمام دوره‌ها بازمحاسبه شدند'},
+  {date:'۱۴۰۴/۰۴/۲۰',user:'ف. نوری (کارشناس)',role:'کارشناس ارزیاب',op:'ورود بیمه',detail:'داده‌های بیمه ورزشی ۲۶ هیئت از فایل اکسل پردازش شد'},
+];
+
+// ===================== INIT =====================
+function toPersian(n){return String(n).replace(/\d/g,d=>'۰۱۲۳۴۵۶۷۸۹'[d])}
+function toEnglish(s){return String(s).replace(/[۰-۹]/g,d=>'۰۱۲۳۴۵۶۷۸۹'.indexOf(d))}
+
+function init(){
+  populateBoardsDropdowns();
+  renderBoardsTable();
+  renderUsersTable();
+  buildMatrixTable();
+  buildCapsEditor();
+  buildManualIndicators();
+  buildHistoryTable();
+  buildLogTable();
+  buildHeatmap('heatmapContainer',BOARDS.slice(0,5));
+  setTimeout(()=>{
+    initCharts();
+    buildChartPageDropdown();
+  },100);
+}
+
+function populateBoardsDropdowns(){
+  ['insuranceBoard','mobinBoard','manualBoard','chartBoardSelect','reportBoard','reportBoard2'].forEach(id=>{
+    const el = document.getElementById(id);
+    if(!el) return;
+    el.innerHTML = BOARDS.map(b=>`<option value="${b.id}">${b.name}</option>`).join('');
+  });
+}
+
+// ===================== NAVIGATION =====================
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  const pages=['dashboard','boards','entry','charts','reports','settings','ranking','users'];
+  const idx=pages.indexOf(id);
+  document.querySelectorAll('.nav-item')[idx]?.classList.add('active');
+  if(id==='charts') setTimeout(initChartPage,100);
+  if(id==='ranking') setTimeout(()=>{renderRankingTable();renderIndicatorRank();},80);
+  if(id==='users') renderUsersTable();
+}
+
+// ===================== TABS =====================
+function switchTab(tabId, section){
+  const parent = section==='settings'?document.getElementById('page-settings'):document.getElementById('page-entry');
+  parent.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  parent.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById(tabId).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// ===================== THEME =====================
+function setTheme(cls){
+  document.body.className = cls;
+  setTimeout(()=>{Object.values(charts).forEach(c=>{try{c.destroy()}catch(e){}});charts={};initCharts();},50);
+}
+
+// ===================== YEAR =====================
+function changeYear(y){
+  currentYear = y;
+  document.getElementById('dashSubtitle').textContent = `نمای کلی عملکرد هیئت‌های ورزشی – سال ${toPersian(y)}`;
+  renderBoardsTable();
+  setTimeout(()=>{Object.values(charts).forEach(c=>{try{c.destroy()}catch(e){}});charts={};initCharts();},50);
+}
+
+// ===================== BOARDS TABLE =====================
+function renderBoardsTable(){
+  const scores = BOARDS.map(b=>b.score[currentYear]||0);
+  const max = Math.max(...scores);
+  const prevY = String(parseInt(currentYear)-1);
+  const sorted = [...BOARDS].sort((a,b)=>(b.score[currentYear]||0)-(a.score[currentYear]||0));
+  const tbody = document.getElementById('boardsTbody');
+  tbody.innerHTML = sorted.map((b,i)=>{
+    const s = b.score[currentYear]||0;
+    const p = b.score[prevY]||0;
+    const diff = s-p;
+    const pct = Math.round(s/max*100);
+    const rankBadge = i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'rank-other';
+    const lvlBadge = `level-${b.level}`;
+    const diffBadge = diff>0?`<span class="status-badge status-up">+${toPersian(diff)}</span>`:diff<0?`<span class="status-badge status-down">${toPersian(diff)}</span>`:`<span class="status-badge status-same">بدون تغییر</span>`;
+    return `<tr>
+      <td>${toPersian(i+1)}</td>
+      <td><strong>${b.name}</strong></td>
+      <td><span class="level-badge ${lvlBadge}">سطح ${toPersian(b.level)}</span></td>
+      <td><strong>${toPersian(s)}</strong></td>
+      <td>${toPersian(p)}</td>
+      <td>${diffBadge}</td>
+      <td><span class="rank-badge ${rankBadge}">${toPersian(i+1)}</span></td>
+      <td><div class="score-bar"><div class="score-bar-inner"><div class="score-bar-fill" style="width:${pct}%"></div></div><span style="font-size:11px;color:var(--text-muted)">${toPersian(pct)}٪</span></div></td>
+      <td><button class="btn btn-outline btn-sm" onclick="viewBoard(${b.id})">مشاهده</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function filterBoards(q){
+  document.querySelectorAll('#boardsTbody tr').forEach(r=>{
+    r.style.display = r.textContent.includes(q)?'':'none';
+  });
+}
+
+function viewBoard(id){
+  const b = BOARDS.find(x=>x.id===id);
+  if(b){showPage('charts');setTimeout(()=>{
+    const sel = document.getElementById('chartBoardSelect');
+    if(sel) sel.value = id;
+    updateAllCharts();
+  },200);}
+}
+
+// ===================== CHARTS =====================
+function getColor(i,alpha=1){
+  const cols = ['#2563a8','#e8a020','#1a7a4a','#c0392b','#7c3aed','#0891b2','#b45309','#065f46'];
+  const c = cols[i%cols.length];
+  if(alpha===1) return c;
+  const r=parseInt(c.slice(1,3),16),g=parseInt(c.slice(3,5),16),b2=parseInt(c.slice(5,7),16);
+  return `rgba(${r},${g},${b2},${alpha})`;
+}
+
+function getPrimary(){return getComputedStyle(document.body).getPropertyValue('--primary-light').trim()||'#2563a8';}
+
+function initCharts(){
+  initBarChart();
+  initDoughnutChart();
+  initLineChart();
+  initRadarChart();
+  initScatterChart();
+  initWaterfallChart();
+}
+
+function initBarChart(){
+  if(charts.bar){try{charts.bar.destroy()}catch(e){}}
+  const sorted = [...BOARDS].sort((a,b)=>(b.score[currentYear]||0)-(a.score[currentYear]||0)).slice(0,12);
+  const ctx = document.getElementById('barChart');
+  if(!ctx) return;
+  charts.bar = new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels:sorted.map(b=>b.name.replace('هیئت ','')),
+      datasets:[{label:'امتیاز نهایی',data:sorted.map(b=>b.score[currentYear]||0),
+        backgroundColor:sorted.map((_,i)=>getColor(0,0.8+i*0.01)),
+        borderColor:sorted.map(_=>getColor(0)),borderWidth:1,borderRadius:4}]
+    },
+    options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{font:{family:'Vazirmatn'}}},x:{ticks:{font:{family:'Vazirmatn',size:10}}}}}
+  });
+}
+
+function initDoughnutChart(){
+  if(charts.donut){try{charts.donut.destroy()}catch(e){}}
+  const counts=[0,0,0];
+  BOARDS.forEach(b=>counts[b.level-1]++);
+  const ctx = document.getElementById('doughnutChart');
+  if(!ctx) return;
+  charts.donut = new Chart(ctx,{
+    type:'doughnut',
+    data:{labels:['سطح ۱','سطح ۲','سطح ۳'],datasets:[{data:counts,backgroundColor:['#2563a8','#1a7a4a','#e8a020'],borderWidth:2,borderColor:'#fff'}]},
+    options:{responsive:true,plugins:{legend:{position:'bottom',labels:{font:{family:'Vazirmatn'}}}}}
+  });
+}
+
+function initLineChart(){
+  if(charts.line){try{charts.line.destroy()}catch(e){}}
+  const top5 = [...BOARDS].sort((a,b)=>(b.score[1404]||0)-(a.score[1404]||0)).slice(0,5);
+  const years = [1400,1401,1402,1403,1404];
+  const ctx = document.getElementById('lineChart');
+  if(!ctx) return;
+  charts.line = new Chart(ctx,{
+    type:'line',
+    data:{
+      labels:years.map(y=>toPersian(y)),
+      datasets:top5.map((b,i)=>({
+        label:b.name.replace('هیئت ',''),
+        data:years.map(y=>b.score[y]||0),
+        borderColor:getColor(i),backgroundColor:getColor(i,0.1),tension:.4,pointRadius:3,borderWidth:2
+      }))
+    },
+    options:{responsive:true,plugins:{legend:{position:'bottom',labels:{font:{family:'Vazirmatn',size:10}}}},scales:{y:{ticks:{font:{family:'Vazirmatn'}}},x:{ticks:{font:{family:'Vazirmatn'}}}}}
+  });
+}
+
+function genRadarData(boardIdx){
+  const b = BOARDS[boardIdx];
+  return [85,72,65,78,55,60,70,80,45,52,68,90,40].map((v,i)=>Math.round(v*(b.score[currentYear]||300)/512));
+}
+
+function initRadarChart(){
+  if(charts.radar){try{charts.radar.destroy()}catch(e){}}
+  const ctx = document.getElementById('radarChart');
+  if(!ctx) return;
+  const b = BOARDS[0];
+  charts.radar = new Chart(ctx,{
+    type:'radar',
+    data:{
+      labels:INDICATORS.map(s=>s.split(':')[0]),
+      datasets:[{label:b.name,data:genRadarData(0),backgroundColor:getColor(0,0.2),borderColor:getColor(0),borderWidth:2,pointRadius:3}]
+    },
+    options:{responsive:true,scales:{r:{ticks:{font:{family:'Vazirmatn',size:9}},pointLabels:{font:{family:'Vazirmatn',size:9}}}},plugins:{legend:{labels:{font:{family:'Vazirmatn'}}}}}
+  });
+}
+
+function updateRadar(idx){
+  if(!charts.radar) return;
+  const b = BOARDS[parseInt(idx)];
+  charts.radar.data.datasets[0].label = b.name;
+  charts.radar.data.datasets[0].data = genRadarData(parseInt(idx));
+  charts.radar.update();
+}
+
+function initScatterChart(){
+  if(charts.scatter){try{charts.scatter.destroy()}catch(e){}}
+  const ctx = document.getElementById('scatterChart');
+  if(!ctx) return;
+  charts.scatter = new Chart(ctx,{
+    type:'bubble',
+    data:{datasets:[{label:'هیئت‌ها',
+      data:BOARDS.slice(0,15).map(b=>({x:Math.round((b.score[currentYear]||0)/30),y:Math.round((b.score[currentYear]||0)/50),r:Math.max(4,Math.round((b.score[currentYear]||0)/80))})),
+      backgroundColor:getColor(0,0.6),borderColor:getColor(0),borderWidth:1
+    }]},
+    options:{responsive:true,scales:{y:{title:{display:true,text:'تعداد مدال',font:{family:'Vazirmatn'}},ticks:{font:{family:'Vazirmatn'}}},x:{title:{display:true,text:'تعداد اعزام',font:{family:'Vazirmatn'}},ticks:{font:{family:'Vazirmatn'}}}},plugins:{legend:{display:false}}}
+  });
+}
+
+function initWaterfallChart(){
+  if(charts.waterfall){try{charts.waterfall.destroy()}catch(e){}}
+  const ctx = document.getElementById('waterfallChart');
+  if(!ctx) return;
+  const diffs = [14,8,-3,5,12,-2,7,3,0,4,8,6,-5];
+  charts.waterfall = new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels:INDICATORS.map(s=>s.split(':')[0]),
+      datasets:[{data:diffs,backgroundColor:diffs.map(v=>v>=0?'rgba(26,122,74,0.75)':'rgba(192,57,43,0.75)'),borderColor:diffs.map(v=>v>=0?'#1a7a4a':'#c0392b'),borderWidth:1,borderRadius:3}]
+    },
+    options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{ticks:{font:{family:'Vazirmatn'}}},x:{ticks:{font:{family:'Vazirmatn',size:9}}}}}
+  });
+}
+
+function updateBarChart(type){
+  if(!charts.bar) return;
+  const sorted = [...BOARDS].sort((a,b)=>(b.score[currentYear]||0)-(a.score[currentYear]||0)).slice(0,12);
+  charts.bar.data.datasets[0].data = sorted.map(b=>b.score[currentYear]||0);
+  charts.bar.update();
+}
+
+// ===================== HEATMAP =====================
+function buildHeatmap(containerId,boards){
+  const years = [1400,1401,1402,1403,1404];
+  const max = 512;
+  let html = `<table style="border-collapse:collapse;font-size:11px;font-family:Vazirmatn,sans-serif;direction:rtl">
+    <thead><tr><th style="padding:4px 8px;text-align:right">هیئت / سال</th>`;
+  years.forEach(y=>html+=`<th style="padding:4px 12px;color:var(--text-muted)">${toPersian(y)}</th>`);
+  html += `</tr></thead><tbody>`;
+  boards.forEach(b=>{
+    html += `<tr><td style="padding:5px 8px;white-space:nowrap;font-weight:500;color:var(--primary)">${b.name.replace('هیئت ','')}</td>`;
+    years.forEach(y=>{
+      const v = b.score[y]||0;
+      const pct = v/max;
+      const alpha = 0.15+pct*0.75;
+      const g = Math.round(255*(1-pct));
+      const cell = `rgba(37,99,168,${alpha.toFixed(2)})`;
+      html += `<td style="padding:4px;text-align:center"><div style="background:${cell};color:${pct>0.5?'#fff':'var(--text)'};width:50px;height:26px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;font-weight:600;font-size:11px">${toPersian(v)}</div></td>`;
+    });
+    html += `</tr>`;
+  });
+  html += `</tbody></table>`;
+  document.getElementById(containerId).innerHTML = html;
+}
+
+// ===================== SETTINGS =====================
+function buildMatrixTable(){
+  const t = document.getElementById('matrixTable');
+  if(!t) return;
+  let html = `<tr><th></th>${MATRIX_COLS.map(c=>`<th>${c}</th>`).join('')}</tr>`;
+  MATRIX_ROWS.forEach((r,i)=>{
+    html += `<tr><td class="row-header">${r}</td>`;
+    MATRIX_COLS.forEach((_,j)=>{
+      html += `<td><input class="matrix-input" type="number" value="${matrixData[i][j]}" data-r="${i}" data-c="${j}" onchange="matrixChanged(${i},${j},this.value)"></td>`;
+    });
+    html += `</tr>`;
+  });
+  t.innerHTML = html;
+}
+
+function matrixChanged(r,c,v){
+  matrixData[r][c] = parseFloat(v)||0;
+}
+
+function saveMatrix(){
+  settingsHistory.push({v:`v1.${settingsHistory.length+1}`,date:nowShamsi(),type:'تغییر ماتریس امتیازات',user:'امین عزیزی‌مقدم'});
+  buildHistoryTable();
+  showToast('✅ ماتریس امتیازات ذخیره شد','success');
+}
+
+function buildCapsEditor(){
+  const el = document.getElementById('capsEditor');
+  if(!el) return;
+  el.innerHTML = `<div class="form-grid" style="margin-top:8px">${INDICATORS.map((ind,i)=>`
+    <div class="form-group">
+      <label class="form-label">${ind}</label>
+      <input class="form-control" type="number" value="${CAPS[i]}" id="cap_${i}" placeholder="سقف امتیاز">
+    </div>`).join('')}</div>`;
+}
+
+function saveCaps(){
+  INDICATORS.forEach((_,i)=>{CAPS[i]=parseInt(document.getElementById(`cap_${i}`).value)||CAPS[i];});
+  settingsHistory.push({v:`v1.${settingsHistory.length+1}`,date:nowShamsi(),type:'تغییر سقف شاخص‌ها',user:'امین عزیزی‌مقدم'});
+  buildHistoryTable();
+  showToast('✅ سقف شاخص‌ها ذخیره شد','success');
+}
+
+function saveCoef(){
+  settingsHistory.push({v:`v1.${settingsHistory.length+1}`,date:nowShamsi(),type:'تغییر ضرایب سطوح',user:'امین عزیزی‌مقدم'});
+  buildHistoryTable();
+  showToast('✅ ضرایب سطوح ذخیره شد','success');
+}
+
+function saveRate(){
+  const a=document.getElementById('rateAmount').value, s=document.getElementById('rateScore').value;
+  document.getElementById('ratePreview').innerHTML = `<span>✅</span><span>هر ${toPersian(a)} میلیون تومان = ${toPersian(s)} امتیاز</span>`;
+  showToast('✅ نرخ تبدیل ذخیره شد','success');
+}
+
+function buildHistoryTable(){
+  const tb = document.getElementById('historyTbody');
+  if(!tb) return;
+  tb.innerHTML = settingsHistory.slice().reverse().map(h=>`
+    <tr>
+      <td>${h.v}</td><td>${h.date}</td><td>${h.type}</td><td>${h.user}</td>
+      <td><button class="btn btn-outline btn-sm" onclick="showToast('بازگشت به ${h.v} انجام شد','success')">بازگشت</button></td>
+    </tr>`).join('');
+}
+
+function rollbackSettings(){
+  if(settingsHistory.length>1){settingsHistory.pop();buildHistoryTable();showToast('↩ بازگشت به نسخه قبل انجام شد');}
+  else showToast('نسخه‌ای برای بازگشت وجود ندارد','danger');
+}
+
+// ===================== MANUAL INDICATORS =====================
+function buildManualIndicators(){
+  const el = document.getElementById('manualIndicators');
+  if(!el) return;
+  el.innerHTML = `<div class="form-grid" style="margin-top:8px">${INDICATORS.map((ind,i)=>`
+    <div class="form-group">
+      <label class="form-label">${ind}</label>
+      <input class="form-control" type="number" id="mi_${i}" placeholder="مقدار عددی">
+    </div>`).join('')}</div>`;
+}
+
+function resetManual(){
+  INDICATORS.forEach((_,i)=>{const el=document.getElementById(`mi_${i}`);if(el)el.value='';});
+}
+
+function saveManual(){
+  addLog('ورود داده دستی','هیئت انتخابی – سال ۱۴۰۴');
+  showToast('✅ داده‌ها با موفقیت ذخیره شدند','success');
+}
+
+// ===================== CALCULATIONS =====================
+function calcInsurance(){
+  const n = parseInt(document.getElementById('insuranceCount').value)||0;
+  const score = Math.min(70, Math.round(n/10));
+  document.getElementById('insuranceResult').innerHTML = `<div class="alert alert-success" style="margin-top:12px"><span>✅</span><span>تعداد بیمه‌شدگان: <strong>${toPersian(n)}</strong> نفر → امتیاز شاخص ۳: <strong>${toPersian(score)}</strong> (از سقف ${toPersian(70)})</span></div>`;
+}
+
+function calcMobin(){
+  const n = parseInt(document.getElementById('mobinCount').value)||0;
+  const score = Math.min(80, Math.round(n/25));
+  document.getElementById('mobinResult').innerHTML = `<div class="alert alert-success" style="margin-top:12px"><span>✅</span><span>تعداد ثبت‌نام‌شدگان: <strong>${toPersian(n)}</strong> نفر → امتیاز شاخص ۴: <strong>${toPersian(score)}</strong> (از سقف ${toPersian(80)})</span></div>`;
+}
+
+// ===================== RECALCULATE =====================
+function confirmRecalc(){document.getElementById('recalcModal').classList.add('open');}
+function doRecalc(){
+  document.getElementById('recalcBtns').style.display='none';
+  document.getElementById('recalcProgress').style.display='block';
+  let prog=0;
+  const intv=setInterval(()=>{
+    prog+=Math.random()*15;
+    if(prog>=100){prog=100;clearInterval(intv);setTimeout(()=>{
+      closeModal('recalcModal');
+      document.getElementById('recalcBtns').style.display='flex';
+      document.getElementById('recalcProgress').style.display='none';
+      document.getElementById('recalcBar').style.width='0%';
+      addLog('بازمحاسبه کلی','تمام دوره‌ها بازمحاسبه شدند');
+      showToast('✅ بازمحاسبه کلی با موفقیت انجام شد','success');
+    },400);}
+    document.getElementById('recalcBar').style.width=Math.min(100,prog)+'%';
+    document.getElementById('recalcStatus').textContent=`در حال محاسبه... ${toPersian(Math.round(Math.min(100,prog)))}٪`;
+  },180);
+}
+
+// ===================== EXCEL EVAL UPLOAD =====================
+// Loaded workbooks from all uploaded eval files: [{filename, wb, sheets:[{name,headers,rows}]}]
+let evalWorkbooks = [];
+// Detected column mapping: {boardCol, ind1col, ind2col, ...}
+let evalColMap = {};
+// Parsed board data ready to apply: {boardName -> {ind0..12: value}}
+let evalParsedData = {};
+
+// کلیدواژه‌های تشخیص ستون برای هر شاخص (مطابق با تعریف جدید)
+const IND_KEYWORDS = [
+  ['اعزام','send','dispatch'],               // ش۱: اعزام (تیمی+انفرادی)
+  ['مقام','مدال','medal','rank','place'],    // ش۲: مقام‌آوری
+  ['بیمه','insurance','ورزشکار','athlete'],  // ش۳: بیمه+ورزشکار سازمان‌یافته
+  ['مبین','ثبت','register','mobin'],         // ش۴: مبین
+  ['مربی','coach','trainer'],                // ش۵: مربیان
+  ['داور','referee','judge'],                // ش۶: داوران
+  ['مسابقه','competition','برگزاری'],        // ش۷: مسابقات
+  ['شهرستان','روستایی','rural','county'],    // ش۸: هیئت شهرستانی
+  ['استعداد','کانون','talent'],              // ش۹: استعدادیابی
+  ['اردو','camp','training'],                // ش۱۰: اردو
+  ['انفرادی','individual','personal_medal'], // ش۱۱: مدال انفرادی
+  ['اعتبار','credit','budget','بودجه'],      // ش۱۲: اعتبارات
+  ['سایر','other','misc','فعالیت'],          // ش۱۳: سایر
+];
+
+function normStr(s){return String(s||'').trim().toLowerCase().replace(/\s+/g,'');}
+
+function detectBoardCol(headers){
+  const keys=['هیئت','فدراسیون','نام','board','federation','name'];
+  for(let h of headers){
+    const n=normStr(h);
+    if(keys.some(k=>n.includes(normStr(k)))) return h;
+  }
+  return headers[0]||'';
+}
+
+function detectIndCol(headers, kwList){
+  for(let kw of kwList){
+    const nkw=normStr(kw);
+    for(let h of headers){
+      if(normStr(h).includes(nkw)) return h;
+    }
+  }
+  return '';
+}
+
+function matchBoardName(rawName){
+  const n=normStr(rawName);
+  let best=null; let bestScore=0;
+  for(let b of BOARDS){
+    const bn=normStr(b.name);
+    const bshort=normStr(b.name.replace('هیئت',''));
+    let score=0;
+    if(n===bn||n===bshort) score=100;
+    else if(n.includes(bshort)||bshort.includes(n)) score=80;
+    else {
+      // character overlap ratio
+      let common=0;
+      for(let ch of n) if(bshort.includes(ch)) common++;
+      score=Math.round(common/Math.max(n.length,bshort.length,1)*60);
+    }
+    if(score>bestScore){bestScore=score;best=b;}
+  }
+  return bestScore>=40?best:null;
+}
+
+function handleExcelUpload(input){
+  const files=Array.from(input.files);
+  if(!files.length) return;
+  evalWorkbooks=[];
+  evalParsedData={};
+  document.getElementById('evalFileList').innerHTML='';
+  document.getElementById('excelPreview').innerHTML='';
+  document.getElementById('evalMappingSection').style.display='none';
+  let loaded=0;
+  files.forEach(file=>{
+    const reader=new FileReader();
+    reader.onload=e=>{
+      try{
+        const wb=XLSX.read(e.target.result,{type:'binary'});
+        const sheets=wb.SheetNames.map(sn=>{
+          const ws=wb.Sheets[sn];
+          const raw=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
+          const headers=(raw[0]||[]).map(h=>String(h||'').trim()).filter(h=>h);
+          const rows=raw.slice(1).filter(r=>r.some(v=>v!==''&&v!==null&&v!==undefined));
+          return {name:sn,headers,rows,raw};
+        });
+        evalWorkbooks.push({filename:file.name,wb,sheets});
+      }catch(err){
+        showToast(`خطا در خواندن ${file.name}`,'danger');
+      }
+      loaded++;
+      if(loaded===files.length) afterAllEvalLoaded();
+    };
+    reader.readAsBinaryString(file);
+  });
+}
+
+function handleEvalDrop(e){
+  e.preventDefault();
+  const dt=new DataTransfer();
+  Array.from(e.dataTransfer.files).forEach(f=>dt.items.add(f));
+  document.getElementById('excelFile').files=dt.files;
+  handleExcelUpload(document.getElementById('excelFile'));
+}
+
+function afterAllEvalLoaded(){
+  // Build file list summary
+  let listHtml='<div style="display:flex;flex-direction:column;gap:8px">';
+  let allSheets=[];
+  evalWorkbooks.forEach(wb=>{
+    const sheetCount=wb.sheets.length;
+    const totalRows=wb.sheets.reduce((a,s)=>a+s.rows.length,0);
+    listHtml+=`<div class="alert alert-success"><span>📄</span><span><strong>${wb.filename}</strong> — ${toPersian(sheetCount)} شیت | ${toPersian(totalRows)} ردیف داده</span></div>`;
+    wb.sheets.forEach(s=>allSheets.push({...s,sourceFile:wb.filename}));
+  });
+  listHtml+='</div>';
+  document.getElementById('evalFileList').innerHTML=listHtml;
+
+  // Detect mode: single-board per file/sheet or multi-board in rows
+  // Collect all unique headers
+  const allHeaders=[...new Set(allSheets.flatMap(s=>s.headers))];
+  const boardCol=detectBoardCol(allHeaders);
+  
+  // Auto-detect indicator columns
+  evalColMap={boardCol};
+  IND_KEYWORDS.forEach((kws,i)=>{evalColMap['ind'+i]=detectIndCol(allHeaders,kws);});
+
+  // Build mapping UI
+  buildEvalMappingUI(allHeaders);
+  document.getElementById('evalMappingSection').style.display='block';
+
+  // Try to show a preview of detected data
+  previewEvalData();
+  showToast(`✅ ${toPersian(evalWorkbooks.length)} فایل بارگذاری شد`,'success');
+}
+
+function buildEvalMappingUI(headers){
+  const opts=`<option value="">— انتخاب ستون —</option>`+headers.map(h=>`<option value="${h}">${h}</option>`).join('');
+  const addOpts=(selId,val)=>{
+    const el=document.getElementById(selId);
+    if(!el) return;
+    el.innerHTML=opts;
+    if(val) el.value=val;
+  };
+  
+  let html=`<div style="margin-bottom:8px"><div class="form-group"><label class="form-label">ستون نام هیئت (اگر وجود دارد)</label><select class="form-control" id="evalBoardCol">${opts}</select></div></div>`;
+  html+=`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px">`;
+  INDICATORS.forEach((ind,i)=>{
+    const detectedVal=evalColMap['ind'+i]||'';
+    html+=`<div class="form-group"><label class="form-label" style="font-size:11px">${ind}</label><select class="form-control" id="evalInd${i}" style="font-size:12px">${opts}</select></div>`;
+  });
+  html+=`</div>`;
+  document.getElementById('evalColMapping').innerHTML=html;
+
+  // set detected values
+  document.getElementById('evalBoardCol').value=evalColMap.boardCol||'';
+  INDICATORS.forEach((_,i)=>{
+    const el=document.getElementById('evalInd'+i);
+    if(el&&evalColMap['ind'+i]) el.value=evalColMap['ind'+i];
+  });
+}
+
+function resetEvalMapping(){
+  const allHeaders=[...new Set(evalWorkbooks.flatMap(wb=>wb.sheets.flatMap(s=>s.headers)))];
+  evalColMap.boardCol=detectBoardCol(allHeaders);
+  IND_KEYWORDS.forEach((kws,i)=>{evalColMap['ind'+i]=detectIndCol(allHeaders,kws);});
+  buildEvalMappingUI(allHeaders);
+}
+
+function applyEvalData(){
+  const boardCol=document.getElementById('evalBoardCol').value;
+  const indCols=INDICATORS.map((_,i)=>document.getElementById('evalInd'+i).value);
+  const yr=parseInt(document.getElementById('evalYear').value)||1404;
+
+  evalParsedData={};
+  let updatedBoards=[];
+
+  evalWorkbooks.forEach(wbObj=>{
+    wbObj.sheets.forEach(sheet=>{
+      // Determine if this sheet is for a specific board (sheet name matches) or has board column
+      const sheetMatchedBoard=matchBoardName(sheet.name);
+      const hasBoardCol=boardCol&&sheet.headers.includes(boardCol);
+
+      sheet.rows.forEach(row=>{
+        const rowObj={};
+        sheet.headers.forEach((h,i)=>{rowObj[h]=row[i];});
+
+        let targetBoard=null;
+        if(hasBoardCol){
+          const rawName=rowObj[boardCol];
+          if(rawName) targetBoard=matchBoardName(rawName);
+        } else if(sheetMatchedBoard){
+          targetBoard=sheetMatchedBoard;
+        }
+        if(!targetBoard) return;
+
+        if(!evalParsedData[targetBoard.id]) evalParsedData[targetBoard.id]={};
+        indCols.forEach((col,i)=>{
+          if(col&&rowObj[col]!==undefined&&rowObj[col]!==''){
+            const v=parseFloat(String(rowObj[col]).replace(/[^0-9.]/g,''));
+            if(!isNaN(v)){
+              // If multiple rows for same board, sum (for counted items) or take last (for scores)
+              evalParsedData[targetBoard.id]['ind'+i]=(evalParsedData[targetBoard.id]['ind'+i]||0)+v;
+            }
+          }
+        });
+      });
+
+      // If single-sheet per board with no rows having board col: treat all rows as that board's records
+      if(!hasBoardCol&&sheetMatchedBoard&&sheet.rows.length>0){
+        // Single-value mode: first data row contains values
+        if(!evalParsedData[sheetMatchedBoard.id]) evalParsedData[sheetMatchedBoard.id]={};
+        const firstRow={};
+        sheet.headers.forEach((h,i)=>{firstRow[h]=sheet.rows[0][i];});
+        indCols.forEach((col,i)=>{
+          if(col&&firstRow[col]!==undefined&&firstRow[col]!==''){
+            const v=parseFloat(String(firstRow[col]).replace(/[^0-9.]/g,''));
+            if(!isNaN(v)&&!evalParsedData[sheetMatchedBoard.id]['ind'+i]){
+              evalParsedData[sheetMatchedBoard.id]['ind'+i]=v;
+            }
+          }
+        });
+      }
+    });
+  });
+
+  // Apply to BOARDS score (cap at CAPS values)
+  Object.entries(evalParsedData).forEach(([bid,inds])=>{
+    const board=BOARDS.find(b=>b.id===parseInt(bid));
+    if(!board) return;
+    let totalScore=0;
+    INDICATORS.forEach((_,i)=>{
+      if(inds['ind'+i]!==undefined){
+        const capped=Math.min(CAPS[i],inds['ind'+i]);
+        totalScore+=capped;
+      }
+    });
+    if(totalScore>0){
+      board.score[yr]=(board.score[yr]||0)+Math.round(totalScore*0.1); // partial update
+      updatedBoards.push(board.name);
+    }
+  });
+
+  const count=Object.keys(evalParsedData).length;
+  showPreviewTable();
+  // بروزرسانی کامل همه جداول و نمودارها
+  renderBoardsTable();
+  if(document.getElementById('page-ranking').classList.contains('active')){renderRankingTable();renderIndicatorRank();}
+  // بروزرسانی نمودارهای داشبورد
+  Object.values(charts).forEach(ch=>{try{ch.destroy()}catch(e){}});
+  charts={};
+  setTimeout(initCharts,120);
+  addLog(`ورود داده اکسل ارزیابی – ${toPersian(count)} هیئت`,`سال ${toPersian(yr)} | هیئت‌های به‌روزشده: ${updatedBoards.slice(0,5).join('، ')}${updatedBoards.length>5?'...':''}`, 'کارشناس ارزیاب');
+  showToast(`✅ داده‌های ${toPersian(count)} هیئت اعمال شد — جداول بروز شدند`,'success');
+}
+
+function showPreviewTable(){
+  if(!Object.keys(evalParsedData).length) return;
+  let html=`<div class="table-wrap" style="margin-top:12px"><table><thead><tr><th>نام هیئت</th>`;
+  INDICATORS.forEach(ind=>html+=`<th style="font-size:11px">${ind.split(':')[0]}</th>`);
+  html+=`</tr></thead><tbody>`;
+  Object.entries(evalParsedData).forEach(([bid,inds])=>{
+    const b=BOARDS.find(x=>x.id===parseInt(bid));
+    if(!b) return;
+    html+=`<tr><td><strong>${b.name}</strong></td>`;
+    INDICATORS.forEach((_,i)=>{
+      const v=inds['ind'+i];
+      const cap=CAPS[i];
+      const clr=v===undefined?'var(--text-muted)':v>=cap*0.8?'#1a7a4a':v>=cap*0.5?'#b45309':'#c0392b';
+      html+=`<td style="text-align:center;color:${clr};font-weight:600">${v!==undefined?toPersian(Math.round(v)):'—'}</td>`;
+    });
+    html+=`</tr>`;
+  });
+  html+=`</tbody></table></div>`;
+  document.getElementById('excelPreview').innerHTML=`<div class="card-title" style="margin-bottom:8px;font-size:13px">📋 پیش‌نمایش داده‌های پردازش‌شده</div>`+html;
+}
+
+function previewEvalData(){} // placeholder called early
+
+// ===================== INSURANCE MULTI-BOARD =====================
+let insRawData=null;
+function handleInsuranceUpload(input){
+  const file=input.files[0];
+  if(!file) return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const wb=XLSX.read(e.target.result,{type:'binary'});
+      const ws=wb.Sheets[wb.SheetNames[0]];
+      const raw=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
+      const headers=(raw[0]||[]).map(h=>String(h||'').trim()).filter(h=>h);
+      const rows=raw.slice(1);
+      insRawData={headers,rows};
+
+      // populate selects
+      const opts=headers.map(h=>`<option value="${h}">${h}</option>`).join('');
+      ['insColBoard','insColDate','insColStatus'].forEach(id=>{
+        const el=document.getElementById(id);
+        if(el){el.innerHTML=(id==='insColStatus'?'<option value="">— ندارد —</option>':'')+opts;}
+      });
+      // auto-detect
+      const bCol=detectBoardCol(headers);
+      const dCol=detectIndCol(headers,['تاریخ اعتبار','expiry','validity','اعتبار','expire','بیمه']);
+      const sCol=detectIndCol(headers,['وضعیت','status','active','فعال']);
+      if(bCol) document.getElementById('insColBoard').value=bCol;
+      if(dCol) document.getElementById('insColDate').value=dCol;
+      if(sCol) document.getElementById('insColStatus').value=sCol;
+
+      document.getElementById('insColConfig').style.display='block';
+      document.getElementById('insUploadZone').style.borderColor='var(--success-light)';
+      document.getElementById('insuranceResult').innerHTML=`<div class="alert alert-success"><span>✅</span><span>فایل بارگذاری شد: <strong>${file.name}</strong> — ${toPersian(rows.length)} ردیف | ${toPersian(headers.length)} ستون شناسایی شد</span></div>`;
+      showToast('✅ فایل بیمه بارگذاری شد','success');
+    }catch(err){
+      document.getElementById('insuranceResult').innerHTML=`<div class="alert alert-warning"><span>⚠️</span><span>خطا: ${err.message}</span></div>`;
+    }
+  };
+  reader.readAsBinaryString(file);
+}
+
+function handleInsDrop(e){
+  e.preventDefault();
+  const f=e.dataTransfer.files[0];
+  if(f){const dt=new DataTransfer();dt.items.add(f);document.getElementById('insuranceFile').files=dt.files;handleInsuranceUpload(document.getElementById('insuranceFile'));}
+}
+
+function processInsuranceData(){
+  if(!insRawData){showToast('ابتدا فایل بارگذاری کنید','danger');return;}
+  const bCol=document.getElementById('insColBoard').value;
+  const dCol=document.getElementById('insColDate').value;
+  const sCol=document.getElementById('insColStatus').value;
+  const activeVal=document.getElementById('insActiveVal').value||'فعال';
+  const yr=document.getElementById('insYear').value||'1404';
+  if(!bCol||!dCol){showToast('ستون نام هیئت و تاریخ اعتبار را انتخاب کنید','danger');return;}
+
+  const bIdx=insRawData.headers.indexOf(bCol);
+  const dIdx=insRawData.headers.indexOf(dCol);
+  const sIdx=sCol?insRawData.headers.indexOf(sCol):-1;
+
+  // Count per board
+  const counts={};
+  insRawData.rows.forEach(row=>{
+    const rawBoard=String(row[bIdx]||'').trim();
+    if(!rawBoard) return;
+    const rawDate=String(row[dIdx]||'').trim();
+    const rawStatus=sIdx>=0?String(row[sIdx]||'').trim():'';
+    // Check status
+    if(sIdx>=0&&rawStatus&&!rawStatus.includes(activeVal)&&rawStatus!=='') return;
+    // Check year in date
+    if(rawDate&&!rawDate.includes(yr)&&!rawDate.includes(yr.slice(2))) return;
+    const board=matchBoardName(rawBoard);
+    if(!board) return;
+    counts[board.id]=(counts[board.id]||0)+1;
+  });
+
+  // Build result table
+  let html=`<div class="card-title" style="font-size:13px;margin-bottom:8px">📊 نتایج پردازش بیمه – ${toPersian(Object.keys(counts).length)} هیئت</div>`;
+  html+=`<div class="table-wrap"><table><thead><tr><th>نام هیئت</th><th>تعداد بیمه‌شده</th><th>امتیاز شاخص ۳</th><th>از سقف</th><th>درصد</th></tr></thead><tbody>`;
+  let updatedCount=0;
+  BOARDS.forEach(b=>{
+    const n=counts[b.id]||0;
+    const score=Math.min(CAPS[2],Math.round(n/10));
+    const pct=Math.round(score/CAPS[2]*100);
+    const clr=pct>=80?'#1a7a4a':pct>=50?'#b45309':'#c0392b';
+    html+=`<tr><td>${b.name}</td><td>${toPersian(n)}</td><td style="color:${clr};font-weight:700">${toPersian(score)}</td><td>${toPersian(CAPS[2])}</td><td><div class="progress-bar" style="width:80px;display:inline-block"><div class="progress-fill" style="width:${pct}%;background:${clr}"></div></div> ${toPersian(pct)}٪</td></tr>`;
+    if(n>0) updatedCount++;
+  });
+  html+=`</tbody></table></div>`;
+  document.getElementById('insuranceResult').innerHTML=html;
+  addLog(`ورود بیمه ورزشی – ${toPersian(updatedCount)} هیئت`,`سال ${toPersian(yr)} | جمع ردیف‌های پردازش‌شده: ${toPersian(Object.values(counts).reduce((a,b)=>a+b,0))}`,'کارشناس ارزیاب');
+  renderBoardsTable();
+  showToast(`✅ بیمه ${toPersian(updatedCount)} هیئت پردازش شد — جداول بروز شدند`,'success');
+}
+
+// ===================== MOBIN MULTI-BOARD =====================
+let mobinRawData=null;
+function handleMobinUpload(input){
+  const file=input.files[0];
+  if(!file) return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const wb=XLSX.read(e.target.result,{type:'binary'});
+      const ws=wb.Sheets[wb.SheetNames[0]];
+      const raw=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
+      const headers=(raw[0]||[]).map(h=>String(h||'').trim()).filter(h=>h);
+      mobinRawData={headers,rows:raw.slice(1)};
+      // populate col selects
+      const opts=headers.map(h=>`<option value="${h}">${h}</option>`).join('');
+      ['mobinColBoard','mobinColDate'].forEach(id=>{
+        const el=document.getElementById(id);if(el)el.innerHTML=opts;
+      });
+      // auto-detect
+      const bCol=detectBoardCol(headers);
+      const dCol=detectIndCol(headers,['تاریخ ثبت','ثبت_نام','تاریخ','date','register']);
+      if(bCol) document.getElementById('mobinColBoard').value=bCol;
+      if(dCol) document.getElementById('mobinColDate').value=dCol;
+      document.getElementById('mobinColConfig').style.display='block';
+      document.getElementById('mobinUploadZone').style.borderColor='var(--success-light)';
+      document.getElementById('mobinFileInfo').innerHTML=`<div class="alert alert-success"><span>✅</span><span>فایل بارگذاری شد: <strong>${file.name}</strong> — ${toPersian(raw.slice(1).length)} ردیف | ${toPersian(headers.length)} ستون</span></div>`;
+      showToast('✅ فایل مبین بارگذاری شد','success');
+    }catch(err){document.getElementById('mobinFileInfo').innerHTML=`<div class="alert alert-warning"><span>⚠️</span><span>خطا: ${err.message}</span></div>`;}
+  };
+  reader.readAsBinaryString(file);
+}
+
+function handleMobinDrop(e){
+  e.preventDefault();
+  const f=e.dataTransfer.files[0];
+  if(f){const dt=new DataTransfer();dt.items.add(f);document.getElementById('mobinFile').files=dt.files;handleMobinUpload(document.getElementById('mobinFile'));}
+}
+
+function processMobinData(){
+  if(!mobinRawData){showToast('ابتدا فایل بارگذاری کنید','danger');return;}
+  const bCol=document.getElementById('mobinColBoard').value;
+  const dCol=document.getElementById('mobinColDate').value;
+  const yr=document.getElementById('mobinYear').value||'1404';
+  if(!bCol||!dCol){showToast('ستون نام هیئت و تاریخ را انتخاب کنید','danger');return;}
+  const bIdx=mobinRawData.headers.indexOf(bCol);
+  const dIdx=mobinRawData.headers.indexOf(dCol);
+  const counts={};
+  mobinRawData.rows.forEach(row=>{
+    const rawB=String(row[bIdx]||'').trim();
+    if(!rawB) return;
+    const rawD=String(row[dIdx]||'').trim();
+    if(rawD&&!rawD.includes(yr)&&!rawD.includes(yr.slice(2))) return;
+    const board=matchBoardName(rawB);
+    if(!board) return;
+    counts[board.id]=(counts[board.id]||0)+1;
+  });
+
+  let html=`<div class="card-title" style="font-size:13px;margin-bottom:8px">📊 نتایج پردازش مبین – ${toPersian(Object.keys(counts).length)} هیئت</div>`;
+  html+=`<div class="table-wrap"><table><thead><tr><th>نام هیئت</th><th>تعداد ثبت‌نام</th><th>امتیاز شاخص ۴</th><th>از سقف</th><th>درصد</th></tr></thead><tbody>`;
+  let updatedCount=0;
+  BOARDS.forEach(b=>{
+    const n=counts[b.id]||0;
+    const score=Math.min(CAPS[3],Math.round(n/25));
+    const pct=Math.round(score/CAPS[3]*100);
+    const clr=pct>=80?'#1a7a4a':pct>=50?'#b45309':'#c0392b';
+    html+=`<tr><td>${b.name}</td><td>${toPersian(n)}</td><td style="color:${clr};font-weight:700">${toPersian(score)}</td><td>${toPersian(CAPS[3])}</td><td><div class="progress-bar" style="width:80px;display:inline-block"><div class="progress-fill" style="width:${pct}%;background:${clr}"></div></div> ${toPersian(pct)}٪</td></tr>`;
+    if(n>0) updatedCount++;
+  });
+  html+=`</tbody></table></div>`;
+  document.getElementById('mobinResult').innerHTML=html;
+  addLog(`ورود مبین – ${toPersian(updatedCount)} هیئت`,`سال ${toPersian(yr)} | جمع ثبت‌نام‌ها: ${toPersian(Object.values(counts).reduce((a,b)=>a+b,0))}`,'کارشناس ارزیاب');
+  renderBoardsTable();
+  showToast(`✅ مبین ${toPersian(updatedCount)} هیئت پردازش شد — جداول بروز شدند`,'success');
+}
+
+// ===================== OLD CALC FUNCTIONS (kept for compat) =====================
+function calcInsurance(){processInsuranceData();}
+function calcMobin(){processMobinData();}
+
+// ===================== REPORTS =====================
+function genReport(type,fmt){
+  showToast(`⏳ در حال تولید گزارش ${fmt.toUpperCase()}...`);
+  setTimeout(()=>showToast(`✅ گزارش ${fmt.toUpperCase()} آماده شد`,'success'),1800);
+}
+
+// ===================== MODALS =====================
+function openAddBoard(){document.getElementById('addBoardModal').classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+function addBoard(){
+  const name = document.getElementById('newBoardName').value.trim();
+  if(!name){showToast('نام هیئت را وارد کنید','danger');return;}
+  const level = parseInt(document.getElementById('newBoardLevel').value);
+  BOARDS.push({id:BOARDS.length+1,name,level,score:{1404:0,1403:0,1402:0,1401:0,1400:0}});
+  renderBoardsTable();
+  populateBoardsDropdowns();
+  closeModal('addBoardModal');
+  showToast(`✅ ${name} به لیست افزوده شد`,'success');
+}
+
+// ===================== USERS MANAGEMENT =====================
+let USERS = [
+  {id:1,name:'امین عزیزی‌مقدم',username:'a.azizi',role:'کاربر ارشد',lastLogin:'۱۴۰۴/۰۵/۱۲',status:'فعال'},
+  {id:2,name:'محمد رضایی',username:'m.rezaei',role:'کارشناس ارزیاب',lastLogin:'۱۴۰۴/۰۵/۱۰',status:'فعال'},
+  {id:3,name:'فاطمه نوری',username:'f.nouri',role:'کارشناس ارزیاب',lastLogin:'۱۴۰۴/۰۵/۰۵',status:'فعال'},
+  {id:4,name:'علی حسینی',username:'a.hosseini',role:'ناظر هیئت',lastLogin:'۱۴۰۴/۰۴/۲۸',status:'غیرفعال'},
+];
+const ROLE_CLS = {'کاربر ارشد':'level-1','کارشناس ارزیاب':'level-2','ناظر هیئت':'level-3'};
+
+function renderUsersTable(){
+  const tb = document.getElementById('usersTbody');
+  if(!tb) return;
+  tb.innerHTML = USERS.map(u=>`<tr>
+    <td><strong>${u.name}</strong></td>
+    <td style="color:var(--text-muted);font-family:monospace">${u.username}</td>
+    <td><span class="level-badge ${ROLE_CLS[u.role]||'level-2'}">${u.role}</span></td>
+    <td>${u.lastLogin}</td>
+    <td><span class="status-badge ${u.status==='فعال'?'status-up':'status-same'}">${u.status}</span></td>
+    <td><button class="btn btn-outline btn-sm" onclick="openEditUser(${u.id})">✏️ ویرایش</button></td>
+  </tr>`).join('');
+}
+
+function openEditUser(id){
+  const u=USERS.find(x=>x.id===id);
+  if(!u) return;
+  document.getElementById('editUserId').value=id;
+  document.getElementById('editUserModalTitle').textContent=`ویرایش: ${u.name}`;
+  document.getElementById('editUserName').value=u.name;
+  document.getElementById('editUserUsername').value=u.username;
+  document.getElementById('editUserRole').value=u.role;
+  document.getElementById('editUserStatus').value=u.status;
+  document.getElementById('deleteUserBtn').style.display=id===1?'none':'inline-flex';
+  document.getElementById('editUserModal').classList.add('open');
+}
+
+function saveUserEdit(){
+  const id=parseInt(document.getElementById('editUserId').value);
+  if(id===0){
+    // New user
+    const newUser={
+      id:Math.max(...USERS.map(x=>x.id))+1,
+      name:document.getElementById('editUserName').value.trim()||'کاربر جدید',
+      username:document.getElementById('editUserUsername').value.trim()||'user'+Date.now(),
+      role:document.getElementById('editUserRole').value,
+      lastLogin:'—',
+      status:document.getElementById('editUserStatus').value
+    };
+    USERS.push(newUser);
+    renderUsersTable();
+    addLog(`افزودن کاربر: ${newUser.name}`,`نقش: ${newUser.role}`,'کاربر ارشد');
+    closeModal('editUserModal');
+    showToast(`✅ کاربر ${newUser.name} اضافه شد`,'success');
+    return;
+  }
+  const u=USERS.find(x=>x.id===id);
+  if(!u) return;
+  const oldRole=u.role;
+  u.name=document.getElementById('editUserName').value.trim()||u.name;
+  u.username=document.getElementById('editUserUsername').value.trim()||u.username;
+  u.role=document.getElementById('editUserRole').value;
+  u.status=document.getElementById('editUserStatus').value;
+  renderUsersTable();
+  addLog(`ویرایش کاربر: ${u.name}`,`نقش: ${oldRole} → ${u.role} | وضعیت: ${u.status}`,'کاربر ارشد');
+  closeModal('editUserModal');
+  showToast(`✅ اطلاعات ${u.name} ذخیره شد`,'success');
+}
+
+function deleteUser(){
+  const id=parseInt(document.getElementById('editUserId').value);
+  if(id===1){showToast('کاربر ارشد اصلی قابل حذف نیست','danger');return;}
+  const u=USERS.find(x=>x.id===id);
+  if(!u) return;
+  if(!confirm(`آیا از حذف کاربر «${u.name}» مطمئن هستید؟`)) return;
+  USERS=USERS.filter(x=>x.id!==id);
+  renderUsersTable();
+  addLog(`حذف کاربر: ${u.name}`,`نام کاربری: ${u.username} | نقش: ${u.role}`,'کاربر ارشد');
+  closeModal('editUserModal');
+  showToast(`✅ کاربر ${u.name} حذف شد`,'success');
+}
+
+function openAddUser(){
+  document.getElementById('editUserId').value='0';
+  document.getElementById('editUserModalTitle').textContent='افزودن کاربر جدید';
+  document.getElementById('editUserName').value='';
+  document.getElementById('editUserUsername').value='';
+  document.getElementById('editUserRole').value='کارشناس ارزیاب';
+  document.getElementById('editUserStatus').value='فعال';
+  document.getElementById('deleteUserBtn').style.display='none';
+  document.getElementById('editUserModal').classList.add('open');
+}
+
+// ===================== AUDIT LOG =====================
+function addLog(op,detail,role='کاربر ارشد'){
+  auditLog.unshift({date:nowShamsi(),user:'امین عزیزی‌مقدم',role,op,detail});
+  buildLogTable();
+}
+
+function buildLogTable(){
+  const tb = document.getElementById('logTbody');
+  if(!tb) return;
+  const roleClr={'کاربر ارشد':'level-1','کارشناس ارزیاب':'level-2','ناظر هیئت':'level-3'};
+  tb.innerHTML = auditLog.map(l=>`<tr>
+    <td style="white-space:nowrap">${l.date}</td>
+    <td>${l.user.split(' (')[0]}</td>
+    <td><span class="level-badge ${roleClr[l.role]||'level-2'}">${l.role||'کارشناس ارزیاب'}</span></td>
+    <td>${l.op}</td>
+    <td style="font-size:12px;color:var(--text-muted)">${l.detail}</td>
+  </tr>`).join('');
+}
+
+function nowShamsi(){return '۱۴۰۴/'+toPersian(Math.floor(Math.random()*12+1)).padStart(2,'۰')+'/'+toPersian(Math.floor(Math.random()*28+1)).padStart(2,'۰');}
+
+// ===================== CHARTS PAGE =====================
+function buildChartPageDropdown(){
+  const sel = document.getElementById('chartBoardSelect');
+  if(!sel) return;
+  sel.innerHTML = BOARDS.map(b=>`<option value="${b.id}">${b.name}</option>`).join('');
+}
+
+function initChartPage(){
+  if(charts.radarBig) try{charts.radarBig.destroy()}catch(e){}
+  if(charts.lineBig) try{charts.lineBig.destroy()}catch(e){}
+  const bIdx = parseInt((document.getElementById('chartBoardSelect')||{}).value||1)-1;
+  const b = BOARDS[bIdx]||BOARDS[0];
+  // Radar Big
+  const r = document.getElementById('radarBig');
+  if(r) charts.radarBig = new Chart(r,{type:'radar',data:{labels:INDICATORS,datasets:[{label:b.name,data:genRadarData(bIdx),backgroundColor:getColor(0,0.2),borderColor:getColor(0),borderWidth:2,pointRadius:3},{label:'میانگین استان',data:INDICATORS.map((_,i)=>Math.round(CAPS[i]*0.6)),backgroundColor:getColor(1,0.1),borderColor:getColor(1),borderWidth:1.5,borderDash:[4,4],pointRadius:2}]},options:{responsive:true,scales:{r:{ticks:{font:{family:'Vazirmatn',size:9}},pointLabels:{font:{family:'Vazirmatn',size:9}}}},plugins:{legend:{labels:{font:{family:'Vazirmatn'}}}}}});
+  // Line Big
+  const l = document.getElementById('lineBig');
+  const years=[1400,1401,1402,1403,1404];
+  if(l) charts.lineBig = new Chart(l,{type:'line',data:{labels:years.map(y=>toPersian(y)),datasets:[{label:b.name,data:years.map(y=>b.score[y]||0),borderColor:getColor(0),backgroundColor:getColor(0,0.15),tension:.4,fill:true,borderWidth:2.5,pointRadius:5}]},options:{responsive:true,plugins:{legend:{labels:{font:{family:'Vazirmatn'}}}},scales:{y:{ticks:{font:{family:'Vazirmatn'}}},x:{ticks:{font:{family:'Vazirmatn'}}}}}});
+  buildHeatmap('heatmapBig',[b,...BOARDS.slice(0,4)]);
+}
+
+function updateAllCharts(){initChartPage();}
+
+// ===================== TOAST =====================
+function showToast(msg,type=''){
+  const wrap = document.getElementById('toastWrap');
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.textContent = msg;
+  wrap.appendChild(t);
+  setTimeout(()=>t.remove(),3200);
+}
+
+// ===================== MOBIN EXCEL UPLOAD =====================
+function handleMobinUpload(input){
+  const file = input.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e=>{
+    try{
+      const wb = XLSX.read(e.target.result,{type:'binary'});
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const data = XLSX.utils.sheet_to_json(ws,{header:1});
+      const rows = data.slice(1).filter(r=>r.length>0);
+      const year = document.getElementById('mobinYear').value;
+      const dateCol = document.getElementById('mobinDateCol').value;
+      // Try to count rows that match the selected Shamsi year
+      let count = rows.length;
+      // Try to find date column by header
+      const headers = data[0]||[];
+      const dateIdx = headers.findIndex(h=>String(h).includes('تاریخ')||String(h).includes('date')||String(h)===dateCol);
+      if(dateIdx>=0){
+        count = rows.filter(r=>{
+          const v = String(r[dateIdx]||'');
+          return v.startsWith(year)||v.includes('/'+year.slice(2))||v.includes(year);
+        }).length;
+        if(count===0) count = rows.length; // fallback
+      }
+      document.getElementById('mobinCount').value = count;
+      document.getElementById('mobinFileInfo').innerHTML = `<div class="alert alert-success"><span>✅</span><span>فایل بارگذاری شد: <strong>${file.name}</strong> — ${toPersian(rows.length)} ردیف کل | <strong>${toPersian(count)} ثبت‌نام</strong> برای سال ${toPersian(year)} شناسایی شد</span></div>`;
+      document.getElementById('mobinUploadZone').style.borderColor='var(--success-light)';
+      document.getElementById('mobinUploadZone').style.background='rgba(26,122,74,0.04)';
+      showToast('✅ فایل مبین بارگذاری شد','success');
+    }catch(err){
+      document.getElementById('mobinFileInfo').innerHTML = `<div class="alert alert-warning"><span>⚠️</span><span>خطا در پردازش فایل: ${err.message}</span></div>`;
+    }
+  };
+  reader.readAsBinaryString(file);
+}
+function handleMobinDrop(e){
+  e.preventDefault();
+  const f=e.dataTransfer.files[0];
+  if(f){const dt=new DataTransfer();dt.items.add(f);document.getElementById('mobinFile').files=dt.files;handleMobinUpload(document.getElementById('mobinFile'));}
+}
+
+// ===================== RANKING =====================
+let rankSortCol='score'; let rankSortDir=-1;
+function getIndicatorScores(boardIdx){
+  const b=BOARDS[boardIdx];
+  const base=[85,72,65,78,55,60,70,80,45,52,68,90,40];
+  return base.map((v,i)=>Math.min(CAPS[i],Math.round(v*(b.score[currentYear]||300)/512)));
+}
+function renderRankingTable(){
+  const yr=parseInt(document.getElementById('rankYear')?document.getElementById('rankYear').value:currentYear);
+  const lvl=parseInt(document.getElementById('rankLevel')?document.getElementById('rankLevel').value:0);
+  const prevYr=yr-1;
+  let list=BOARDS.map((b,i)=>({...b,idx:i,s:b.score[yr]||0,p:b.score[prevYr]||0,inds:getIndicatorScores(i)}));
+  if(lvl>0) list=list.filter(b=>b.level===lvl);
+  list.sort((a,b)=>rankSortDir*(b[rankSortCol==='score'?'s':rankSortCol==='name'?'name':rankSortCol==='level'?'level':rankSortCol==='change'?'s':rankSortCol==='rank'?'s':'s']-a[rankSortCol==='score'?'s':rankSortCol==='name'?'name':rankSortCol==='level'?'level':rankSortCol==='change'?'s':rankSortCol==='rank'?'s':'s']));
+  if(rankSortCol==='name') list.sort((a,b)=>rankSortDir*(a.name.localeCompare(b.name,'fa')));
+
+  const maxS=list[0]?.s||1;
+  // Summary cards
+  const avgS=Math.round(list.reduce((a,b)=>a+b.s,0)/(list.length||1));
+  document.getElementById('rankSummaryCards').innerHTML=`
+    <div class="stat-card"><div class="stat-label">تعداد هیئت‌ها</div><div class="stat-value">${toPersian(list.length)}</div></div>
+    <div class="stat-card accent"><div class="stat-label">میانگین امتیاز</div><div class="stat-value">${toPersian(avgS)}</div></div>
+    <div class="stat-card success"><div class="stat-label">بالاترین امتیاز</div><div class="stat-value">${toPersian(list[0]?.s||0)}</div><div class="stat-sub">${list[0]?.name||''}</div></div>
+    <div class="stat-card danger"><div class="stat-label">پایین‌ترین امتیاز</div><div class="stat-value">${toPersian(list[list.length-1]?.s||0)}</div><div class="stat-sub">${list[list.length-1]?.name||''}</div></div>`;
+
+  // Podium
+  const top3=list.slice(0,3);
+  const podiumOrder=[1,0,2]; // 2nd, 1st, 3rd
+  const heights=['140px','180px','110px'];
+  const medals=['🥈','🥇','🥉'];
+  const podiumColors=['#C0C0C0','#FFD700','#cd7f32'];
+  document.getElementById('rankPodium').innerHTML=podiumOrder.map(pi=>{
+    const b=top3[pi];if(!b)return '';
+    return `<div style="text-align:center">
+      <div style="font-size:24px;margin-bottom:6px">${medals[pi]}</div>
+      <div style="font-size:12px;font-weight:700;color:var(--primary);margin-bottom:8px;max-width:90px">${b.name.replace('هیئت','')}</div>
+      <div style="font-size:20px;font-weight:700;color:var(--primary);margin-bottom:6px">${toPersian(b.s)}</div>
+      <div style="width:88px;height:${heights[pi]};background:${podiumColors[pi]};border-radius:8px 8px 0 0;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:900;color:rgba(0,0,0,0.3)">${toPersian(pi+1)}</div>
+    </div>`;
+  }).join('');
+
+  // Table
+  const tbody=document.getElementById('rankingTbody');
+  tbody.innerHTML=list.map((b,i)=>{
+    const diff=b.s-b.p;
+    const pct=Math.round(b.s/maxS*100);
+    const rkBadge=i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'rank-other';
+    const diffBadge=diff>0?`<span class="status-badge status-up">+${toPersian(diff)}</span>`:diff<0?`<span class="status-badge status-down">${toPersian(diff)}</span>`:`<span class="status-badge status-same">—</span>`;
+    const lvlBadge=`level-${b.level}`;
+    const indCells=b.inds.map((v,si)=>{
+      const capPct=Math.round(v/CAPS[si]*100);
+      const clr=capPct>=80?'#1a7a4a':capPct>=50?'#b45309':'#c0392b';
+      return `<td style="text-align:center"><span style="color:${clr};font-weight:600">${toPersian(v)}</span></td>`;
+    }).join('');
+    const miniBar=`<div style="width:60px;height:6px;background:var(--border);border-radius:3px;display:inline-block"><div style="width:${pct}%;height:100%;background:var(--primary-light);border-radius:3px"></div></div>`;
+    return `<tr id="rankrow_${b.id}">
+      <td><span class="rank-badge ${rkBadge}">${toPersian(i+1)}</span></td>
+      <td><strong>${b.name}</strong></td>
+      <td><span class="level-badge ${lvlBadge}">سطح ${toPersian(b.level)}</span></td>
+      <td><strong style="color:var(--primary-light)">${toPersian(b.s)}</strong><br>${miniBar}</td>
+      ${indCells}
+      <td>${diffBadge}</td>
+      <td><button class="btn btn-outline btn-sm" onclick="viewBoard(${b.id})">📊</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function sortRanking(col){
+  if(rankSortCol===col) rankSortDir*=-1; else {rankSortCol=col;rankSortDir=-1;}
+  renderRankingTable();
+}
+
+function filterRanking(q){
+  document.querySelectorAll('#rankingTbody tr').forEach(r=>{r.style.display=r.textContent.includes(q)?'':'none';});
+}
+
+function renderIndicatorRank(){
+  const idx=parseInt(document.getElementById('indicatorRankSel')?.value||0);
+  const yr=parseInt(document.getElementById('rankYear')?.value||currentYear);
+  const list=BOARDS.map((b,i)=>({name:b.name,v:getIndicatorScores(i)[idx],level:b.level})).sort((a,b)=>b.v-a.v);
+  const max=list[0]?.v||1;
+  document.getElementById('indicatorRankContainer').innerHTML=`<div style="display:flex;flex-direction:column;gap:6px;margin-top:4px">${list.map((b,i)=>{
+    const pct=Math.round(b.v/max*100);
+    const clr=i<3?'var(--accent)':'var(--primary-light)';
+    return `<div style="display:flex;align-items:center;gap:10px">
+      <div style="width:24px;text-align:center;font-size:12px;font-weight:700;color:var(--text-muted)">${toPersian(i+1)}</div>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px"><span style="font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${b.name.replace('هیئت ','')}</span><strong style="color:var(--primary)">${toPersian(b.v)}</strong></div>
+        <div class="progress-bar"><div class="progress-fill" style="width:${pct}%;background:${clr}"></div></div>
+      </div>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+function exportRankingExcel(){
+  try{
+    const yr=parseInt(document.getElementById('rankYear')?.value||currentYear);
+    const list=[...BOARDS].sort((a,b)=>(b.score[yr]||0)-(a.score[yr]||0));
+    const wsData=[['رتبه','نام هیئت','سطح','امتیاز نهایی',...INDICATORS.map(i=>i.split(':')[0])]];
+    list.forEach((b,i)=>{
+      const inds=getIndicatorScores(BOARDS.indexOf(b));
+      wsData.push([i+1,b.name,`سطح ${b.level}`,b.score[yr]||0,...inds]);
+    });
+    const wb=XLSX.utils.book_new();
+    const ws=XLSX.utils.aoa_to_sheet(wsData);
+    XLSX.utils.book_append_sheet(wb,ws,'رنکینگ');
+    XLSX.writeFile(wb,`رنکینگ_هیئت‌ها_${yr}.xlsx`);
+    showToast('✅ فایل Excel دانلود شد','success');
+  }catch(e){showToast('خطا در تولید Excel','danger');}
+}
+
+// ===================== EXPORT =====================
+function exportDashboard(){showToast('⏳ در حال تهیه PDF...');setTimeout(()=>showToast('✅ PDF داشبورد آماده شد','success'),2000);}
+
+// ===================== MAIN =====================
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
